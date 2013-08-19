@@ -1,0 +1,7 @@
+parameters:
+#    silvanus_sync.example.class: Silvanus\SyncBundle\Example
+
+services:
+#    silvanus_sync.example:
+#        class: %silvanus_sync.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

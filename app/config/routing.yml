@@ -1,0 +1,9 @@
+silvanus_sync:
+    resource: "@SilvanusSyncBundle/Resources/config/routing.yml"
+    prefix:   /
+
+
+silvanus_firewall_rules:
+    resource: "@SilvanusFirewallRulesBundle/Resources/config/routing.yml"
+    prefix:   /
+

@@ -1,0 +1,7 @@
+#silvanus_firewall_rules_homepage:
+#    pattern:  /hello/{name}
+#    defaults: { _controller: SilvanusFirewallRulesBundle:Default:index }
+
+silvanus_firewall_rules:
+    resource: "@SilvanusFirewallRulesBundle/Resources/config/routing/firewallrules.yml"
+    prefix:   /firewallrules

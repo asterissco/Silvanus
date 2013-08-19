@@ -1,0 +1,7 @@
+parameters:
+#    silvanus_firewall_rules.example.class: Silvanus\FirewallRulesBundle\Example
+
+services:
+#    silvanus_firewall_rules.example:
+#        class: %silvanus_firewall_rules.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
