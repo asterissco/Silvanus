@@ -39,6 +39,7 @@ class SyncCommand extends ContainerAwareCommand
 	
 		foreach($entities as $entity){
 		
+			exec('iptables -F');
 			exec($entity->getRule());
 		
 			$output->writeln($entity->getRule());
