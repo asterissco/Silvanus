@@ -16,9 +16,9 @@
 {% block body -%}
 
 
-    <h1>FirewallRules list</h1>
+    <div class="page-header"><h1>Firewall rules list</h1></div>
 
-    <table class="records_list">
+    <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
@@ -32,27 +32,17 @@
                 <td><a href="{{ path('firewallrules_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.rule }}</td>
                 <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('firewallrules_show', { 'id': entity.id }) }}">show</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('firewallrules_edit', { 'id': entity.id }) }}">edit</a>
-                    </li>
-                </ul>
+                
+                        <button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button>
+                        <button class="btn btn-warning "  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id }) }}'">Edit</button>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-        <ul>
-        <li>
-            <a href="{{ path('firewallrules_new') }}">
-                Create a new entry
-            </a>
-        </li>
-    </ul>
+			
+            <button class="btn btn-success" onclick="window.location.href='{{ path('firewallrules_new') }}'">New rule</button>
 
 {% endblock %}
 

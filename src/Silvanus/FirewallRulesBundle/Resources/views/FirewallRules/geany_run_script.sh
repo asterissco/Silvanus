@@ -2,7 +2,7 @@
 
 rm $0
 
-./new.html
+./edit.html
 
 echo "
 

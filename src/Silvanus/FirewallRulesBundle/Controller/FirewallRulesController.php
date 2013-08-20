@@ -119,6 +119,9 @@ class FirewallRulesController extends Controller
      */
     public function updateAction(Request $request, $id)
     {
+		
+		
+		
         $em = $this->getDoctrine()->getManager();
 
         $entity = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->find($id);
@@ -132,6 +135,8 @@ class FirewallRulesController extends Controller
         $editForm->submit($request);
 
         if ($editForm->isValid()) {
+			
+			
             $em->persist($entity);
             $em->flush();
 
