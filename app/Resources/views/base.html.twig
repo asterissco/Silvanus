@@ -3,11 +3,27 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+			<link rel="STYLESHEET" type="text/css" href="{{ asset('bundles/silvanus/css/bootstrap.min.css') }}"></link> 
+        {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+
+
+			<script type="text/javascript" src="{{ asset('bundles/silvanus/js/jquery-2.0.3.min.js') }}"></script>
+			<script type="text/javascript" src="{{ asset('bundles/silvanus/js/bootstrap.min.js') }}"></script>		
+
+		
     </head>
     <body>
+        
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+
+		{% block content %} {% endblock %}
+
+		{% block javascripts %}{% endblock %}
+		
+		
+		
+		
     </body>
 </html>

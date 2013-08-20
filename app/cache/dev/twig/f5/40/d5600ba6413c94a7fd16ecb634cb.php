@@ -13,6 +13,7 @@ class __TwigTemplate_f540d5600ba6413c94a7fd16ecb634cb extends Twig_Template
             'title' => array($this, 'block_title'),
             'stylesheets' => array($this, 'block_stylesheets'),
             'body' => array($this, 'block_body'),
+            'content' => array($this, 'block_content'),
             'javascripts' => array($this, 'block_javascripts'),
         );
     }
@@ -31,20 +32,44 @@ class __TwigTemplate_f540d5600ba6413c94a7fd16ecb634cb extends Twig_Template
         ";
         // line 6
         $this->displayBlock('stylesheets', $context, $blocks);
-        // line 7
+        // line 9
         echo "        <link rel=\"icon\" type=\"image/x-icon\" href=\"";
         echo twig_escape_filter($this->env, $this->env->getExtension('assets')->getAssetUrl("favicon.ico"), "html", null, true);
         echo "\" />
+
+
+\t\t\t<script type=\"text/javascript\" src=\"";
+        // line 12
+        echo twig_escape_filter($this->env, $this->env->getExtension('assets')->getAssetUrl("bundles/silvanus/js/jquery-2.0.3.min.js"), "html", null, true);
+        echo "\"></script>
+\t\t\t<script type=\"text/javascript\" src=\"";
+        // line 13
+        echo twig_escape_filter($this->env, $this->env->getExtension('assets')->getAssetUrl("bundles/silvanus/js/bootstrap.min.js"), "html", null, true);
+        echo "\"></script>\t\t
+
+\t\t
     </head>
     <body>
+        
         ";
-        // line 10
+        // line 19
         $this->displayBlock('body', $context, $blocks);
-        // line 11
-        echo "        ";
+        // line 20
+        echo "
+\t\t";
+        // line 21
+        $this->displayBlock('content', $context, $blocks);
+        // line 22
+        echo "
+\t\t";
+        // line 23
         $this->displayBlock('javascripts', $context, $blocks);
-        // line 12
-        echo "    </body>
+        // line 24
+        echo "\t\t
+\t\t
+\t\t
+\t\t
+    </body>
 </html>
 ";
     }
@@ -58,14 +83,25 @@ class __TwigTemplate_f540d5600ba6413c94a7fd16ecb634cb extends Twig_Template
     // line 6
     public function block_stylesheets($context, array $blocks = array())
     {
+        // line 7
+        echo "\t\t\t<link rel=\"STYLESHEET\" type=\"text/css\" href=\"";
+        echo twig_escape_filter($this->env, $this->env->getExtension('assets')->getAssetUrl("bundles/silvanus/css/bootstrap.min.css"), "html", null, true);
+        echo "\"></link> 
+        ";
     }
 
-    // line 10
+    // line 19
     public function block_body($context, array $blocks = array())
     {
     }
 
-    // line 11
+    // line 21
+    public function block_content($context, array $blocks = array())
+    {
+        echo " ";
+    }
+
+    // line 23
     public function block_javascripts($context, array $blocks = array())
     {
     }
@@ -82,6 +118,6 @@ class __TwigTemplate_f540d5600ba6413c94a7fd16ecb634cb extends Twig_Template
 
     public function getDebugInfo()
     {
-        return array (  69 => 11,  59 => 6,  53 => 5,  47 => 12,  42 => 10,  35 => 7,  33 => 6,  29 => 5,  23 => 1,  89 => 36,  82 => 31,  70 => 25,  64 => 10,  57 => 18,  51 => 17,  48 => 16,  44 => 11,  31 => 4,  28 => 3,);
+        return array (  105 => 23,  99 => 21,  94 => 19,  87 => 7,  84 => 6,  78 => 5,  68 => 24,  66 => 23,  63 => 22,  61 => 21,  58 => 20,  56 => 19,  47 => 13,  43 => 12,  36 => 9,  34 => 6,  30 => 5,  24 => 1,);
     }
 }
