@@ -3,12 +3,15 @@
 namespace Silvanus\FirewallRulesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * FirewallRules
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\FirewallRulesBundle\Entity\FirewallRulesRepository")
+ * @UniqueEntity("priority")
+ * @UniqueEntity("rule")
  */
 class FirewallRules
 {
@@ -27,6 +30,13 @@ class FirewallRules
      * @ORM\Column(name="rule", type="string", length=255)
      */
     private $rule;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="priority", type="integer")
+     */
+    private $priority;
 
 
     /**
@@ -60,5 +70,28 @@ class FirewallRules
     public function getRule()
     {
         return $this->rule;
+    }
+
+    /**
+     * Set priority
+     *
+     * @param integer $priority
+     * @return FirewallRules
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    
+        return $this;
+    }
+
+    /**
+     * Get priority
+     *
+     * @return integer 
+     */
+    public function getPriority()
+    {
+        return $this->priority;
     }
 }

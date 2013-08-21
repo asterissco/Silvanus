@@ -8,7 +8,7 @@
         {% if errors|length > 0 %}
 
             {% for error in errors %}
-                <span class="label label-danger">{{ error.message }}</span>
+                <div class="label label-danger">{{ error.message }}</div>
             {% endfor %}
         
         {% endif %}
@@ -16,54 +16,39 @@
 {% endblock form_errors %}
 
 {% block form_row %}
-    <div class="form_row">
-        {{ form_label(form) }}
-        {{ form_errors(form) }}
-        {{ form_widget(form) }}
+    
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12">{{ form_label(form) }}</div>
+			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>
+			
+		</div>
     </div>
+    
 {% endblock form_row %}
 
 {% block body -%}
 
 
     
-    <div class="page-header"><h1>Edit firewall rule</h1></div>
+    <div class="page-header"><h1>Firewall <small>edit rule</small></h1></div>
 			
 		
 			<form action="{{ path('firewallrules_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }} class="form-vertical">
-				<input type="hidden" name="_method" value="PUT" />
-
-					
-				<div class="row">	
-					
-					<div class="col-md-10">	
-						<div class="form-group">
-							
-							<label for="inputEmail1" class="control-label">Rule</label>
-								
-							{{ form_widget(edit_form.rule, {'attr': {'class':'form-control input-md' }}) }}
-							{{ form_errors(edit_form) }}
-							
-						</div>
-					</div>	
-					
-					{# {{ form_row(edit_form._token) }} #}
-					
-					<br>
+				{{ form_widget(edit_form) }}
+				<p>
+					<button class="btn btn-success" type="submit">Update</button>
+				</p>
 				
-				
-				</div>
-				
-				<button class="btn btn-success" type="submit">Edit</button>
-					
-
-				
-				
+			
 			</form>
 		
 
 		<div class="col-md-12">	
 				<br><br>
+				
 				<div class="col-md-1">	
 				
 					<form action="{{ path('firewallrules_delete', { 'id': entity.id }) }}" method="post" class="form-inline">
@@ -74,10 +59,10 @@
 					</form>
 
 				</div>
-
 				<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules') }}'">Back</button>
+				
 			
-			</div>
+		</div>
               
 
 {% endblock %}

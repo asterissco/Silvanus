@@ -155,6 +155,8 @@ class FirewallRulesController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
+
+	/*
         $form = $this->createDeleteForm($id);
         $form->submit($request);
 
@@ -171,6 +173,22 @@ class FirewallRulesController extends Controller
         }
 
         return $this->redirect($this->generateUrl('firewallrules'));
+    
+    */
+ 
+		$em = $this->getDoctrine()->getManager();
+		$entity = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->find($id);
+
+		if (!$entity) {
+			throw $this->createNotFoundException('Unable to find FirewallRules entity.');
+		}
+
+		$em->remove($entity);
+		$em->flush();
+
+        return $this->redirect($this->generateUrl('firewallrules'));
+ 
+ 
     }
 
     /**

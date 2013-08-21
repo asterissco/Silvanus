@@ -15,7 +15,9 @@ class FirewallRulesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('rule');
+            ->add('rule')
+			->add('priority')
+		;
     }
 
     /**

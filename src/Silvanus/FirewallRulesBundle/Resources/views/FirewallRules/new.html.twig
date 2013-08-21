@@ -1,20 +1,62 @@
 {% extends '::base.html.twig' %}
 
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+		
+		});
+	
+	</script>
+
+{% endblock %}
+
+{% form_theme form _self %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12">{{ form_label(form) }}</div>
+			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>
+			
+		</div>
+    </div>
+    
+{% endblock form_row %}
+
 {% block body -%}
-    <h1>FirewallRules creation</h1>
+
+    <div class="page-header"><h1>Firewall <small>create new rule</small></h1></div>
 
     <form action="{{ path('firewallrules_create') }}" method="post" {{ form_enctype(form) }}>
         {{ form_widget(form) }}
         <p>
-            <button type="submit">Create</button>
+            <button class="btn btn-success" type="submit">Create</button>
         </p>
     </form>
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('firewallrules') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
+	<div class="col-md-12">	
+			<br><br>
+			
+			<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules') }}'">Back</button>
+		
+	</div>
+
 {% endblock %}
