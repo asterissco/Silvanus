@@ -37,17 +37,111 @@ class FirewallRulesController extends Controller
      */
     public function createAction(Request $request)
     {
+		
+		//get form values
+		$arrForm=$this->get('request')->request->get('silvanus_firewallrulesbundle_firewallrulestype');
+		
         $entity  = new FirewallRules();
         $form = $this->createForm(new FirewallRulesCreateType(), $entity);
         $form->submit($request);
 
         if ($form->isValid()) {
+
+			/*
+			 * Force option mechanism
+			 * 
+			 * */			
+			if(isset($arrForm['append'])){
+			
+				//get last priority
+				$firewallRepository	= $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
+				
+				$query = $firewallRepository->createQueryBuilder('f')
+					->orderBy('f.priority','desc')
+					->setFirstResult( 0 )
+					->setMaxResults( 1 )
+					->getQuery();
+			
+				$lastEntity=$query->getSingleResult();
+
+				if(!$lastEntity){
+					
+					$entity->setPriority(1);
+					
+				}else{
+				
+					$entity->setPriority($lastEntity->getPriority()+1);
+					
+				}
+						
+			}
+
+			
+            
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
 
             return $this->redirect($this->generateUrl('firewallrules_show', array('id' => $entity->getId())));
-        }
+        
+        }else{
+
+			/*
+			 * Force option mechanism
+			 * 
+			 * */
+			if(isset($arrForm['force'])){
+
+				/*
+				 * Get the priority errors
+				 * 
+				 * */
+				foreach ($form->get('priority')->getErrors() as $err){
+					
+					$priorityError=$err->getMessageTemplate();
+					
+				}
+			
+				
+				/*
+				 * If is true this condition, move the priority value of rules +1
+				 * 
+				 * */
+				if($priorityError=='This value is already used.' 
+					and count($form->get('rule')->getErrors())==0 
+					and count($form->get('priority')->getErrors())==1
+					){
+
+					$firewallRepository = $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
+				
+					$query		= $firewallRepository->createQueryBuilder('f')
+						->where('f.priority >= :priority')
+						->andWhere('f.id != :id')
+						->setParameter(':priority',$arrForm['priority'])
+						->setParameter(':id',$entity->getId())
+						->orderBy('f.priority','desc')
+						->getQuery();
+
+					$fixPrio	= $query->getResult();
+					
+					foreach($fixPrio as $fix){
+						
+						$fix->setPriority($fix->getPriority()+1);
+						$em->persist($fix);
+						
+					}
+				
+					$em->persist($entity);
+					$em->flush();
+
+					return $this->redirect($this->generateUrl('firewallrules_show', array('id' => $entity->getId())));
+												
+				}
+
+			}
+
+			
+		}
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:new.html.twig', array(
             'entity' => $entity,
