@@ -1,5 +1,8 @@
 {% extends '::base.html.twig' %}
 
+
+
+
 {% form_theme edit_form _self %}
 
 
@@ -29,8 +32,21 @@
     
 {% endblock form_row %}
 
-{% block body -%}
+{% block javascripts %}
 
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+		
+		});
+	
+	</script>
+
+{% endblock %}
+
+
+{% block body -%}
 
     
     <div class="page-header"><h1>Firewall <small>edit rule</small></h1></div>

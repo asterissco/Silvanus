@@ -1,18 +1,5 @@
 {% extends '::base.html.twig' %}
 
-{% block javascripts %}
-
-	<script type="text/javascript">
-	
-		$(document).ready(function(){
-		
-		
-		});
-	
-	</script>
-
-{% endblock %}
-
 {% form_theme form _self %}
 
 {% block form_errors %}
@@ -40,6 +27,40 @@
     </div>
     
 {% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+			var lastPriority="";
+		
+			$("#silvanus_firewallrulesbundle_firewallrulestype_append").click(function(event){
+			
+				if($(this).is(':checked')){
+				
+					lastPriority=$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val();
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val("");
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").attr("disabled","disabled");
+				
+					
+				}
+				if(!$(this).is(':checked')){
+				
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").removeAttr("disabled");
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val(lastPriority);
+					
+									
+				}
+			
+			});
+		
+		});
+	
+	</script>
+
+{% endblock %}
 
 {% block body -%}
 

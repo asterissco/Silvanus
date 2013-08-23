@@ -21,7 +21,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                
                 <th>Priority</th>
                 <th>Rule</th>
                 <th>Actions</th>
@@ -30,7 +30,7 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('firewallrules_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                
                 <td>{{ entity.priority }}</td>
                 <td>{{ entity.rule }}</td>
                 <td>

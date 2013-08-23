@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Silvanus\FirewallRulesBundle\Entity\FirewallRules;
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesType;
+use Silvanus\FirewallRulesBundle\Form\FirewallRulesCreateType;
+use Silvanus\FirewallRulesBundle\Form\FirewallRulesUpdateType;
 
 /**
  * FirewallRules controller.
@@ -36,7 +38,7 @@ class FirewallRulesController extends Controller
     public function createAction(Request $request)
     {
         $entity  = new FirewallRules();
-        $form = $this->createForm(new FirewallRulesType(), $entity);
+        $form = $this->createForm(new FirewallRulesCreateType(), $entity);
         $form->submit($request);
 
         if ($form->isValid()) {
@@ -60,7 +62,7 @@ class FirewallRulesController extends Controller
     public function newAction()
     {
         $entity = new FirewallRules();
-        $form   = $this->createForm(new FirewallRulesType(), $entity);
+        $form   = $this->createForm(new FirewallRulesCreateType(), $entity);
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:new.html.twig', array(
             'entity' => $entity,
@@ -103,7 +105,7 @@ class FirewallRulesController extends Controller
             throw $this->createNotFoundException('Unable to find FirewallRules entity.');
         }
 
-        $editForm = $this->createForm(new FirewallRulesType(), $entity);
+        $editForm = $this->createForm(new FirewallRulesUpdateType(), $entity);
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:edit.html.twig', array(
@@ -120,7 +122,7 @@ class FirewallRulesController extends Controller
     public function updateAction(Request $request, $id)
     {
 		
-		
+		$arrForm=$this->get('request')->request->get('silvanus_firewallrulesbundle_firewallrulestype');
 		
         $em = $this->getDoctrine()->getManager();
 
@@ -131,17 +133,71 @@ class FirewallRulesController extends Controller
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new FirewallRulesType(), $entity);
+        $editForm = $this->createForm(new FirewallRulesUpdateType(), $entity);
+       
         $editForm->submit($request);
+
+		
 
         if ($editForm->isValid()) {
 			
 			
-            $em->persist($entity);
-            $em->flush();
+        
+        }else{
+		
+		
+			/*
+			 * Get the priority errors
+			 * 
+			 * */
+			foreach ($editForm->get('priority')->getErrors() as $err){
+				
+				$priorityError=$err->getMessageTemplate();
+				
+			}
+		
+			
+			/*
+			 * If is true this condition, move the priority value of rules +1
+			 * 
+			 * */
+			if($priorityError=='This value is already used.' 
+				and count($editForm->get('rule')->getErrors())==0 
+				and count($editForm->get('priority')->getErrors())==1
+				and isset($arrForm['force'])
+				){
 
-            return $this->redirect($this->generateUrl('firewallrules_edit', array('id' => $id)));
-        }
+				$firewallRepository = $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
+			
+				$query		= $firewallRepository->createQueryBuilder('f')
+					->where('f.priority >= :priority')
+					->andWhere('f.id != :id')
+					->setParameter(':priority',$arrForm['priority'])
+					->setParameter(':id',$entity->getId())
+					->orderBy('f.priority','desc')
+					->getQuery();
+
+				$fixPrio	= $query->getResult();
+				
+				foreach($fixPrio as $fix){
+					
+					$fix->setPriority($fix->getPriority()+1);
+					$em->persist($fix);
+					
+				}
+			
+				$em->persist($entity);
+				$em->flush();
+
+				return $this->redirect($this->generateUrl('firewallrules_edit', array('id' => $id)));
+											
+			}
+
+		
+
+			
+		}
+		
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:edit.html.twig', array(
             'entity'      => $entity,
