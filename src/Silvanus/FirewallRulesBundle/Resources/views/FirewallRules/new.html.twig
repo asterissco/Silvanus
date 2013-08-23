@@ -34,26 +34,89 @@
 	
 		$(document).ready(function(){
 		
-			var lastPriority="";
-		
+			var lastPriority	= "";
+			var lastForce		= false;
+			var lastAppend		= false;
+
+			/*
+			* Append checkbox
+			*
+			*/
 			$("#silvanus_firewallrulesbundle_firewallrulestype_append").click(function(event){
 			
 				if($(this).is(':checked')){
 				
+					/*
+					* Priority textbox 
+					*
+					*/
 					lastPriority=$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val();
 					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val("");
 					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").attr("disabled","disabled");
-				
+
+					/*
+					* Force checkbox 
+					*
+					*/				
+					if($('#silvanus_firewallrulesbundle_firewallrulestype_force').is(':checked')){
+						lastForce = true;
+					}else{
+						lastForce = false;
+					}
+					
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').prop("checked",false);
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').attr("disabled","disabled");  
 					
 				}
 				if(!$(this).is(':checked')){
-				
+
+					/*
+					* Priority textbox 
+					*
+					*/				
 					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").removeAttr("disabled");
 					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val(lastPriority);
-					
+
+					/*
+					* Force checkbox 
+					*
+					*/				
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').removeAttr("disabled");
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').prop("checked",lastForce);
 									
 				}
 			
+			});
+
+
+			/*
+			* Force checkbox
+			*
+			*/
+			$("#silvanus_firewallrulesbundle_firewallrulestype_force").click(function(event){
+			
+				if($(this).is(':checked')){
+									
+					if($('#silvanus_firewallrulesbundle_firewallrulestype_append').is(':checked')){
+						lastAppend = true;
+					}else{
+						lastAppend = false;
+					}
+					
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').prop("checked",false);
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').attr("disabled","disabled");  
+						
+				
+				}
+
+				if(!$(this).is(':checked')){
+				
+					
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').removeAttr("disabled","disabled");  
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').prop("checked",lastAppend);
+				
+				}
+				
 			});
 		
 		});
