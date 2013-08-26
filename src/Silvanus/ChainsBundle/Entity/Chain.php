@@ -3,12 +3,15 @@
 namespace Silvanus\ChainsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Chain
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\ChainsBundle\Entity\ChainRepository")
+ * @UniqueEntity("name")
+ * 
  */
 class Chain
 {
