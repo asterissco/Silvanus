@@ -19,6 +19,7 @@ class AppKernel extends Kernel
             new Silvanus\FirewallRulesBundle\SilvanusFirewallRulesBundle(),
             new Silvanus\SyncBundle\SilvanusSyncBundle(),
 	    new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
+            new Silvanus\ChainsBundle\SilvanusChainsBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

@@ -1,0 +1,7 @@
+parameters:
+#    silvanus_chains.example.class: Silvanus\ChainsBundle\Example
+
+services:
+#    silvanus_chains.example:
+#        class: %silvanus_chains.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
