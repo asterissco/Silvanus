@@ -1,5 +1,31 @@
 {% extends '::base.html.twig' %}
 
+{% form_theme filter_form _self %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+				
+			<div class="col-md-3">{{ form_label(form) }}</div>
+			<div class="col-md-6">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-3">{{ form_errors(form) }}</div>	
+		
+    </div>
+    
+{% endblock form_row %}
+
 {% block javascripts %}
 
 	<script type="text/javascript">
@@ -18,6 +44,37 @@
 
     <div class="page-header"><h1>Firewall <small>rule list</small></h1></div>
 
+		<legend>Filter</legend>
+		
+			
+			<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('firewallrules') }}" method="post" class="form-horizontal"> 
+
+				<div class="row">
+
+					<div class="col-md-6">
+					
+						{{ form_row(filter_form.sort_by) }}
+						{{ form_row(filter_form.sort_direction) }}
+						{# {{ form_row(filter_form.show_free_rules) }} #}
+						
+				
+					</div>
+					
+					<div class="col-md-6">					
+					
+						{{ form_row(filter_form.rule) }}
+						
+						<button  class="btn btn-success" type="submit">Filter</button>
+						
+					</div>					
+				
+				</div>
+				
+			</form>
+		
+	<br><br>
+	
+	<legend>List</legend>
     <table class="table">
         <thead>
             <tr>
@@ -28,19 +85,25 @@
             </tr>
         </thead>
         <tbody>
+        
+        {# entities record #}
+        
         {% for entity in entities %}
-            <tr>
-                
-                <td>{{ entity.priority }}</td>
-                <td>{{ entity.rule }}</td>
-                <td>
-                
-                        <button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button>
-                        <button class="btn btn-warning"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id }) }}'">Edit</button>
-                        <button class="btn btn-danger"  onclick="window.location.href='{{ path('firewallrules_delete', { 'id': entity.id }) }}'">Delete</button>
+            
+			
+				<tr>
+					<td>{{ entity.priority }}</td>
+					<td>{{ entity.rule }}</td>
+					<td>
+					
+							<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button>
+							<button class="btn btn-warning"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id }) }}'">Edit</button>
+							<button class="btn btn-danger"  onclick="window.location.href='{{ path('firewallrules_delete', { 'id': entity.id }) }}'">Delete</button>
 
-                </td>
-            </tr>
+					</td>
+										
+				</tr>
+
         {% endfor %}
         </tbody>
     </table>

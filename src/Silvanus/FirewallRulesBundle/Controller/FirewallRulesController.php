@@ -21,14 +21,53 @@ class FirewallRulesController extends Controller
      * Lists all FirewallRules entities.
      *
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
+
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findAll();
+	
+		//form request
+		if($request->getMethod()=='POST'){
+			
+			$formFilter = $this->createRuleFilterForm();
+			$formFilter->submit($request);
+			
+			$formData = $formFilter->getData();
+			
+			$firewallRepository = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
+			
+			$builder = $firewallRepository->createQueryBuilder('f');
+
+			if($formData['rule']!=''){
+				
+				$builder->where($builder->expr()->like('f.rule', ':rule'));
+				$builder->setParameter(':rule','%'.$formData['rule'].'%');
+				
+			}
+
+			$builder->orderBy('f.'.$formData['sort_by'],$formData['sort_direction']);
+			
+			$query = $builder->getQuery();
+			
+			$entities = $query->getResult();
+
+			
+			
+		//no form request
+		}else{
+
+			$entities = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findAll();
+			$formFilter = $this->createRuleFilterForm();
+			
+			
+		}
+		
+		
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:index.html.twig', array(
-            'entities' => $entities,
+            'entities' 			=> $entities,
+            'filter_form' 		=> $formFilter->createView(),         
         ));
     }
     /**
@@ -355,4 +394,55 @@ class FirewallRulesController extends Controller
             ->getForm()
         ;
     }
+
+    /**
+     * Creates a form to filter rules list
+     *
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createRuleFilterForm()
+    {
+        return $this->createFormBuilder(array())
+            ->add('sort_by', 'choice',array(
+				'choices'=>array(
+						'id'=>'Id',
+						'priority'=>'Priority',
+						'rule'=>'Rule',						
+					),
+				'label'=>'Sort by',	
+				))
+            ->add('sort_direction', 'choice',array(
+				'choices'=>array(
+						'asc'=>'Asc',
+						'desc'=>'Desc',
+					),
+				'label'=>'Sort direction',	
+				))
+            //~ ->add('show_free_rules', 'choice',array(
+				//~ 'choices'=>array(
+						//~ '0'=>'No',
+						//~ '1'=>'Yes',
+					//~ ),
+				//~ 'label'=>'Show free rules',	
+				//~ ))
+            ->add('rule', 'text',array(
+					'label'=>'Rule',
+					'required' => false	
+				))
+            ->getForm()
+        ;
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
