@@ -38,6 +38,15 @@ class FirewallRules
      */
     private $priority;
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="chain_id", type="integer")
+     * @ORM\OneToOne(targetEntity="Chain", cascade={"persist", "remove"}))
+     * @ORM\JoinColumn(name="chain_id", referencedColumnName="id")
+     */
+    private $chain_id;
+
 
     /**
      * Get id
@@ -93,5 +102,30 @@ class FirewallRules
     public function getPriority()
     {
         return $this->priority;
+    }
+
+
+
+    /**
+     * Set chain_id
+     *
+     * @param integer $chainId
+     * @return FirewallRules
+     */
+    public function setChainId($chainId)
+    {
+        $this->chain_id = $chainId;
+    
+        return $this;
+    }
+
+    /**
+     * Get chain_id
+     *
+     * @return integer 
+     */
+    public function getChainId()
+    {
+        return $this->chain_id;
     }
 }

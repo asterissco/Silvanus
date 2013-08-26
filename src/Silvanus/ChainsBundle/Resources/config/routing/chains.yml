@@ -1,0 +1,30 @@
+chains:
+    pattern:  /
+    defaults: { _controller: "SilvanusChainsBundle:Chain:index" }
+
+chains_show:
+    pattern:  /{id}/show
+    defaults: { _controller: "SilvanusChainsBundle:Chain:show" }
+
+chains_new:
+    pattern:  /new
+    defaults: { _controller: "SilvanusChainsBundle:Chain:new" }
+
+chains_create:
+    pattern:  /create
+    defaults: { _controller: "SilvanusChainsBundle:Chain:create" }
+    requirements: { _method: post }
+
+chains_edit:
+    pattern:  /{id}/edit
+    defaults: { _controller: "SilvanusChainsBundle:Chain:edit" }
+
+chains_update:
+    pattern:  /{id}/update
+    defaults: { _controller: "SilvanusChainsBundle:Chain:update" }
+    requirements: { _method: post|put }
+
+chains_delete:
+    pattern:  /{id}/delete
+    defaults: { _controller: "SilvanusChainsBundle:Chain:delete" }
+    requirements: { _method: post|delete|get }
