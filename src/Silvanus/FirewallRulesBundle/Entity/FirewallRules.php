@@ -10,8 +10,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\FirewallRulesBundle\Entity\FirewallRulesRepository")
- * @UniqueEntity("priority")
- * @UniqueEntity("rule")
+ * @UniqueEntity(fields= {"priority","chain_id"})
+ * @UniqueEntity(fields= {"rule","chain_id"})
  */
 class FirewallRules
 {

@@ -113,7 +113,9 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('chains_show', array('id' => $entity->getId())));
+            //return $this->redirect($this->generateUrl('chains_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('chains'));
+        
         }
 
         return array(
@@ -218,7 +220,8 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
+            //return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
+			return $this->redirect($this->generateUrl('chains'));
         }
 
         return array(
@@ -260,6 +263,12 @@ class ChainController extends Controller
 		
 			throw $this->createNotFoundException('Uneable to find Chain entity');
 			
+		}
+		
+		$firewallRulesEntities = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findBy(array('chain_id'=>$id));
+		
+		foreach($firewallRulesEntities as $firewalRulesEntity){
+			$em->remove($firewalRulesEntity);
 		}
 		
 		$em->remove($entity);

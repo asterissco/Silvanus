@@ -64,9 +64,16 @@ class FirewallRulesController extends Controller
 		//no form request
 		}else{
 
-			$entities = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findBy(array(
-					'chain_id'=>$id_chain
-				));
+			$builder = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
+
+			$query = $builder
+				->where('f.chain_id = :id_chain')
+				->orderBy('f.priority','asc')
+				->setParameter(':id_chain',$id_chain)
+				->getQuery();
+
+			$entities = $query->getResult();
+			
 			$formFilter = $this->createRuleFilterForm();
 			
 			
@@ -92,8 +99,10 @@ class FirewallRulesController extends Controller
 		$arrForm=$this->get('request')->request->get('silvanus_firewallrulesbundle_firewallrulestype');
 		
         $entity  = new FirewallRules();
+        $entity->setChainId($id_chain);
         $form = $this->createForm(new FirewallRulesCreateType(), $entity);
         $form->submit($request);
+
 
         if ($form->isValid()) {
 
@@ -106,7 +115,11 @@ class FirewallRulesController extends Controller
 				//get last priority
 				$firewallRepository	= $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
 				
-				$query = $firewallRepository->createQueryBuilder('f')
+				$builder	= $firewallRepository->createQueryBuilder('f');
+				
+				$query = $builder 
+					->where($builder->expr()->eq('f.chain_id',':id_chain'))
+					->setParameter(':id_chain',$id_chain)
 					->orderBy('f.priority','desc')
 					->setFirstResult( 0 )
 					->setMaxResults( 1 )
@@ -127,9 +140,7 @@ class FirewallRulesController extends Controller
 				}
 						
 			}
-
-			$entity->setChainId($id_chain);
-            
+         
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
@@ -182,9 +193,7 @@ class FirewallRulesController extends Controller
 						$em->persist($fix);
 						
 					}
-				
-					$entity->setChainId($id_chain); 
-				
+								
 					$em->persist($entity);
 					$em->flush();
 
@@ -325,11 +334,15 @@ class FirewallRulesController extends Controller
 
 				$firewallRepository = $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
 			
-				$query		= $firewallRepository->createQueryBuilder('f')
+				$builder = $firewallRepository->createQueryBuilder('f');
+			
+				$query		= $builder
 					->where('f.priority >= :priority')
 					->andWhere('f.id != :id')
+					->andWhere('f.chain_id = :id_chain')
 					->setParameter(':priority',$arrForm['priority'])
 					->setParameter(':id',$entity->getId())
+					->setParameter(':id_chain',$id_chain)
 					->orderBy('f.priority','desc')
 					->getQuery();
 
@@ -432,9 +445,9 @@ class FirewallRulesController extends Controller
         return $this->createFormBuilder(array())
             ->add('sort_by', 'choice',array(
 				'choices'=>array(
-						'id'=>'Id',
 						'priority'=>'Priority',
 						'rule'=>'Rule',						
+						'id'=>'Id',
 					),
 				'label'=>'Sort by',	
 				))
