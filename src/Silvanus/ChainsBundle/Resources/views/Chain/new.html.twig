@@ -1,20 +1,67 @@
 {% extends '::base.html.twig' %}
 
+{% form_theme form _self %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12">{{ form_label(form) }}</div>
+			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>
+			
+		</div>
+    </div>
+    
+{% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+		
+		});
+	
+	</script>
+
+{% endblock %}
+
+
 {% block body -%}
-    <h1>Chain creation</h1>
+    
+    <div class="page-header"><h1>Chain <small>new</small></h1></div>
+    
 
     <form action="{{ path('chains_create') }}" method="post" {{ form_enctype(form) }}>
         {{ form_widget(form) }}
         <p>
-            <button type="submit">Create</button>
+            <button class="btn btn-success" type="submit">Create</button>
         </p>
     </form>
 
-        <ul class="record_actions">
-    <li>
-        <a href="{{ path('chains') }}">
-            Back to the list
-        </a>
-    </li>
-</ul>
+	<div class="col-md-12">	
+
+		<br><br>
+		
+		<button class="btn btn-info" onclick="window.location.href='{{ path('chains') }}'">Back</button>        
+
+	</div>
+
+
+
 {% endblock %}
