@@ -6,6 +6,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+//~ use Symfony\Component\Form\CallbackValidator;
+//~ use Symfony\Component\Form\FormError;
+//~ use Symfony\Component\Form\FormInterface;
+
+
+
 class ChainType extends AbstractType
 {
     /**
@@ -16,8 +22,29 @@ class ChainType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('policy')
+            ->add('policy','choice',array(
+				'choices' => array(
+					'ACCEPT' 	=> 'ACCEPT',
+					'DROP' 		=> 'DROP',
+				)
+            ))
             ->add('host');
+
+
+//~ 
+	   //~ //validacion de campos de este tipo
+		//~ $builder->addEventListener("error",new CallbackValidator(function(FormInterface $form) {
+//~ 
+//~ 
+			//~ if(!preg_match("[^/?*:;{}\\]+\\.[^/?*:;{}\\]+",$form['name'])){
+				//~ 
+				//~ $form['name']->addError(new FormError('File name without spaces and /'));
+				//~ 
+			//~ }
+//~ 
+		//~ }));
+
+    
     }
 
     /**

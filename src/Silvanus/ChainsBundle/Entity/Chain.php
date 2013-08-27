@@ -4,6 +4,8 @@ namespace Silvanus\ChainsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 /**
  * Chain
@@ -11,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\ChainsBundle\Entity\ChainRepository")
  * @UniqueEntity("name")
+ * @Assert\Callback(methods={"isNameValid"})
  * 
  */
 class Chain
@@ -41,7 +44,7 @@ class Chain
     /**
      * @var string
      *
-     * @ORM\Column(name="host", type="string", length=255)
+     * @ORM\Column(name="host", type="string", length=255, nullable=TRUE)
      */
     private $host;
 
@@ -124,4 +127,56 @@ class Chain
     {
         return $this->host;
     }
+
+	/* validators */
+	
+	public function isNameValid(ExecutionContextInterface $context){
+	
+		if(strpos($this->name,' ')){
+	
+			$context->addViolationAt('name', 'File name, no spaces character', array(), null);
+			
+		}
+
+		if(strpos($this->name,'/')){
+	
+			$context->addViolationAt('name', 'File name, no "/" character', array(), null);
+			
+		}
+        
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
 }
