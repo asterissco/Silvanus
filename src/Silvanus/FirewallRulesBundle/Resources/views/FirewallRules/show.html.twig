@@ -18,12 +18,12 @@
 
         <ul class="record_actions">
     <li>
-        <a href="{{ path('firewallrules') }}">
+        <a href="{{ path('firewallrules', {'id_chain':id_chain} ) }}">
             Back to the list
         </a>
     </li>
     <li>
-        <a href="{{ path('firewallrules_edit', { 'id': entity.id }) }}">
+        <a href="{{ path('firewallrules_edit', { 'id': entity.id, 'id_chain':id_chain }) }}">
             Edit
         </a>
     </li>

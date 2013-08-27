@@ -1,5 +1,5 @@
 firewallrules:
-    pattern:  /
+    pattern:  /{id_chain}
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:index" }
 
 firewallrules_show:
@@ -7,20 +7,20 @@ firewallrules_show:
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:show" }
 
 firewallrules_new:
-    pattern:  /new
+    pattern:  /new/{id_chain}
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:new" }
 
 firewallrules_create:
-    pattern:  /create
+    pattern:  /create/{id_chain}
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:create" }
-    requirements: { _method: post }
+    requirements: { _method: post|get }
 
 firewallrules_edit:
-    pattern:  /{id}/edit
+    pattern:  /{id}/{id_chain}/edit
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:edit" }
 
 firewallrules_update:
-    pattern:  /{id}/update
+    pattern:  /{id}/{id_chain}/update
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:update" }
     requirements: { _method: post|put }
 

@@ -42,12 +42,12 @@
 {% block body -%}
 
 
-    <div class="page-header"><h1>Firewall <small>rule list</small></h1></div>
+    <div class="page-header"><h1>Firewall <small>rule list chain: </small> | {{ chain_entity.name }} {{ chain_entity.policy }} </h1></div>
 
 		<legend>Filter</legend>
 		
 			
-			<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('firewallrules') }}" method="POST" class="form-horizontal"> 
+			<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('firewallrules', {'id_chain':id_chain} ) }}" method="POST" class="form-horizontal"> 
 
 				<div class="row">
 
@@ -97,7 +97,7 @@
 					<td>
 					
 							{# <button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button> #}
-							<button class="btn btn-warning"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id }) }}'">Edit</button>
+							<button class="btn btn-warning"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id, 'id_chain': id_chain }) }}'">Edit</button>
 							<button class="btn btn-danger"  onclick="window.location.href='{{ path('firewallrules_delete', { 'id': entity.id }) }}'">Delete</button>
 
 					</td>
@@ -109,7 +109,7 @@
     </table>
 
 			
-            <button class="btn btn-success" onclick="window.location.href='{{ path('firewallrules_new') }}'">New rule</button>
+            <button class="btn btn-success" onclick="window.location.href='{{ path('firewallrules_new', {'id_chain': id_chain}) }}'">New rule</button>
 
 {% endblock %}
 

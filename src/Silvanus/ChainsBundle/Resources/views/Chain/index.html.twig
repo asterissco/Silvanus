@@ -93,8 +93,8 @@
                 <td>
 					<button class="btn btn-danger" onclick="window.location.href='{{ path('chains_delete', { 'id': entity.id }) }}'" >Delete</button>
 					<button class="btn btn-success" onclick="window.location.href='{{ path('chains_edit', { 'id': entity.id }) }}'" >Update</button>
-					<button class="btn btn-primary" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button>
-					 
+					{# <button class="btn btn-primary" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button> #}
+					<button class="btn btn-primary" onclick="window.location.href='{{ path('firewallrules', { 'id_chain': entity.id }) }}'" >Admin firewall rules</button>
 				
                 </td>
             </tr>

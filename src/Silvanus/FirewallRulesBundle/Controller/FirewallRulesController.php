@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Silvanus\FirewallRulesBundle\Entity\FirewallRules;
+use Silvanus\ChainsBundle\Entity\Chain;
+
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesType;
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesCreateType;
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesUpdateType;
@@ -21,11 +23,12 @@ class FirewallRulesController extends Controller
      * Lists all FirewallRules entities.
      *
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request,$id_chain)
     {
 
         $em = $this->getDoctrine()->getManager();
 
+		$chain_entity = $em->getRepository('SilvanusChainsBundle:Chain')->find($id_chain);
 	
 		//form request
 		if($request->getMethod()=='POST'){
@@ -46,6 +49,10 @@ class FirewallRulesController extends Controller
 				
 			}
 
+			$builder->where($builder->expr()->like('f.chain_id', ':chain_id'));
+			$builder->setParameter(':chain_id',$id_chain);
+
+
 			$builder->orderBy('f.'.$formData['sort_by'],$formData['sort_direction']);
 			
 			$query = $builder->getQuery();
@@ -57,7 +64,9 @@ class FirewallRulesController extends Controller
 		//no form request
 		}else{
 
-			$entities = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findAll();
+			$entities = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findBy(array(
+					'chain_id'=>$id_chain
+				));
 			$formFilter = $this->createRuleFilterForm();
 			
 			
@@ -68,13 +77,15 @@ class FirewallRulesController extends Controller
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:index.html.twig', array(
             'entities' 			=> $entities,
             'filter_form' 		=> $formFilter->createView(),         
+            'id_chain'			=> $id_chain,
+            'chain_entity'		=> $chain_entity,
         ));
     }
     /**
      * Creates a new FirewallRules entity.
      *
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request,$id_chain)
     {
 		
 		//get form values
@@ -101,27 +112,29 @@ class FirewallRulesController extends Controller
 					->setMaxResults( 1 )
 					->getQuery();
 			
-				$lastEntity=$query->getSingleResult();
+				$lastEntity = $query->getResult();
 
-				if(!$lastEntity){
+
+				if(!isset($lastEntity[0])){
 					
 					$entity->setPriority(1);
 					
 				}else{
 				
+					$lastEntity = $lastEntity[0];
 					$entity->setPriority($lastEntity->getPriority()+1);
 					
 				}
 						
 			}
 
-			
+			$entity->setChainId($id_chain);
             
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('firewallrules_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
         
         }else{
 
@@ -170,10 +183,12 @@ class FirewallRulesController extends Controller
 						
 					}
 				
+					$entity->setChainId($id_chain); 
+				
 					$em->persist($entity);
 					$em->flush();
 
-					return $this->redirect($this->generateUrl('firewallrules_show', array('id' => $entity->getId())));
+					return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
 												
 				}
 
@@ -183,8 +198,9 @@ class FirewallRulesController extends Controller
 		}
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:new.html.twig', array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
+            'entity' 	=> $entity,
+            'form'   	=> $form->createView(),
+            'id_chain'	=> $id_chain,
         ));
     }
 
@@ -192,14 +208,15 @@ class FirewallRulesController extends Controller
      * Displays a form to create a new FirewallRules entity.
      *
      */
-    public function newAction()
+    public function newAction($id_chain)
     {
         $entity = new FirewallRules();
         $form   = $this->createForm(new FirewallRulesCreateType(), $entity);
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:new.html.twig', array(
-            'entity' => $entity,
-            'form'   => $form->createView(),
+            'entity' 	=> $entity,
+			'form'   	=> $form->createView(),
+            'id_chain' 	=> $id_chain,
         ));
     }
 
@@ -221,14 +238,17 @@ class FirewallRulesController extends Controller
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:show.html.twig', array(
             'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),        ));
+            'delete_form' => $deleteForm->createView(),        
+			'id_chain'	  => $entity->getChainId(),	
+            ));
+    
     }
 
     /**
      * Displays a form to edit an existing FirewallRules entity.
      *
      */
-    public function editAction($id)
+    public function editAction($id, $id_chain)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -242,9 +262,10 @@ class FirewallRulesController extends Controller
         $deleteForm = $this->createDeleteForm($id);
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+            'entity'      	=> $entity,
+            'edit_form'   	=> $editForm->createView(),
+            'delete_form' 	=> $deleteForm->createView(),
+            'id_chain'		=> $id_chain,
         ));
     }
 
@@ -252,7 +273,7 @@ class FirewallRulesController extends Controller
      * Edits an existing FirewallRules entity.
      *
      */
-    public function updateAction(Request $request, $id)
+    public function updateAction(Request $request, $id, $id_chain)
     {
 		
 		$arrForm=$this->get('request')->request->get('silvanus_firewallrulesbundle_firewallrulestype');
@@ -271,10 +292,12 @@ class FirewallRulesController extends Controller
         $editForm->submit($request);
 
 		
-
         if ($editForm->isValid()) {
 			
-			
+				$em->persist($entity);
+				$em->flush();
+				
+				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));			
         
         }else{
 		
@@ -322,7 +345,7 @@ class FirewallRulesController extends Controller
 				$em->persist($entity);
 				$em->flush();
 
-				return $this->redirect($this->generateUrl('firewallrules_edit', array('id' => $id)));
+				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
 											
 			}
 
@@ -333,9 +356,10 @@ class FirewallRulesController extends Controller
 		
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:edit.html.twig', array(
-            'entity'      => $entity,
-            'edit_form'   => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
+            'entity'      	=> $entity,
+            'edit_form'   	=> $editForm->createView(),
+            'delete_form' 	=> $deleteForm->createView(),
+            'id_chain'	 	=> $id_chain,
         ));
     }
     /**
@@ -368,6 +392,8 @@ class FirewallRulesController extends Controller
 		$em = $this->getDoctrine()->getManager();
 		$entity = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->find($id);
 
+		$id_chain=$entity->getChainId();
+
 		if (!$entity) {
 			throw $this->createNotFoundException('Unable to find FirewallRules entity.');
 		}
@@ -375,7 +401,7 @@ class FirewallRulesController extends Controller
 		$em->remove($entity);
 		$em->flush();
 
-        return $this->redirect($this->generateUrl('firewallrules'));
+        return $this->redirect($this->generateUrl('firewallrules', array('id_chain'=>$id_chain)));
  
  
     }

@@ -49,7 +49,7 @@
     <div class="page-header"><h1>Firewall <small>edit rule</small></h1></div>
 			
 		
-			<form action="{{ path('firewallrules_update', { 'id': entity.id }) }}" method="post" {{ form_enctype(edit_form) }} class="form-vertical">
+			<form action="{{ path('firewallrules_update', { 'id': entity.id, 'id_chain':id_chain }) }}" method="post" {{ form_enctype(edit_form) }} class="form-vertical">
 				{{ form_widget(edit_form) }}
 				<p>
 					<button class="btn btn-success" type="submit">Update</button>
@@ -72,7 +72,7 @@
 					</form>
 
 				</div>
-				<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules') }}'">Back</button>
+				<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules', {'id_chain':id_chain} ) }}'">Back</button>
 				
 			
 		</div>
