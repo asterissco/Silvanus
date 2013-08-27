@@ -25,13 +25,70 @@ class ChainController extends Controller
      * @Method("GET")
      * @Template()
      */
-    public function indexAction()
+    public function indexAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('SilvanusChainsBundle:Chain')->findAll();
+		$em = $this->getDoctrine()->getManager();
 
-		$filter_form = $this->createFilterForm();
+		
+		/* form filter */
+		if($request->getMethod()=='POST'){
+		
+			$filter_form = $this->createFilterForm();
+			
+			$filter_form->submit($request);
+		
+			
+			if($filter_form->isValid()){
+
+				$formData=$filter_form->getData();
+
+				$builder = $em->getRepository('SilvanusChainsBundle:Chain')->createQueryBuilder('c');
+				
+				if($formData['name']!=''){
+				
+					$builder->where($builder->expr()->like('c.name',':name'));
+					$builder->setParameter(':name','%'.$formData['name'].'%');
+				
+				}
+
+				if($formData['host']!=''){
+				
+					$builder->where($builder->expr()->like('c.host',':host'));
+					$builder->setParameter(':host','%'.$formData['host'].'%');
+				
+				}
+
+				if($formData['policy']!=''){
+				
+					$builder->where($builder->expr()->eq('c.policy',':policy'));
+					$builder->setParameter(':policy',$formData['policy']);
+				
+				}
+
+
+				$builder->orderBy('c.'.$formData['sort_by'],$formData['sort_direction']);
+				
+				$entities=$builder->getQuery()->getResult();
+				
+				
+				
+			}else{
+				
+				$entities = $em->getRepository('SilvanusChainsBundle:Chain')->findAll();
+				
+			}
+			
+		}else{
+
+
+			$entities = $em->getRepository('SilvanusChainsBundle:Chain')->findAll();
+
+			$filter_form = $this->createFilterForm();
+
+			
+		}
+		
 
         return array(
             'entities' 		=> $entities,
@@ -243,8 +300,8 @@ class ChainController extends Controller
 				))
             ->add('sort_direction','choice',array(
 				'choices'=>array(
-						'asc'=>'Asc',
-						'desc'=>'Desc',
+						'ASC'=>'Asc',
+						'DESC'=>'Desc',
 					),
 				'label'=>'Sort direction',	
 				))				
