@@ -10,6 +10,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Silvanus\ChainsBundle\Entity\Chain;
 use Silvanus\ChainsBundle\Form\ChainType;
 
+use Silvanus\SyncBundle\Entity\Sync;
+
 /**
  * Chain controller.
  *
@@ -109,9 +111,17 @@ class ChainController extends Controller
         $form->submit($request);
 
         if ($form->isValid()) {
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
+
+			$syncEntity = new sync();
+			$syncEntity->setChainId($entity->getId());
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$em->persist($syncEntity);
+			$em->flush();
 
             //return $this->redirect($this->generateUrl('chains_show', array('id' => $entity->getId())));
             return $this->redirect($this->generateUrl('chains'));
@@ -220,6 +230,14 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
+			$syncEntity = new sync();
+			$syncEntity->setChainId($id);
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$em->persist($syncEntity);
+			$em->flush();
+
+
             //return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
 			return $this->redirect($this->generateUrl('chains'));
         }
@@ -273,6 +291,14 @@ class ChainController extends Controller
 		
 		$em->remove($entity);
 		$em->flush();
+
+		$syncEntity = new sync();
+		$syncEntity->setChainId($id);
+		$syncEntity->setTime(new \DateTime('now'));
+		$syncEntity->setError(false);
+		$em->persist($syncEntity);
+		$em->flush();
+
 
         return $this->redirect($this->generateUrl('chains'));
     }

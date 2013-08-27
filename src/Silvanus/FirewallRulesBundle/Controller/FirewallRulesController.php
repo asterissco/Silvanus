@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Silvanus\FirewallRulesBundle\Entity\FirewallRules;
 use Silvanus\ChainsBundle\Entity\Chain;
+use Silvanus\SyncBundle\Entity\Sync;
+
 
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesType;
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesCreateType;
@@ -145,6 +147,13 @@ class FirewallRulesController extends Controller
             $em->persist($entity);
             $em->flush();
 
+			$syncEntity = new sync();
+			$syncEntity->setChainId($id_chain);
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$em->persist($syncEntity);
+			$em->flush();
+
             return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
         
         }else{
@@ -196,6 +205,14 @@ class FirewallRulesController extends Controller
 								
 					$em->persist($entity);
 					$em->flush();
+
+					$syncEntity = new sync();
+					$syncEntity->setChainId($id_chain);
+					$syncEntity->setTime(new \DateTime('now'));
+					$syncEntity->setError(false);
+					$em->persist($syncEntity);
+					$em->flush();
+
 
 					return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
 												
@@ -305,6 +322,14 @@ class FirewallRulesController extends Controller
 			
 				$em->persist($entity);
 				$em->flush();
+	
+				$syncEntity = new sync();
+				$syncEntity->setChainId($id_chain);
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$em->persist($syncEntity);
+				$em->flush();
+
 				
 				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));			
         
@@ -357,6 +382,14 @@ class FirewallRulesController extends Controller
 			
 				$em->persist($entity);
 				$em->flush();
+
+				$syncEntity = new sync();
+				$syncEntity->setChainId($id_chain);
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$em->persist($syncEntity);
+				$em->flush();
+
 
 				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
 											
@@ -413,6 +446,14 @@ class FirewallRulesController extends Controller
 
 		$em->remove($entity);
 		$em->flush();
+
+		$syncEntity = new sync();
+		$syncEntity->setChainId($id_chain);
+		$syncEntity->setTime(new \DateTime('now'));
+		$syncEntity->setError(false);
+		$em->persist($syncEntity);
+		$em->flush();
+
 
         return $this->redirect($this->generateUrl('firewallrules', array('id_chain'=>$id_chain)));
  
