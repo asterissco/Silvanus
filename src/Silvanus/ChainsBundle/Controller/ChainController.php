@@ -21,7 +21,7 @@ class ChainController extends Controller
     /**
      * Lists all Chain entities.
      *
-     * @Route("/", name="chain")
+     * @Route("/", name="chains")
      * @Method("GET")
      * @Template()
      */
@@ -31,14 +31,17 @@ class ChainController extends Controller
 
         $entities = $em->getRepository('SilvanusChainsBundle:Chain')->findAll();
 
+		$filter_form = $this->createFilterForm();
+
         return array(
-            'entities' => $entities,
+            'entities' 		=> $entities,
+            'filter_form'	=> $filter_form->createView(),
         );
     }
     /**
      * Creates a new Chain entity.
      *
-     * @Route("/", name="chain_create")
+     * @Route("/", name="chains_create")
      * @Method("POST")
      * @Template("SilvanusChainsBundle:Chain:new.html.twig")
      */
@@ -53,19 +56,20 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('chain_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('chains_show', array('id' => $entity->getId())));
         }
 
         return array(
             'entity' => $entity,
             'form'   => $form->createView(),
+            
         );
     }
 
     /**
      * Displays a form to create a new Chain entity.
      *
-     * @Route("/new", name="chain_new")
+     * @Route("/new", name="chains_new")
      * @Method("GET")
      * @Template()
      */
@@ -83,7 +87,7 @@ class ChainController extends Controller
     /**
      * Finds and displays a Chain entity.
      *
-     * @Route("/{id}", name="chain_show")
+     * @Route("/{id}", name="chains_show")
      * @Method("GET")
      * @Template()
      */
@@ -108,7 +112,7 @@ class ChainController extends Controller
     /**
      * Displays a form to edit an existing Chain entity.
      *
-     * @Route("/{id}/edit", name="chain_edit")
+     * @Route("/{id}/edit", name="chains_edit")
      * @Method("GET")
      * @Template()
      */
@@ -135,7 +139,7 @@ class ChainController extends Controller
     /**
      * Edits an existing Chain entity.
      *
-     * @Route("/{id}", name="chain_update")
+     * @Route("/{id}", name="chains_update")
      * @Method("PUT")
      * @Template("SilvanusChainsBundle:Chain:edit.html.twig")
      */
@@ -157,7 +161,7 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('chain_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
         }
 
         return array(
@@ -169,11 +173,12 @@ class ChainController extends Controller
     /**
      * Deletes a Chain entity.
      *
-     * @Route("/{id}", name="chain_delete")
+     * @Route("/{id}", name="chains_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, $id)
     {
+		/*
         $form = $this->createDeleteForm($id);
         $form->submit($request);
 
@@ -188,8 +193,22 @@ class ChainController extends Controller
             $em->remove($entity);
             $em->flush();
         }
+		
+		*/
+		
+		$em 	= $this->getDoctrine()->getManager();
+		$entity	= $em->getRepository('SilvanusChainsBundle:Chain')->find($id);
+		
+		if(!$entity){
+		
+			throw $this->createNotFoundException('Uneable to find Chain entity');
+			
+		}
+		
+		$em->remove($entity);
+		$em->flush();
 
-        return $this->redirect($this->generateUrl('chain'));
+        return $this->redirect($this->generateUrl('chains'));
     }
 
     /**
@@ -206,4 +225,48 @@ class ChainController extends Controller
             ->getForm()
         ;
     }
+
+    /**
+     * Creates a form to filter list
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createFilterForm()
+    {
+        return $this->createFormBuilder(array())
+            ->add('sort_by','choice', array(
+				'label' 	=> 		'Sort by',
+				'choices' 	=> 		array(
+					'id'=>'ID',
+					'name'=>'Name',
+					)
+				))
+            ->add('sort_direction','choice',array(
+				'choices'=>array(
+						'asc'=>'Asc',
+						'desc'=>'Desc',
+					),
+				'label'=>'Sort direction',	
+				))				
+            ->add('policy','choice', array(
+				'label' 	=> 		'Policy',
+				'choices' 	=> 		array(
+					'accept'=>'ACCEPT',
+					'drop'	=>'DROP'
+					)
+				))
+            ->add('name','text', array(
+				'label' 	=> 		'Name',
+				'required'	=> 		false		
+				))
+            ->add('host','text', array(
+				'label' 	=> 		'Host',
+				'required'	=> 		false		
+				))
+            ->getForm()
+        ;
+    }
+
+
+
 }

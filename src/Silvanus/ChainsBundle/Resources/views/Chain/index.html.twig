@@ -1,12 +1,80 @@
 {% extends '::base.html.twig' %}
 
-{% block body -%}
-    <h1>Chain list</h1>
+{% form_theme filter_form _self %}
 
-    <table class="records_list">
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+				
+			<div class="col-md-3">{{ form_label(form) }}</div>
+			<div class="col-md-6">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-3">{{ form_errors(form) }}</div>	
+		
+    </div>
+    
+{% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+		
+		});
+	
+	</script>
+
+{% endblock %}
+
+{% block body -%}
+    
+    <div class="page-header"><h1>Chains list</h1></div>
+    
+	<legend>Filter</legend>
+
+		<form action="{{ path('chains') }}" method="POST" class="form-horizontal">
+		
+			<div class="row">
+			
+				<div class="col-md-6">
+				
+					{{ form_row(filter_form.sort_by) }}
+					{{ form_row(filter_form.sort_direction) }}
+					{{ form_row(filter_form.policy) }}
+				
+				</div>
+			
+				<div class="col-md-6">
+				
+					{{ form_row(filter_form.name) }}
+					{{ form_row(filter_form.host) }}
+					<button type="submit" class="btn btn-success">Filter</button>
+				
+				</div>
+
+			</div>
+
+		</form>
+
+	<legend>List</legend>
+	
+    <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                {# <th>Id</th> #}
                 <th>Name</th>
                 <th>Policy</th>
                 <th>Host</th>
@@ -16,30 +84,23 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('chains_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                {# <td><a href="{{ path('chains_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td> #}
                 <td>{{ entity.name }}</td>
                 <td>{{ entity.policy }}</td>
                 <td>{{ entity.host }}</td>
                 <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('chains_show', { 'id': entity.id }) }}">show</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('chains_edit', { 'id': entity.id }) }}">edit</a>
-                    </li>
-                </ul>
+					<button class="btn btn-danger" onclick="window.location.href='{{ path('chains_delete', { 'id': entity.id }) }}'" >Delete</button>
+					<button class="btn btn-success" onclick="window.location.href='{{ path('chains_edit', { 'id': entity.id }) }}'" >Update</button>
+					<button class="btn btn-primary" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button>
+					 
+				
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-        <ul>
-        <li>
-            <a href="{{ path('chains_new') }}">
-                Create a new entry
-            </a>
-        </li>
-    </ul>
+
+	<button class="btn btn-success"  onclick="window.location.href='{{ path('chains_new') }}'">New Chain</button>
+    
     {% endblock %}
