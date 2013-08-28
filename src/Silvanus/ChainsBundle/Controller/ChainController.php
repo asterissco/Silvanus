@@ -116,12 +116,18 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
-			$syncEntity = new sync();
-			$syncEntity->setChainId($entity->getId());
-			$syncEntity->setTime(new \DateTime('now'));
-			$syncEntity->setError(false);
-			$em->persist($syncEntity);
-			$em->flush();
+			/* add sync petition */
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
+			if(!$syncEntity){
+
+				$syncEntity = new sync();
+				$syncEntity->setChainId($entity->getId());
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$em->persist($syncEntity);
+				$em->flush();
+
+			}
 
             //return $this->redirect($this->generateUrl('chains_show', array('id' => $entity->getId())));
             return $this->redirect($this->generateUrl('chains'));
@@ -230,12 +236,19 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
-			$syncEntity = new sync();
-			$syncEntity->setChainId($id);
-			$syncEntity->setTime(new \DateTime('now'));
-			$syncEntity->setError(false);
-			$em->persist($syncEntity);
-			$em->flush();
+			/* add sync petition */
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id));
+			if(!$syncEntity){
+
+				$syncEntity = new sync();
+				$syncEntity->setChainId($id);
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$em->persist($syncEntity);
+				$em->flush();
+
+			}
+
 
 
             //return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
@@ -292,12 +305,19 @@ class ChainController extends Controller
 		$em->remove($entity);
 		$em->flush();
 
-		$syncEntity = new sync();
-		$syncEntity->setChainId($id);
-		$syncEntity->setTime(new \DateTime('now'));
-		$syncEntity->setError(false);
-		$em->persist($syncEntity);
-		$em->flush();
+		/* add sync petition */
+		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id));
+		if(!$syncEntity){
+
+			$syncEntity = new sync();
+			$syncEntity->setChainId($id);
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$em->persist($syncEntity);
+			$em->flush();
+
+		}
+
 
 
         return $this->redirect($this->generateUrl('chains'));

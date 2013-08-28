@@ -3,12 +3,15 @@
 namespace Silvanus\SyncBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Sync
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\SyncBundle\Entity\SyncRepository")
+ * @UniqueEntity("chainId")
+ *  
  */
 class Sync
 {

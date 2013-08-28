@@ -144,6 +144,12 @@ class Chain
 			$context->addViolationAt('name', 'File name, no "/" character', array(), null);
 			
 		}
+
+		if($this->name=='silvanus_test_chain'){
+	
+			$context->addViolationAt('name', '"silvanus_test_chain" is reserved chain name', array(), null);
+			
+		}
         
 		
 	}

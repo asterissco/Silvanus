@@ -149,13 +149,21 @@ class FirewallRulesController extends Controller
          
             $em->persist($entity);
             $em->flush();
+            
+            $this->fixPriority($id_chain);
 
-			$syncEntity = new sync();
-			$syncEntity->setChainId($id_chain);
-			$syncEntity->setTime(new \DateTime('now'));
-			$syncEntity->setError(false);
-			$em->persist($syncEntity);
-			$em->flush();
+			/* add sync petition */
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id_chain));
+			if(!$syncEntity){
+
+				$syncEntity = new sync();
+				$syncEntity->setChainId($id_chain);
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$em->persist($syncEntity);
+				$em->flush();
+
+			}
 
             return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
         
@@ -216,12 +224,18 @@ class FirewallRulesController extends Controller
 					
 					$this->fixPriority($id_chain);
 										
-					$syncEntity = new sync();
-					$syncEntity->setChainId($id_chain);
-					$syncEntity->setTime(new \DateTime('now'));
-					$syncEntity->setError(false);
-					$em->persist($syncEntity);
-					$em->flush();
+					/* add sync petition */
+					$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id_chain));
+					if(!$syncEntity){
+
+						$syncEntity = new sync();
+						$syncEntity->setChainId($id_chain);
+						$syncEntity->setTime(new \DateTime('now'));
+						$syncEntity->setError(false);
+						$em->persist($syncEntity);
+						$em->flush();
+
+					}
 
 
 
@@ -334,13 +348,20 @@ class FirewallRulesController extends Controller
 				$em->persist($entity);
 				$em->flush();
 	
-				$syncEntity = new sync();
-				$syncEntity->setChainId($id_chain);
-				$syncEntity->setTime(new \DateTime('now'));
-				$syncEntity->setError(false);
-				$em->persist($syncEntity);
-				$em->flush();
+				/* add sync petition */
+				$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id_chain));
+				if(!$syncEntity){
 
+					$syncEntity = new sync();
+					$syncEntity->setChainId($id_chain);
+					$syncEntity->setTime(new \DateTime('now'));
+					$syncEntity->setError(false);
+					$em->persist($syncEntity);
+					$em->flush();
+
+				}
+
+				$this->fixPriority($id_chain);
 				
 				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));			
         
@@ -396,21 +417,24 @@ class FirewallRulesController extends Controller
 
 				$this->fixPriority($id_chain);
 
-				$syncEntity = new sync();
-				$syncEntity->setChainId($id_chain);
-				$syncEntity->setTime(new \DateTime('now'));
-				$syncEntity->setError(false);
-				$em->persist($syncEntity);
-				$em->flush();
+				/* add sync petition */
+				$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id_chain));
+				if(!$syncEntity){
+
+					$syncEntity = new sync();
+					$syncEntity->setChainId($id_chain);
+					$syncEntity->setTime(new \DateTime('now'));
+					$syncEntity->setError(false);
+					$em->persist($syncEntity);
+					$em->flush();
+
+				}
 
 
 				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
 											
 			}
-
 		
-
-			
 		}
 		
 
@@ -462,12 +486,18 @@ class FirewallRulesController extends Controller
 
 		$this->fixPriority($id_chain);
 
-		$syncEntity = new sync();
-		$syncEntity->setChainId($id_chain);
-		$syncEntity->setTime(new \DateTime('now'));
-		$syncEntity->setError(false);
-		$em->persist($syncEntity);
-		$em->flush();
+		/* add sync petition */
+		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id_chain));
+		if(!$syncEntity){
+
+			$syncEntity = new sync();
+			$syncEntity->setChainId($id_chain);
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$em->persist($syncEntity);
+			$em->flush();
+
+		}
 
 
         return $this->redirect($this->generateUrl('firewallrules', array('id_chain'=>$id_chain)));

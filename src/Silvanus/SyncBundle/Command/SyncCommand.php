@@ -34,18 +34,34 @@ class SyncCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-   	
-		$entities=$this->em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findAll();
+		$syncEntities = $this->em->getRepository('SilvanusSyncBundle:Sync')->findAll();
 	
-		foreach($entities as $entity){
-		
-			exec('iptables -F');
-			exec($entity->getRule());
-		
-			$output->writeln($entity->getRule());
+		foreach($syncEntities as $syncEntity){
+			
+			echo $syncEntity->getChainId()."\n";
 			
 		}
-	
 
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
