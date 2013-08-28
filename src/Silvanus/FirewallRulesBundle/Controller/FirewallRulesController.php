@@ -101,10 +101,12 @@ class FirewallRulesController extends Controller
 		$arrForm=$this->get('request')->request->get('silvanus_firewallrulesbundle_firewallrulestype');
 		
         $entity  = new FirewallRules();
-        $entity->setChainId($id_chain);
+        $entity->setChainId($id_chain);      
+        
         $form = $this->createForm(new FirewallRulesCreateType(), $entity);
         $form->submit($request);
 
+		$em = $this->getDoctrine()->getManager();
 
         if ($form->isValid()) {
 
@@ -113,6 +115,7 @@ class FirewallRulesController extends Controller
 			 * 
 			 * */			
 			if(isset($arrForm['append'])){
+			
 			
 				//get last priority
 				$firewallRepository	= $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
@@ -143,7 +146,7 @@ class FirewallRulesController extends Controller
 						
 			}
          
-            $em = $this->getDoctrine()->getManager();
+         
             $em->persist($entity);
             $em->flush();
 
@@ -173,8 +176,8 @@ class FirewallRulesController extends Controller
 					$priorityError=$err->getMessageTemplate();
 					
 				}
-			
-				
+		
+					
 				/*
 				 * If is true this condition, move the priority value of rules +1
 				 * 
@@ -186,32 +189,40 @@ class FirewallRulesController extends Controller
 
 					$firewallRepository = $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
 				
-					$query		= $firewallRepository->createQueryBuilder('f')
+					$builder 	= $firewallRepository->createQueryBuilder('f');
+				
+				
+					$query		= $builder
 						->where('f.priority >= :priority')
-						->andWhere('f.id != :id')
+						//->andWhere('f.id != :id')
+						->andWhere('f.chain_id = :id_chain')
 						->setParameter(':priority',$arrForm['priority'])
-						->setParameter(':id',$entity->getId())
+						//->setParameter(':id',$entity->getId())
+						->setParameter(':id_chain',$id_chain)
 						->orderBy('f.priority','desc')
 						->getQuery();
 
 					$fixPrio	= $query->getResult();
 					
 					foreach($fixPrio as $fix){
-						
+					
 						$fix->setPriority($fix->getPriority()+1);
 						$em->persist($fix);
 						
 					}
-								
+												
 					$em->persist($entity);
 					$em->flush();
-
+					
+					$this->fixPriority($id_chain);
+										
 					$syncEntity = new sync();
 					$syncEntity->setChainId($id_chain);
 					$syncEntity->setTime(new \DateTime('now'));
 					$syncEntity->setError(false);
 					$em->persist($syncEntity);
 					$em->flush();
+
 
 
 					return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
@@ -383,6 +394,8 @@ class FirewallRulesController extends Controller
 				$em->persist($entity);
 				$em->flush();
 
+				$this->fixPriority($id_chain);
+
 				$syncEntity = new sync();
 				$syncEntity->setChainId($id_chain);
 				$syncEntity->setTime(new \DateTime('now'));
@@ -447,6 +460,8 @@ class FirewallRulesController extends Controller
 		$em->remove($entity);
 		$em->flush();
 
+		$this->fixPriority($id_chain);
+
 		$syncEntity = new sync();
 		$syncEntity->setChainId($id_chain);
 		$syncEntity->setTime(new \DateTime('now'));
@@ -459,6 +474,37 @@ class FirewallRulesController extends Controller
  
  
     }
+
+    /**
+     * Fixed the priority in all chain
+     * 
+     * @param mixed $id_chain The chain id
+     * 
+	 */
+	private function fixPriority($id_chain){
+	
+		$em = $this->getDoctrine()->getManager();
+		
+		$builder = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
+		
+		$query = $builder
+			->where('f.chain_id = :id_chain ')
+			->setParameter(':id_chain',$id_chain)
+			->orderBy('f.priority','asc')
+			->getQuery();
+		
+		$entities = $query->getResult();
+		
+		$n=1;
+		foreach($entities as $entity){
+		
+			$entity->setPriority($n);
+			$em->persist($entity);
+			$n++;
+		}
+	
+		$em->flush();
+	}
 
     /**
      * Creates a form to delete a FirewallRules entity by id.
