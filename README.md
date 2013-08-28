@@ -1,8 +1,12 @@
-Silvanus v 0.5
+Silvanus v0.5
 ========================
 
 Welcome to Silvanus iptables firewall web administrator to set up custom chains for advance 
-Firewall
+Firewall.
+
+Silvanus is Symfony2 project.
+
+This version is functional Beta, dont support security (recommended use htpassword). Use with careful
 
 1) Requeriments 
 ----------------------------------
@@ -118,3 +122,16 @@ Like root
 Add 5 minutes execute
 
 	*/5 * * * * php /var/www/silvanustest/Silvanus/app/console silvanus:sync
+
+6) This project use
+
+Symfony2
+iptables
+mysql
+doctrine
+twig
+jquery
+
+### Thanks your use!
+
+Alejandro Cabrera
