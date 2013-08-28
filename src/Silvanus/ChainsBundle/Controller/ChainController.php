@@ -61,13 +61,6 @@ class ChainController extends Controller
 				
 				}
 
-				if($formData['policy']!=''){
-				
-					$builder->where($builder->expr()->eq('c.policy',':policy'));
-					$builder->setParameter(':policy',$formData['policy']);
-				
-				}
-
 
 				$builder->orderBy('c.'.$formData['sort_by'],$formData['sort_direction']);
 				
@@ -360,13 +353,6 @@ class ChainController extends Controller
 					),
 				'label'=>'Sort direction',	
 				))				
-            ->add('policy','choice', array(
-				'label' 	=> 		'Policy',
-				'choices' 	=> 		array(
-					'accept'=>'ACCEPT',
-					'drop'	=>'DROP'
-					)
-				))
             ->add('name','text', array(
 				'label' 	=> 		'Name',
 				'required'	=> 		false		

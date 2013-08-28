@@ -38,7 +38,12 @@ class SyncCommand extends ContainerAwareCommand
 	
 		foreach($syncEntities as $syncEntity){
 			
-			echo $syncEntity->getChainId()."\n";
+			$chainEntity = $this->em->getRepository('SilvanusChainsBundle:Chain')->findOneBy(array('id'=>$syncEntity->getChainId()));
+			
+			echo '#'.$chainEntity->getId().' '.$chainEntity->getName().' '.$chainEntity->getPolicy()."\n";
+			
+			//create test chain
+			exec('iptables -N silvanus_test_chain');
 			
 		}
 

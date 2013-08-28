@@ -53,7 +53,6 @@
 				
 					{{ form_row(filter_form.sort_by) }}
 					{{ form_row(filter_form.sort_direction) }}
-					{{ form_row(filter_form.policy) }}
 				
 				</div>
 			
@@ -78,7 +77,6 @@
             <tr>
                 {# <th>Id</th> #}
                 <th>Name</th>
-                <th>Policy</th>
                 <th>Host</th>
                 <th>Actions</th>
             </tr>
@@ -88,7 +86,6 @@
             <tr>
                 {# <td><a href="{{ path('chains_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td> #}
                 <td>{{ entity.name }}</td>
-                <td>{{ entity.policy }}</td>
                 <td>{{ entity.host }}</td>
                 <td>
 					<button class="btn btn-danger" onclick="window.location.href='{{ path('chains_delete', { 'id': entity.id }) }}'" >Delete</button>

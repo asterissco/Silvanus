@@ -22,12 +22,6 @@ class ChainType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('policy','choice',array(
-				'choices' => array(
-					'ACCEPT' 	=> 'ACCEPT',
-					'DROP' 		=> 'DROP',
-				)
-            ))
             ->add('host');
 
 

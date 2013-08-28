@@ -37,13 +37,6 @@ class Chain
     /**
      * @var string
      *
-     * @ORM\Column(name="policy", type="string", length=255)
-     */
-    private $policy;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="host", type="string", length=255, nullable=TRUE)
      */
     private $host;
@@ -82,28 +75,6 @@ class Chain
         return $this->name;
     }
 
-    /**
-     * Set policy
-     *
-     * @param string $policy
-     * @return Chain
-     */
-    public function setPolicy($policy)
-    {
-        $this->policy = $policy;
-    
-        return $this;
-    }
-
-    /**
-     * Get policy
-     *
-     * @return string 
-     */
-    public function getPolicy()
-    {
-        return $this->policy;
-    }
 
     /**
      * Set host
