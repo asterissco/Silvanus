@@ -160,6 +160,7 @@ class FirewallRulesController extends Controller
 				$syncEntity->setChainId($id_chain);
 				$syncEntity->setTime(new \DateTime('now'));
 				$syncEntity->setError(false);
+				$syncEntity->setAction('u');
 				$em->persist($syncEntity);
 				$em->flush();
 
@@ -232,6 +233,7 @@ class FirewallRulesController extends Controller
 						$syncEntity->setChainId($id_chain);
 						$syncEntity->setTime(new \DateTime('now'));
 						$syncEntity->setError(false);
+						$syncEntity->setAction('u');
 						$em->persist($syncEntity);
 						$em->flush();
 
@@ -356,6 +358,7 @@ class FirewallRulesController extends Controller
 					$syncEntity->setChainId($id_chain);
 					$syncEntity->setTime(new \DateTime('now'));
 					$syncEntity->setError(false);
+					$syncEntity->setAction('u');
 					$em->persist($syncEntity);
 					$em->flush();
 
@@ -425,6 +428,7 @@ class FirewallRulesController extends Controller
 					$syncEntity->setChainId($id_chain);
 					$syncEntity->setTime(new \DateTime('now'));
 					$syncEntity->setError(false);
+					$syncEntity->setAction('u');
 					$em->persist($syncEntity);
 					$em->flush();
 
@@ -494,6 +498,7 @@ class FirewallRulesController extends Controller
 			$syncEntity->setChainId($id_chain);
 			$syncEntity->setTime(new \DateTime('now'));
 			$syncEntity->setError(false);
+			$syncEntity->setAction('u');
 			$em->persist($syncEntity);
 			$em->flush();
 

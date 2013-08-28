@@ -50,14 +50,14 @@ class Sync
      *
      * @ORM\Column(name="action", type="string", length=255, nullable=TRUE)
      */
-    private $action=null;
+    private $action;
 
     /**
      * @var string
      *
      * @ORM\Column(name="chain_name", type="string", length=255, nullable=TRUE)
      */
-    private $chainName=null;
+    private $chainName;
 
 
     /**
@@ -137,51 +137,5 @@ class Sync
     public function getError()
     {
         return $this->error;
-    }
-
-    /**
-     * Set action
-     *
-     * @param string $action
-     * @return Sync
-     */
-    public function setAction($action)
-    {
-        $this->action = $action;
-    
-        return $this;
-    }
-
-    /**
-     * Get action
-     *
-     * @return string 
-     */
-    public function getAction()
-    {
-        return $this->action;
-    }
-
-    /**
-     * Set chainName
-     *
-     * @param string $chainName
-     * @return Sync
-     */
-    public function setChainName($chainName)
-    {
-        $this->chainName = $chainName;
-    
-        return $this;
-    }
-
-    /**
-     * Get chainName
-     *
-     * @return string 
-     */
-    public function getChainName()
-    {
-        return $this->chainName;
     }
 }

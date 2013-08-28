@@ -117,6 +117,7 @@ class ChainController extends Controller
 				$syncEntity->setChainId($entity->getId());
 				$syncEntity->setTime(new \DateTime('now'));
 				$syncEntity->setError(false);
+				$syncEntity->setAction('c');
 				$em->persist($syncEntity);
 				$em->flush();
 
@@ -237,6 +238,7 @@ class ChainController extends Controller
 				$syncEntity->setChainId($id);
 				$syncEntity->setTime(new \DateTime('now'));
 				$syncEntity->setError(false);
+				$syncEntity->setAction('u');
 				$em->persist($syncEntity);
 				$em->flush();
 
@@ -295,22 +297,33 @@ class ChainController extends Controller
 			$em->remove($firewalRulesEntity);
 		}
 		
+		$chainName=$entity->getName();
+		
 		$em->remove($entity);
 		$em->flush();
 
 		/* add sync petition */
-		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id));
+		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findOneBy(array('chainId'=>$id));
 		if(!$syncEntity){
 
 			$syncEntity = new sync();
 			$syncEntity->setChainId($id);
 			$syncEntity->setTime(new \DateTime('now'));
 			$syncEntity->setError(false);
+			$syncEntity->setAction('d');
+			$syncEntity->setChainName($chainName);
 			$em->persist($syncEntity);
 			$em->flush();
 
+		}else{
+		
+			$syncEntity->setAction('d');
+			$syncEntity->setChainName($chainName);
+			
 		}
 
+		$em->persist($syncEntity);
+		$em->flush();
 
 
         return $this->redirect($this->generateUrl('chains'));
