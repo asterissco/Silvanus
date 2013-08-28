@@ -25,6 +25,8 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
+    globals:
+        version: '0.4'
 
 # Assetic Configuration
 assetic:
@@ -64,3 +66,7 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
     spool:     { type: memory }
+    
+# Silvanus config
+parameters:
+    test_chain: 'silvanus_test_chain'

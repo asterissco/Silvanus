@@ -2,12 +2,12 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Silvanus {{ version }} {% endblock %}</title>
         {% block stylesheets %}
 			<link rel="STYLESHEET" type="text/css" href="{{ asset('bundles/silvanus/css/bootstrap.min.css') }}"></link>
 			<link rel="STYLESHEET" type="text/css" href="{{ asset('bundles/silvanus/css/silvanus.css') }}"></link>
         {% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        {# <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" /> #}
 
 
 			<script type="text/javascript" src="{{ asset('bundles/silvanus/js/jquery-2.0.3.min.js') }}"></script>

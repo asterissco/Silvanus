@@ -27,12 +27,14 @@ class SyncCommand extends ContainerAwareCommand
 		 
 	
 		$this->em = $this->getContainer()->get('doctrine')->getManager();
-		 
+		$this->test_chain = $this->getContainer()->getParameter('test_chain');
+		
 	 }
 	 
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+		
 
 		$syncEntities = $this->em->getRepository('SilvanusSyncBundle:Sync')->findAll();
 	
@@ -43,9 +45,9 @@ class SyncCommand extends ContainerAwareCommand
 			echo '#'.$chainEntity->getId().' '.$chainEntity->getName()."\n";
 			
 			//delete and create test chain
-			exec('iptables -F silvanus_test_chain 2>&1',$trash);
-			exec('iptables -X silvanus_test_chain 2>&1',$trash);
-			exec('iptables -N silvanus_test_chain');
+			exec('iptables -F '.$this->test_chain.' 2>&1',$trash);
+			exec('iptables -X '.$this->test_chain.' 2>&1',$trash);
+			exec('iptables -N '.$this->test_chain);
 			
 			//load and test rules for this chain
 			$builder 	= $this->em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
@@ -62,7 +64,7 @@ class SyncCommand extends ContainerAwareCommand
 			//test loop
 			foreach($firewallRulesEntities as $firewallRulesEntity){
 				
-				$rule = "iptables -I silvanus_test_chain ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
+				$rule = "iptables -I ".$this->test_chain." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
 				
 				if($chainEntity->getHost()!=''){
 				
@@ -93,8 +95,8 @@ class SyncCommand extends ContainerAwareCommand
 				
 			}
 
-			exec('iptables -F silvanus_test_chain 2>&1',$trash);
-			exec('iptables -X silvanus_test_chain 2>&1',$trash);
+			exec('iptables -F '.$this->test_chain.' 2>&1',$trash);
+			exec('iptables -X '.$this->test_chain.' 2>&1',$trash);
 
 			
 			//no errors found
@@ -132,24 +134,3 @@ class SyncCommand extends ContainerAwareCommand
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
