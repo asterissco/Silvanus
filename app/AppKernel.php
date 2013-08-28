@@ -18,7 +18,7 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new Silvanus\FirewallRulesBundle\SilvanusFirewallRulesBundle(),
             new Silvanus\SyncBundle\SilvanusSyncBundle(),
-	    new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
+//			new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new Silvanus\ChainsBundle\SilvanusChainsBundle(),
         );
 
