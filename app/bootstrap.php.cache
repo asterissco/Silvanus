@@ -546,6 +546,9 @@ $dup->baseUrl = null;
 $dup->basePath = null;
 $dup->method = null;
 $dup->format = null;
+if (!$dup->get('_format')) {
+$dup->setRequestFormat($this->getRequestFormat());
+}
 return $dup;
 }
 public function __clone()
@@ -807,7 +810,7 @@ $host = $this->server->get('SERVER_ADDR','');
 }
 $host = strtolower(preg_replace('/:\d+$/','', trim($host)));
 if ($host && !preg_match('/^\[?(?:[a-zA-Z0-9-:\]_]+\.?)+$/', $host)) {
-throw new \UnexpectedValueException('Invalid Host');
+throw new \UnexpectedValueException('Invalid Host "'.$host.'"');
 }
 if (count(self::$trustedHostPatterns) > 0) {
 if (in_array($host, self::$trustedHosts)) {
@@ -819,7 +822,7 @@ self::$trustedHosts[] = $host;
 return $host;
 }
 }
-throw new \UnexpectedValueException('Untrusted Host');
+throw new \UnexpectedValueException('Untrusted Host "'.$host.'"');
 }
 return $host;
 }
@@ -1286,8 +1289,16 @@ $previous = null;
 $obStatus = ob_get_status(1);
 while (($level = ob_get_level()) > 0 && $level !== $previous) {
 $previous = $level;
-if ($obStatus[$level - 1] && isset($obStatus[$level - 1]['del']) && $obStatus[$level - 1]['del']) {
+if ($obStatus[$level - 1]) {
+if (version_compare(PHP_VERSION,'5.4','>=')) {
+if (isset($obStatus[$level - 1]['flags']) && ($obStatus[$level - 1]['flags'] & PHP_OUTPUT_HANDLER_REMOVABLE)) {
 ob_end_flush();
+}
+} else {
+if (isset($obStatus[$level - 1]['del']) && $obStatus[$level - 1]['del']) {
+ob_end_flush();
+}
+}
 }
 }
 flush();
@@ -2132,13 +2143,13 @@ protected $debug;
 protected $booted;
 protected $name;
 protected $startTime;
-protected $classes;
 protected $loadClassCache;
-const VERSION ='2.3.3';
-const VERSION_ID ='20303';
+protected $errorReportingLevel;
+const VERSION ='2.3.4';
+const VERSION_ID ='20304';
 const MAJOR_VERSION ='2';
 const MINOR_VERSION ='3';
-const RELEASE_VERSION ='3';
+const RELEASE_VERSION ='4';
 const EXTRA_VERSION ='';
 public function __construct($environment, $debug)
 {
@@ -2147,7 +2158,6 @@ $this->debug = (Boolean) $debug;
 $this->booted = false;
 $this->rootDir = $this->getRootDir();
 $this->name = $this->getName();
-$this->classes = array();
 $this->bundles = array();
 if ($this->debug) {
 $this->startTime = microtime(true);
