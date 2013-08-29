@@ -18,6 +18,14 @@ use Symfony\Component\Validator\ExecutionContextInterface;
  */
 class Chain
 {
+
+    public function __construct(){
+        
+        $this->trusted = new \Doctrine\Common\Collections\ArrayCollection();
+
+    }
+
+
     /**
      * @var integer
      *
@@ -41,6 +49,15 @@ class Chain
      */
     private $host;
 
+	/**
+	 *
+	 * @ORM\ManyToMany(targetEntity="Trusted")
+     * @ORM\JoinTable(name="chain_trusted", 
+     *      joinColumns={@ORM\JoinColumn(name="chain_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="trusted_id", referencedColumnName="id")}
+     *      )
+	 */
+	private $trusted;
 
     /**
      * Get id
@@ -100,8 +117,7 @@ class Chain
     }
 
 
-	/* validators */
-	
+	/* validators */	
 	public function isNameValid(ExecutionContextInterface $context){
 	
 		if(strpos($this->name,' ')){
@@ -124,37 +140,27 @@ class Chain
         
 		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
+    /**
+     * Set trusted
+     *
+     * @param string $trusted
+     * @return Chain
+     */
+    public function setTrusted($trusted)
+    {
+        $this->trusted = $trusted;
+    
+        return $this;
+    }
 
+    /**
+     * Get trusted
+     *
+     * @return string 
+     */
+    public function getTrusted()
+    {
+        return $this->trusted;
+    }
 }

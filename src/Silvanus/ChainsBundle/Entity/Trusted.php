@@ -12,6 +12,14 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Trusted
 {
+
+    public function __construct(){
+        
+        $this->chains = new \Doctrine\Common\Collections\ArrayCollection();
+
+    }
+	
+	
     /**
      * @var integer
      *
@@ -28,6 +36,12 @@ class Trusted
      */
     private $name;
 
+    /**
+     *
+     * @ORM\ManyToMany(targetEntity="Chain", mappedBy="trusted")
+     * 
+     */
+	private $chains;
 
     /**
      * Get id
@@ -60,5 +74,30 @@ class Trusted
     public function getName()
     {
         return $this->name;
+    }
+
+
+
+    /**
+     * Set chains
+     *
+     * @param string $chains
+     * @return Trusted
+     */
+    public function setChains($chains)
+    {
+        $this->chains = $chains;
+    
+        return $this;
+    }
+
+    /**
+     * Get chains
+     *
+     * @return string 
+     */
+    public function getChains()
+    {
+        return $this->chains;
     }
 }
