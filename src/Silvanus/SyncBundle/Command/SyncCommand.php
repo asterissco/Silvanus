@@ -36,8 +36,9 @@ class SyncCommand extends ContainerAwareCommand
     {
 		
 
-		$syncEntities = $this->em->getRepository('SilvanusSyncBundle:Sync')->findAll();
-	
+		$syncEntities 		= $this->em->getRepository('SilvanusSyncBundle:Sync')->findAll();
+		$trustedEntities 	= $this->em->getRepository('SilvanusChainsBundle:Trusted')->findAll();
+		
 		foreach($syncEntities as $syncEntity){
 		
 			unset($trash);
@@ -46,6 +47,9 @@ class SyncCommand extends ContainerAwareCommand
 			if($syncEntity->getAction()=='d'){
 				
 				exec('iptables -D INPUT -j '.$syncEntity->getChainName().' 2>&1',$trash);
+				exec('iptables -D FORWARD -j '.$syncEntity->getChainName().' 2>&1',$trash);
+				exec('iptables -D OUTPUT -j '.$syncEntity->getChainName().' 2>&1',$trash);
+				
 				exec('iptables -F '.$syncEntity->getChainName().' 2>&1',$trash);
 				exec('iptables -X '.$syncEntity->getChainName().' 2>&1',$trash);
 				$this->em->remove($syncEntity);
@@ -119,6 +123,13 @@ class SyncCommand extends ContainerAwareCommand
 				
 				//no errors found
 				if(!$errorHandle){
+
+					foreach($trustedEntities as $trustedEntity){
+					
+						exec('iptables -D '.$trustedEntity->getName().' -j '.$chainEntity->getName().' 2>&1',$trash);
+						
+					}
+
 				
 					//delete and create test chain
 					exec('iptables -F '.$chainEntity->getName().' 2>&1',$trash);
@@ -146,12 +157,15 @@ class SyncCommand extends ContainerAwareCommand
 					
 				}
 				
-				//if create a new chain, add trusted host
-				if($syncEntity->getAction()=='c'){
-			
-					exec('iptables -A INPUT -j '.$chainEntity->getName().' 2>&1',$trash);
 					
-				}	
+				foreach($chainEntity->getTrusted() as $trusted){
+				
+					exec('iptables -A '.$trusted.' -j '.$chainEntity->getName().' 2>&1',$trash);
+					
+				}
+				
+				
+
 			
 			}
 
