@@ -48,11 +48,11 @@ class FirewallRules
     private $chain_id;
 
     /**
-     * @var boolean
      *
-     * @ORM\Column(name="sync_error", type="boolean", nullable=TRUE)
+     * @ORM\OneToOne(targetEntity="RulesSyncStatus")
+     * @ORM\JoinColumn(name="RulesSyncStatus_id", referencedColumnName="id")
      */
-    private $syncError;
+    private $syncStatus;
 
     /**
      * @var Array
@@ -144,14 +144,14 @@ class FirewallRules
     }
 
     /**
-     * Set syncError
+     * Set syncStatus
      *
-     * @param boolean $syncError
-     * @return FirewallRules
+     * @param int $syncError
+     * @return String	
      */
-    public function setSyncError($syncError)
+    public function setSyncStatus($syncStatus)
     {
-        $this->syncError = $syncError;
+        $this->syncStatus = $syncStatus;
     
         return $this;
     }
@@ -159,11 +159,11 @@ class FirewallRules
     /**
      * Get syncError
      *
-     * @return boolean 
+     * @return string
      */
-    public function getSyncError()
+    public function getSyncStatus()
     {
-        return $this->syncError;
+        return $this->syncStatus;
     }
 
     /**

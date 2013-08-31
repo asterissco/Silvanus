@@ -109,7 +109,7 @@ class SyncCommand extends ContainerAwareCommand
 					echo $rule;
 					
 					if($errorHandle){
-						$firewallRulesEntity->setSyncError(true);
+						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>3)));
 						$firewallRulesEntity->setSyncErrorMessage(serialize($output));
 						$this->em->persist($firewallRulesEntity);
 					}
@@ -144,7 +144,8 @@ class SyncCommand extends ContainerAwareCommand
 						$rule = "iptables -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
 						$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
 						
-						$firewallRulesEntity->setSyncError(false);
+						
+						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>2)));
 						$firewallRulesEntity->setSyncErrorMessage('');
 						
 						$this->em->persist($firewallRulesEntity);				

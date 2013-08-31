@@ -55,7 +55,6 @@
 					
 						{{ form_row(filter_form.sort_by) }}
 						{{ form_row(filter_form.sort_direction) }}
-						{{ form_row(filter_form.sync_error) }} 
 						
 				
 					</div>
@@ -97,24 +96,25 @@
 					<td>{{ entity.rule }}</td>
 					<td>
 
-						{% if entity.syncError == false %}
-							<button class="btn btn-success">NO ERRORS</button>
-						{% endif %}
-						{% if entity.syncError == true %}
-							
-							{% set error = '' %}
-							
+						{% if entity.syncStatus == 'Sync ERROR'  %}
+
+							{% set error = ''%}
 							{% for errorMessage in entity.syncErrorMessage %}
 						
 								{% set error = error ~ errorMessage ~ "<br>" %}
 						
 							{% endfor %}
 						
-							<button class="btn btn-danger" onclick='bootbox.alert("{{ error }}")'>ERRORS FOUND</button>
+							<button class="btn btn-danger" onclick='bootbox.alert("{{ error }}")'>{{ entity.syncStatus }}</button>
+
+						
+						{% else %}
+						
+							<button class="btn btn-success" )'>{{ entity.syncStatus }}</button>
 							
-							
-							
+						
 						{% endif %}
+
 
 					
 					</td>

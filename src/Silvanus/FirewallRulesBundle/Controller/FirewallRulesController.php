@@ -159,6 +159,8 @@ class FirewallRulesController extends Controller
 			}
          
          
+			$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+         
             $em->persist($entity);
             $em->flush();
             
@@ -358,6 +360,8 @@ class FirewallRulesController extends Controller
 
 		
         if ($editForm->isValid()) {
+
+				$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
 			
 				$em->persist($entity);
 				$em->flush();
@@ -375,6 +379,7 @@ class FirewallRulesController extends Controller
 					$em->flush();
 
 				}
+
 
 				$this->fixPriority($id_chain);
 				
@@ -602,15 +607,6 @@ class FirewallRulesController extends Controller
             ->add('rule', 'text',array(
 					'label'=>'Rule',
 					'required' => false	
-				))
-            ->add('sync_error', 'choice',array(
-					'label'=>'Sync status',
-					'required' => false,
-					'choices' => array(
-						'' => '',
-						'false' => 'False',
-						'true' => 'True',
-						)	
 				))
             ->getForm()
         ;
