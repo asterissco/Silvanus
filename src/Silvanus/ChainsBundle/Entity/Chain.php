@@ -59,6 +59,14 @@ class Chain
 	 */
 	private $trusted;
 
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="error", type="boolean", nullable=TRUE)
+     */
+    private $error;
+
     /**
      * Get id
      *
@@ -163,4 +171,28 @@ class Chain
     {
         return $this->trusted;
     }
+
+    /**
+     * Set error
+     *
+     * @param boolean $error
+     * @return Sync
+     */
+    public function setError($error)
+    {
+        $this->error = $error;
+    
+        return $this;
+    }
+
+    /**
+     * Get error
+     *
+     * @return boolean 
+     */
+    public function getError()
+    {
+        return $this->error;
+    }    
+    
 }

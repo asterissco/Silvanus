@@ -132,6 +132,7 @@ class SyncCommand extends ContainerAwareCommand
 						
 					}
 
+					$chainEntity->setError(false);
 				
 					//delete and create test chain
 					exec('iptables -F '.$chainEntity->getName().' 2>&1',$trash);
@@ -166,12 +167,14 @@ class SyncCommand extends ContainerAwareCommand
 					
 				}else{
 					
+					$chainEntity->setError(true);
 					$syncEntity->setError(true);
 					$this->em->persist($syncEntity);
 					
 				}
 				
-					
+				
+				$this->em->persist($chainEntity);	
 				
 				
 

@@ -49,7 +49,7 @@ class FirewallRules
 
     /**
      *
-     * @ORM\OneToOne(targetEntity="RulesSyncStatus")
+     * @ORM\ManyToOne(targetEntity="RulesSyncStatus")
      * @ORM\JoinColumn(name="RulesSyncStatus_id", referencedColumnName="id")
      */
     private $syncStatus;

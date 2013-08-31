@@ -79,6 +79,7 @@
                 <th>Name</th>
                 <th>Host</th>
                 <th>Trusted</th>
+                <th>Sync Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -94,6 +95,19 @@
 						{{ trusted }}
 					
 					{% endfor %}
+                
+                </td>
+                <td>
+                
+					{% if entity.error == true %}
+					
+						ERRORS
+					
+					{% else %}
+					
+						NO ERRORS
+					
+					{% endif %}
                 
                 </td>
                 <td>
