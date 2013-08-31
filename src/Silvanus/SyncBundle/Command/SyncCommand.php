@@ -110,6 +110,9 @@ class SyncCommand extends ContainerAwareCommand
 					
 					if($errorHandle){
 						print_r($output);
+						$firewallRulesEntity->setSyncError(true);
+						$firewallRulesEntity->setSyncErrorMessage(serialize($output));
+						$this->em->persist($firewallRulesEntity);
 					}
 						
 					echo "\n";
@@ -141,6 +144,11 @@ class SyncCommand extends ContainerAwareCommand
 					
 						$rule = "iptables -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
 						$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
+						
+						$firewallRulesEntity->setSyncError(false);
+						$firewallRulesEntity->setSyncErrorMessage('');
+						
+						$this->em->persist($firewallRulesEntity);				
 										
 						exec($rule.' 2>&1',$trash);
 						

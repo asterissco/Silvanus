@@ -81,6 +81,7 @@
                 
                 <th>Priority</th>
                 <th>Rule</th>
+                <th>Sync Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -95,6 +96,29 @@
 					<td>{{ entity.priority }}</td>
 					<td>{{ entity.rule }}</td>
 					<td>
+
+						{% if entity.syncError == false %}
+							<button class="btn btn-success">NO ERRORS</button>
+						{% endif %}
+						{% if entity.syncError == true %}
+							
+							{% set error = '' %}
+							
+							{% for errorMessage in entity.syncErrorMessage %}
+						
+								{% set error = error ~ errorMessage ~ "<br>" %}
+						
+							{% endfor %}
+						
+							<button class="btn btn-danger" onclick='bootbox.alert("{{ error }}")'>ERRORS FOUND</button>
+							
+							
+							
+						{% endif %}
+
+					
+					</td>
+					<td>
 					
 							{# <button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button> #}
 							<button class="btn btn-warning"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id, 'id_chain': id_chain }) }}'">Edit</button>
@@ -103,6 +127,7 @@
 					</td>
 										
 				</tr>
+				
 
         {% endfor %}
         </tbody>
@@ -110,6 +135,20 @@
 
 			
             <button class="btn btn-success" onclick="window.location.href='{{ path('firewallrules_new', {'id_chain': id_chain}) }}'">New rule</button>
+
+<div id="myModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<!-- dialog body -->
+				<div class="modal-body">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				Hello world!
+				</div>
+			<!-- dialog buttons -->
+			<div class="modal-footer"><button type="button" class="btn btn-primary">OK</button></div>
+		</div>
+	</div>
+</div>
 
 {% endblock %}
 

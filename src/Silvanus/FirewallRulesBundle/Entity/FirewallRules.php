@@ -47,6 +47,20 @@ class FirewallRules
      */
     private $chain_id;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="sync_error", type="boolean", nullable=TRUE)
+     */
+    private $syncError;
+
+    /**
+     * @var Array
+     *
+     * @ORM\Column(name="sync_error_message", type="array", length=255, nullable=TRUE)
+     */
+    private $syncErrorMessage;
+
 
     /**
      * Get id
@@ -127,5 +141,54 @@ class FirewallRules
     public function getChainId()
     {
         return $this->chain_id;
+    }
+
+    /**
+     * Set syncError
+     *
+     * @param boolean $syncError
+     * @return FirewallRules
+     */
+    public function setSyncError($syncError)
+    {
+        $this->syncError = $syncError;
+    
+        return $this;
+    }
+
+    /**
+     * Get syncError
+     *
+     * @return boolean 
+     */
+    public function getSyncError()
+    {
+        return $this->syncError;
+    }
+
+    /**
+     * Set syncErrorMessage
+     *
+     * @param string $syncErrorMessage
+     * @return FirewallRules
+     */
+    public function setSyncErrorMessage($syncErrorMessage)
+    {
+        $this->syncErrorMessage = $syncErrorMessage;
+    
+        return $this;
+    }
+
+    /**
+     * Get syncErrorMessage
+     *
+     * @return string 
+     */
+    public function getSyncErrorMessage()
+    {
+		if($this->syncErrorMessage!=null){
+			return unserialize($this->syncErrorMessage);
+		}
+        return $this->syncErrorMessage;
     }
 }
