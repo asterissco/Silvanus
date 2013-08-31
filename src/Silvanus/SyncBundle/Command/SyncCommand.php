@@ -109,7 +109,6 @@ class SyncCommand extends ContainerAwareCommand
 					echo $rule;
 					
 					if($errorHandle){
-						print_r($output);
 						$firewallRulesEntity->setSyncError(true);
 						$firewallRulesEntity->setSyncErrorMessage(serialize($output));
 						$this->em->persist($firewallRulesEntity);
@@ -124,7 +123,7 @@ class SyncCommand extends ContainerAwareCommand
 				exec('iptables -X '.$this->test_chain.' 2>&1',$trash);
 
 				
-				//no errors found
+				//no errors found, inset rules into chain and chain into trusted chain
 				if(!$errorHandle){
 
 					foreach($trustedEntities as $trustedEntity){
@@ -137,7 +136,7 @@ class SyncCommand extends ContainerAwareCommand
 					//delete and create test chain
 					exec('iptables -F '.$chainEntity->getName().' 2>&1',$trash);
 					exec('iptables -X '.$chainEntity->getName().' 2>&1',$trash);
-					exec('iptables -N '.$chainEntity->getName());
+					exec('iptables -N '.$chainEntity->getName().' 2>&1',$trash);
 					
 					//set the rules to chain
 					foreach($firewallRulesEntities as $firewallRulesEntity){
@@ -156,6 +155,12 @@ class SyncCommand extends ContainerAwareCommand
 				
 					//delete the petition
 					$this->em->remove($syncEntity);
+
+					foreach($chainEntity->getTrusted() as $trusted){
+					
+						exec('iptables -A '.$trusted.' -j '.$chainEntity->getName().' 2>&1',$trash);
+						
+					}
 					
 					
 				}else{
@@ -166,11 +171,6 @@ class SyncCommand extends ContainerAwareCommand
 				}
 				
 					
-				foreach($chainEntity->getTrusted() as $trusted){
-				
-					exec('iptables -A '.$trusted.' -j '.$chainEntity->getName().' 2>&1',$trash);
-					
-				}
 				
 				
 
