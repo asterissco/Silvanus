@@ -28,3 +28,8 @@ chains_delete:
     pattern:  /{id}/delete
     defaults: { _controller: "SilvanusChainsBundle:Chain:delete" }
     requirements: { _method: post|delete|get }
+
+chains_force_sync:
+    pattern:  /{id}/force_sync
+    defaults: { _controller: "SilvanusChainsBundle:Chain:forceSync" }
+    requirements: { _method: get }

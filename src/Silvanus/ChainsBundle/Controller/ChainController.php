@@ -256,6 +256,37 @@ class ChainController extends Controller
             'delete_form' => $deleteForm->createView(),
         );
     }
+
+    /**
+     * Force sync
+     *
+     * @Route("/{id}", name="chains_force_sync")
+     */
+    public function forceSyncAction(Request $request, $id)
+    {
+
+		$em 			= $this->getDoctrine()->getManager();
+
+		$chainEntity 	= $em->getRepository('SilvanusChainsBundle:Chain')->findOneBy(array('id'=>$id));		
+		$syncEntity 	= $em->getRepository('SilvanusSyncBundle:Sync')->findOneBy(array('chainId'=>$id));
+		
+		if(!$syncEntity){
+
+			$syncEntity = new sync();
+			$syncEntity->setChainId($chainEntity->getId());
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$syncEntity->setAction('u');
+			$syncEntity->setChainName($chainEntity->getName());
+			$em->persist($syncEntity);
+			$em->flush();
+
+		}
+
+		return $this->redirect($this->generateUrl('chains'));
+
+	}
+
     /**
      * Deletes a Chain entity.
      *

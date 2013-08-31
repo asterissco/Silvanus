@@ -101,6 +101,7 @@
 					<button class="btn btn-success" onclick="window.location.href='{{ path('chains_edit', { 'id': entity.id }) }}'" >Update</button>
 					{# <button class="btn btn-primary" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button> #}
 					<button class="btn btn-primary" onclick="window.location.href='{{ path('firewallrules', { 'id_chain': entity.id }) }}'" >Admin firewall rules</button>
+					<button class="btn btn-primary" onclick="window.location.href='{{ path('chains_force_sync', { 'id': entity.id }) }}'" >Force Sync</button>
 				
                 </td>
             </tr>
