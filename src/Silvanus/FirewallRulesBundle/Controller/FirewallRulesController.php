@@ -51,7 +51,19 @@ class FirewallRulesController extends Controller
 				
 			}
 
-			$builder->where($builder->expr()->like('f.chain_id', ':chain_id'));
+			if($formData['sync_error']!=''){
+
+				if($formData['sync_error']=='true'){	$sync_error=true;	}
+				if($formData['sync_error']=='false'){	$sync_error=false;	}
+					
+				$builder->andWhere($builder->expr()->eq('f.syncError',':sync_error'));
+				$builder->setParameter(':sync_error',$sync_error);
+				
+			}
+
+
+
+			$builder->andWhere($builder->expr()->like('f.chain_id', ':chain_id'));
 			$builder->setParameter(':chain_id',$id_chain);
 
 
@@ -590,6 +602,15 @@ class FirewallRulesController extends Controller
             ->add('rule', 'text',array(
 					'label'=>'Rule',
 					'required' => false	
+				))
+            ->add('sync_error', 'choice',array(
+					'label'=>'Sync status',
+					'required' => false,
+					'choices' => array(
+						'' => '',
+						'false' => 'False',
+						'true' => 'True',
+						)	
 				))
             ->getForm()
         ;
