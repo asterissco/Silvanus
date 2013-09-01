@@ -1,8 +1,21 @@
-Silvanus v0.5
+Silvanus v0.6
 ========================
 
-Welcome to Silvanus iptables firewall web administrator to set up custom chains for advance 
-Firewall.
+Current version:
+
+ - Support multiple chains add to trusted iptables chains (INPUT, FORDWARD, OUTPUT)
+ - Support multiple Rules for chains
+ - Test the rules previus apply the rules by chains
+ - Debug information of synchronization in webpage
+ - Synchronization status list
+ - Support Magic Word "/host/" (see How To Use)
+<br>
+
+**This is no tested version, use with careful**
+
+<br>
+
+Welcome to Silvanus iptables firewall web administrator to set up custom chains for large and advance configuration.
 
 Silvanus is Symfony2 project.
 
@@ -11,20 +24,23 @@ This version is functional Beta, dont support security (recommended use htpasswo
 1) Requeriments 
 ----------------------------------
 
-Linux Like operating system
-php 5.3+ with cli module
-mysql 5+ (or other Database Doctrine and PDO suppport)
-PDO php extensions
-Web Server (Apache 2+ recommended with mod rewrite)
-git
-cron (recommended)
+ - Linux Like operating system
+ - php 5.3+ with cli module
+ - mysql 5+ (or other Database Doctrine and PDO suppport)
+ - PDO php extensions
+ - Web Server (Apache 2+ recommended with mod rewrite)
+ - Composer
+ - git
+ - cron (recommended)
 
 2) Previous installation
+----------------------------------
 
 Install Mysql (or other server) and create a database.
 Create a user to connect with all privileges
 
 3) Installation (with git)
+----------------------------------
 
 ### Database and configuration
 
@@ -38,18 +54,25 @@ Enter in the Silvanus directory
 
 	administrador@lab2:/var/www/silvanustest$ cd Silvanus/
 
-Comment the DoctrineFixturesBundle (Bug for next version)
 
-	administrador@lab2:/var/www/silvanustest/Silvanus$ vim app/AppKernel.php 
-	//          new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
-
-Option, updete with composer
+Update with composer
 
 	administrador@lab2:/var/www/silvanustest/Silvanus$ php composer.phar update
 
-Set database (Mysql in this case) connection
+Set database (Mysql in this case) configuration
 
 	administrador@lab2:/var/www/silvanustest/Silvanus$ vim app/config/parameters.yml
+
+Set enviroment configuration:
+
+	administrador@lab2:/var/www/silvanus/Symfony$ vim app/config/config.yml 
+
+	Inside the document 
+
+	# Silvanus config
+		parameters:
+			test_chain: 'silvanus_test_chain' #chain to test rules before apply
+			iptables_path: '/sbin/iptables'	  #regular path to iptables (Needed for CRON)
 
 Test database connection
 
@@ -66,6 +89,11 @@ Generate database schema
 
 	administrador@lab2:/var/www/silvanustest/Silvanus$ php app/console doctrine:schema:create
 
+Generate fixtures
+
+	administrador@lab2:/var/www/silvanustest/Silvanus$ php app/console doctrine:fixtures:load
+
+
 ### Publish Symfony2 web directory in your Web Server
 
 Follow the official instructions for Symfony2 project
@@ -73,13 +101,17 @@ Follow the official instructions for Symfony2 project
 	http://symfony.com/doc/current/cookbook/configuration/web_server_configuration.html
 	
 4) How to use (example)
-
-Create a new chain 
+----------------------------------
+Create a new chain (host is optionally)
 
 	name: test_chain
 	host: 192.168.100.50
+	truested: {INPUT,FORDWARD,OUTPUT} least an option
+
+ 
+
 	
-Create a firewall rule
+Create a firewall rule ("/host/" is a "Magic Word" to refered Chains Host value, 192.168.100.50 in this case )
 
 	Go to Admin Firewall Rules
 	New rule
@@ -113,25 +145,26 @@ Show the magic effect
 	
 
 
-5) Insert sync script in Cron
+5) Insert sync script in Cron (Recommended)
 
 Like root
 
 	root@lab2:/var/www/silvanustest/Silvanus# crontab -e
 
-Add 5 minutes execute
+Add 1 minutes execute
 
-	*/5 * * * * php /var/www/silvanustest/Silvanus/app/console silvanus:sync
+	*/1 * * * * php /var/www/silvanustest/Silvanus/app/console silvanus:sync >> /var/log/silvanus.log
 
 6) This project use
 
-Symfony2
-iptables
-mysql
-doctrine
-twig
-jquery
+ - Symfony 2
+ - iptables
+ - mysql 5
+ - doctrine 2
+ - twig 3
+ - jquery 2
+ - PHP 5.3.3
 
-### Thanks your use!
+### Thanks you for use!
 
-Alejandro Cabrera
+Alejandro Cabrera.
