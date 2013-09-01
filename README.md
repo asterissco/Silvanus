@@ -59,6 +59,12 @@ Update with composer
 
 	administrador@lab2:/var/www/silvanustest/Silvanus$ php composer.phar update
 
+*If you see this problem see https://github.com/cartalyst/sentry/issues/185
+
+	[RuntimeException]
+	Could not scan for classes inside "symfony/Component/HttpFoundation/Resources/stubs" which does not appear to be a file not a folder
+
+
 Set database (Mysql in this case) configuration
 
 	administrador@lab2:/var/www/silvanustest/Silvanus$ vim app/config/parameters.yml
