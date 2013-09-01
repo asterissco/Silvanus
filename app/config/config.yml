@@ -70,3 +70,4 @@ swiftmailer:
 # Silvanus config
 parameters:
     test_chain: 'silvanus_test_chain'
+    iptables_path: '/sbin/iptables'

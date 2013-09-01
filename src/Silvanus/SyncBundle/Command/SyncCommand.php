@@ -26,8 +26,9 @@ class SyncCommand extends ContainerAwareCommand
 	 protected function initialize(InputInterface $input, OutputInterface $output){
 		 
 	
-		$this->em = $this->getContainer()->get('doctrine')->getManager();
-		$this->test_chain = $this->getContainer()->getParameter('test_chain');
+		$this->em 				= $this->getContainer()->get('doctrine')->getManager();
+		$this->test_chain 		= $this->getContainer()->getParameter('test_chain');
+		$this->iptables_path 	= $this->getContainer()->getParameter('iptables_path');
 		
 	 }
 	 
@@ -46,12 +47,12 @@ class SyncCommand extends ContainerAwareCommand
 			//delete chain
 			if($syncEntity->getAction()=='d'){
 				
-				exec('iptables -D INPUT -j '.$syncEntity->getChainName().' 2>&1',$trash);
-				exec('iptables -D FORWARD -j '.$syncEntity->getChainName().' 2>&1',$trash);
-				exec('iptables -D OUTPUT -j '.$syncEntity->getChainName().' 2>&1',$trash);
+				exec($this->iptables_path.'  -D INPUT -j '.$syncEntity->getChainName().' 2>&1',$trash);
+				exec($this->iptables_path.'  -D FORWARD -j '.$syncEntity->getChainName().' 2>&1',$trash);
+				exec($this->iptables_path.'  -D OUTPUT -j '.$syncEntity->getChainName().' 2>&1',$trash);
 				
-				exec('iptables -F '.$syncEntity->getChainName().' 2>&1',$trash);
-				exec('iptables -X '.$syncEntity->getChainName().' 2>&1',$trash);
+				exec($this->iptables_path.'  -F '.$syncEntity->getChainName().' 2>&1',$trash);
+				exec($this->iptables_path.'  -X '.$syncEntity->getChainName().' 2>&1',$trash);
 				$this->em->remove($syncEntity);
 				
 				
@@ -65,9 +66,9 @@ class SyncCommand extends ContainerAwareCommand
 				echo '#'.$chainEntity->getId().' '.$chainEntity->getName()."\n";
 				
 				//delete and create test chain
-				exec('iptables -F '.$this->test_chain.' 2>&1',$trash);
-				exec('iptables -X '.$this->test_chain.' 2>&1',$trash);
-				exec('iptables -N '.$this->test_chain.' 2>&1',$trash);
+				exec($this->iptables_path.'  -F '.$this->test_chain.' 2>&1',$trash);
+				exec($this->iptables_path.'  -X '.$this->test_chain.' 2>&1',$trash);
+				exec($this->iptables_path.'  -N '.$this->test_chain.' 2>&1',$trash);
 				
 				//load and test rules for this chain
 				$builder 	= $this->em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
@@ -84,7 +85,7 @@ class SyncCommand extends ContainerAwareCommand
 				//test loop
 				foreach($firewallRulesEntities as $firewallRulesEntity){
 					
-					$rule = "iptables -I ".$this->test_chain." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
+					$rule = $this->iptables_path." -I ".$this->test_chain." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
 					
 					if($chainEntity->getHost()!=''){
 					
@@ -104,7 +105,7 @@ class SyncCommand extends ContainerAwareCommand
 						echo ' [ok]		';
 					}
 					
-					$rule = "iptables -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
+					$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
 					$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
 					echo $rule;
 					
@@ -119,8 +120,8 @@ class SyncCommand extends ContainerAwareCommand
 					
 				}
 
-				exec('iptables -F '.$this->test_chain.' 2>&1',$trash);
-				exec('iptables -X '.$this->test_chain.' 2>&1',$trash);
+				exec($this->iptables_path.'  -F '.$this->test_chain.' 2>&1',$trash);
+				exec($this->iptables_path.'  -X '.$this->test_chain.' 2>&1',$trash);
 
 				
 				//no errors found, inset rules into chain and chain into trusted chain
@@ -128,21 +129,21 @@ class SyncCommand extends ContainerAwareCommand
 
 					foreach($trustedEntities as $trustedEntity){
 					
-						exec('iptables -D '.$trustedEntity->getName().' -j '.$chainEntity->getName().' 2>&1',$trash);
+						exec($this->iptables_path.'  -D '.$trustedEntity->getName().' -j '.$chainEntity->getName().' 2>&1',$trash);
 						
 					}
 
 					$chainEntity->setError(false);
 				
 					//delete and create test chain
-					exec('iptables -F '.$chainEntity->getName().' 2>&1',$trash);
-					exec('iptables -X '.$chainEntity->getName().' 2>&1',$trash);
-					exec('iptables -N '.$chainEntity->getName().' 2>&1',$trash);
+					exec($this->iptables_path.'  -F '.$chainEntity->getName().' 2>&1',$trash);
+					exec($this->iptables_path.'  -X '.$chainEntity->getName().' 2>&1',$trash);
+					exec($this->iptables_path.'  -N '.$chainEntity->getName().' 2>&1',$trash);
 					
 					//set the rules to chain
 					foreach($firewallRulesEntities as $firewallRulesEntity){
 					
-						$rule = "iptables -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
+						$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
 						$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
 						
 						
@@ -160,7 +161,7 @@ class SyncCommand extends ContainerAwareCommand
 
 					foreach($chainEntity->getTrusted() as $trusted){
 					
-						exec('iptables -A '.$trusted.' -j '.$chainEntity->getName().' 2>&1',$trash);
+						exec($this->iptables_path.'  -A '.$trusted.' -j '.$chainEntity->getName().' 2>&1',$trash);
 						
 					}
 					
