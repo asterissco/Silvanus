@@ -1,0 +1,75 @@
+{% extends '::base.html.twig' %}
+
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+
+
+		$(document).ready(function(){
+
+
+			
+		});
+	
+	</script>
+
+{% endblock %}
+
+{% block body -%}
+    
+    <div class="page-header"><h1>Sync <small>petitions to dispatch </small></h1></div>
+    
+    {% if entities|length > 0 %}
+		
+		<table class="table">
+			<thead>
+				<tr>
+					
+					<th>ID</th>
+					<th>Chain</th>
+					<th>Time</th>
+					<th>Sync Status</th>
+				 
+				</tr>
+			</thead>
+			<tbody>
+			
+			{# entities record #}
+			
+			{% for entity in entities %}
+
+				<tr>
+				
+					<td>{{ entity.id }}</td>
+					<td>{{ entity.chainName }}</td>
+					<td>{{ entity.time |date('Y-m-d H:i:s')}}</td>
+					<td>
+					
+						{% if entity.error %}
+						
+							ERROR, check Firewall Rules of Chain
+						
+						{% else %}
+						
+							Pending to sync
+						
+						{% endif %}
+					
+					</td>
+					
+				</tr>
+				
+					
+
+			{% endfor %}
+			</tbody>
+		</table>
+
+	{% else %}
+	
+		<p>No sync petitions to Dispatch</p>
+	
+	{% endif %}
+    
+{% endblock %}

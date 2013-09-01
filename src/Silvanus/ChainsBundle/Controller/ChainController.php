@@ -284,7 +284,7 @@ class ChainController extends Controller
 
 		}
 
-		return $this->redirect($this->generateUrl('chains',array('message'=>'Force sync successful: '.$chainEntity->getName())));
+		return $this->redirect($this->generateUrl('chains',array('message'=>'Force petition successful: '.$chainEntity->getName())));
 
 	}
 

@@ -39,6 +39,7 @@
 				<a class="navbar-brand" href="{{ path('frontend') }}">Silvanus</a>
 			</div>
 			<div class="collapse navbar-collapse">
+				
 				<ul class="nav navbar-nav">
 					{% if 'chain' in app.request.getRequestURI() %}					
 						<li class="active">
@@ -48,8 +49,18 @@
 						<a href="{{ path('chains') }}">Chains</a>
 					</li>
 				</ul>
-				
-				
+
+				<ul class="nav navbar-nav">
+					{% if 'sync' in app.request.getRequestURI() %}					
+						<li class="active">
+					{% else %}						
+						<li>						
+					{% endif %}	
+						<a href="{{ path('sync') }}">Sync</a>
+					</li>
+				</ul>
+
+								
 			</div>
 		</div>
 	</div>        
