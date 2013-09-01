@@ -1,0 +1,7 @@
+parameters:
+#    silvanus_frontend.example.class: Silvanus\FrontendBundle\Example
+
+services:
+#    silvanus_frontend.example:
+#        class: %silvanus_frontend.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

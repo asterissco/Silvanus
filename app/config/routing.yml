@@ -1,3 +1,7 @@
+silvanus_frontend:
+    resource: "@SilvanusFrontendBundle/Resources/config/routing.yml"
+    prefix:   /
+
 silvanus_chains:
     resource: "@SilvanusChainsBundle/Resources/config/routing.yml"
     prefix:   /
