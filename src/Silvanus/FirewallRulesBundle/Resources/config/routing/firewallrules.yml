@@ -1,6 +1,6 @@
 firewallrules:
-    pattern:  /{id_chain}
-    defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:index" }
+    pattern:  /list/{id_chain}/{message}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:index", message: '' }
 
 firewallrules_show:
     pattern:  /{id}/show

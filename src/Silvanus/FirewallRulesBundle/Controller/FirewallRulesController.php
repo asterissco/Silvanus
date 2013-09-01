@@ -25,7 +25,7 @@ class FirewallRulesController extends Controller
      * Lists all FirewallRules entities.
      *
      */
-    public function indexAction(Request $request,$id_chain)
+    public function indexAction(Request $request,$id_chain,$message)
     {
 
         $em = $this->getDoctrine()->getManager();
@@ -100,6 +100,7 @@ class FirewallRulesController extends Controller
             'filter_form' 		=> $formFilter->createView(),         
             'id_chain'			=> $id_chain,
             'chain_entity'		=> $chain_entity,
+            'message'			=> $message,
         ));
     }
     /**
@@ -180,7 +181,11 @@ class FirewallRulesController extends Controller
 
 			}
 
-            return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
+            return $this->redirect($this->generateUrl('firewallrules', 
+				array(	'id_chain' => $id_chain, 
+						'message'=> 'Create successful',
+				)	
+			));
         
         }else{
 
@@ -233,6 +238,8 @@ class FirewallRulesController extends Controller
 						$em->persist($fix);
 						
 					}
+					
+					$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
 												
 					$em->persist($entity);
 					$em->flush();
@@ -254,8 +261,11 @@ class FirewallRulesController extends Controller
 					}
 
 
-
-					return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
+					return $this->redirect($this->generateUrl('firewallrules', 
+						array(	'id_chain' => $id_chain, 
+								'message'=> 'Create successful',
+						)	
+					));
 												
 				}
 
@@ -383,7 +393,11 @@ class FirewallRulesController extends Controller
 
 				$this->fixPriority($id_chain);
 				
-				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));			
+				return $this->redirect($this->generateUrl('firewallrules', 
+					array(	'id_chain' => $id_chain, 
+							'message'=> 'Update successful',
+					)	
+				));
         
         }else{
 		
@@ -432,6 +446,8 @@ class FirewallRulesController extends Controller
 					
 				}
 			
+				$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+			
 				$em->persist($entity);
 				$em->flush();
 
@@ -452,7 +468,11 @@ class FirewallRulesController extends Controller
 				}
 
 
-				return $this->redirect($this->generateUrl('firewallrules', array('id_chain' => $id_chain)));
+				return $this->redirect($this->generateUrl('firewallrules', 
+					array(	'id_chain' => $id_chain, 
+							'message'=> 'Update successful',
+					)	
+				));
 											
 			}
 		
@@ -522,7 +542,11 @@ class FirewallRulesController extends Controller
 		}
 
 
-        return $this->redirect($this->generateUrl('firewallrules', array('id_chain'=>$id_chain)));
+		return $this->redirect($this->generateUrl('firewallrules', 
+			array(	'id_chain' => $id_chain, 
+					'message'=> 'Delete successful',
+			)	
+		));
  
  
     }

@@ -44,32 +44,39 @@
 
     <div class="page-header"><h1>Firewall <small>rule list chain: </small> | {{ chain_entity.name }}</h1></div>
 
-		<legend>Filter</legend>
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}
+
+
+	<legend>Filter</legend>
+	
 		
+		<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('firewallrules', {'id_chain':id_chain} ) }}" method="POST" class="form-horizontal"> 
+
+			<div class="row">
+
+				<div class="col-md-6">
+				
+					{{ form_row(filter_form.sort_by) }}
+					{{ form_row(filter_form.sort_direction) }}
+					
 			
-			<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('firewallrules', {'id_chain':id_chain} ) }}" method="POST" class="form-horizontal"> 
-
-				<div class="row">
-
-					<div class="col-md-6">
-					
-						{{ form_row(filter_form.sort_by) }}
-						{{ form_row(filter_form.sort_direction) }}
-						
-				
-					</div>
-					
-					<div class="col-md-6">					
-					
-						{{ form_row(filter_form.rule) }}
-						
-						<button  class="btn btn-success" type="submit">Filter</button>
-						
-					</div>					
-				
 				</div>
 				
-			</form>
+				<div class="col-md-6">					
+				
+					{{ form_row(filter_form.rule) }}
+					
+					<button  class="btn btn-success" type="submit">Filter</button>
+					
+				</div>					
+			
+			</div>
+			
+		</form>
 		
 	<br><br>
 	
@@ -122,7 +129,7 @@
 					
 							{# <button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button> #}
 							<button class="btn btn-warning"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id, 'id_chain': id_chain }) }}'">Edit</button>
-							<button class="btn btn-danger"  onclick="window.location.href='{{ path('firewallrules_delete', { 'id': entity.id }) }}'">Delete</button>
+							<button class="btn btn-danger"  onclick="confirm_redirect('{{ path('firewallrules_delete', { 'id': entity.id }) }}','Are you sure?')">Delete</button>
 
 					</td>
 										
