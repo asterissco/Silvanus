@@ -62,13 +62,8 @@
 				
 				<div class="col-md-1">	
 				
-					<form action="{{ path('chains_delete', { 'id': entity.id }) }}" method="post" class="form-inline">
-						<input type="hidden" name="_method" value="DELETE" />
-						{{ form_widget(delete_form) }}
-						<button type="submit" class="btn btn-danger" >Delete</button>
-						
-					</form>
-
+					<button class="btn btn-danger" onclick="confirm_redirect('{{ path('chains_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
+				
 				</div>
 				<button class="btn btn-info" onclick="window.location.href='{{ path('chains') }}'">Back</button>
 				

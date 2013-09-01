@@ -27,7 +27,7 @@ class ChainController extends Controller
      * @Method("GET")
      * @Template()
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, $message)
     {
 
 		$em = $this->getDoctrine()->getManager();
@@ -88,6 +88,7 @@ class ChainController extends Controller
         return array(
             'entities' 		=> $entities,
             'filter_form'	=> $filter_form->createView(),
+            'message'		=> $message,
         );
     }
     /**
@@ -124,7 +125,7 @@ class ChainController extends Controller
 			}
 
             //return $this->redirect($this->generateUrl('chains_show', array('id' => $entity->getId())));
-            return $this->redirect($this->generateUrl('chains'));
+            return $this->redirect($this->generateUrl('chains',array('message'=>'Create successful: '.$entity->getName())));
         
         }
 
@@ -247,7 +248,7 @@ class ChainController extends Controller
 
 
             //return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
-			return $this->redirect($this->generateUrl('chains'));
+			return $this->redirect($this->generateUrl('chains', array('message'=>'Update successful: '.$entity->getName())));
         }
 
         return array(
@@ -283,7 +284,7 @@ class ChainController extends Controller
 
 		}
 
-		return $this->redirect($this->generateUrl('chains'));
+		return $this->redirect($this->generateUrl('chains',array('message'=>'Force sync successful: '.$chainEntity->getName())));
 
 	}
 
@@ -357,7 +358,7 @@ class ChainController extends Controller
 		$em->flush();
 
 
-        return $this->redirect($this->generateUrl('chains'));
+        return $this->redirect($this->generateUrl('chains',array('message'=>'Delete successful: '.$entity->getName())));
     }
 
     /**

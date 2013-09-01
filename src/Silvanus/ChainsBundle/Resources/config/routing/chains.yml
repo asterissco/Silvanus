@@ -1,6 +1,6 @@
 chains:
-    pattern:  /
-    defaults: { _controller: "SilvanusChainsBundle:Chain:index" }
+    pattern:  /list/{message}
+    defaults: { _controller: "SilvanusChainsBundle:Chain:index", message: '' }
 
 chains_show:
     pattern:  /{id}/show

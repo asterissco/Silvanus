@@ -29,10 +29,12 @@
 {% block javascripts %}
 
 	<script type="text/javascript">
-	
+
+
 		$(document).ready(function(){
-		
-		
+
+
+			
 		});
 	
 	</script>
@@ -42,6 +44,12 @@
 {% block body -%}
     
     <div class="page-header"><h1>Chains <small>list</small></h1></div>
+    
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}
     
 	<legend>Filter</legend>
 
@@ -111,7 +119,7 @@
                 
                 </td>
                 <td>
-					<button class="btn btn-danger" onclick="window.location.href='{{ path('chains_delete', { 'id': entity.id }) }}'" >Delete</button>
+					<button class="btn btn-danger" onclick="confirm_redirect('{{ path('chains_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
 					<button class="btn btn-success" onclick="window.location.href='{{ path('chains_edit', { 'id': entity.id }) }}'" >Update</button>
 					{# <button class="btn btn-primary" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button> #}
 					<button class="btn btn-primary" onclick="window.location.href='{{ path('firewallrules', { 'id_chain': entity.id }) }}'" >Admin firewall rules</button>
