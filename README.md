@@ -174,3 +174,5 @@ Add 1 minutes execute
 ### Thanks you for use!
 
 Alejandro Cabrera.
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.es_ES"><img alt="Licencia de Creative Commons" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">Silvanus</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.es_ES">Creative Commons Reconocimiento-NoComercial-CompartirIgual 3.0 Unported License</a>.
