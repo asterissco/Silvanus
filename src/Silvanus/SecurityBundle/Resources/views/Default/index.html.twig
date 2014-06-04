@@ -1,1 +1,22 @@
-Hello {{ name }}!
+<form action="{{ path('silvanus_security_login_check') }}" method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="_username" value="" />
+ 
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="_password" />
+ 
+    {#
+        añade lo siguiente si quieres redirigir al usuario a una
+        URL concreta después del login (explicado más adelante)
+        <input type="hidden" name="_target_path" value="/account" />
+    #}
+ 
+    <button type="submit">login</button>
+    
+    {% if error is defined %}
+    
+		{{ error }}
+		
+	{% endif %}
+    
+</form>

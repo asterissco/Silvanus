@@ -4,13 +4,17 @@ namespace Silvanus\SecurityBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Security\Core\Role\RoleInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 /**
  * Role
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\SecurityBundle\Entity\RoleRepository")
  */
-class Role
+class Role implements RoleInterface
 {
     /**
      * @var integer
@@ -24,9 +28,9 @@ class Role
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @ORM\Column(name="role", type="string", length=255)
      */
-    private $name;
+    private $role;
 
     /**
      * @var string
@@ -37,7 +41,7 @@ class Role
 
 	/**
 	 * 
-	 * @ORM\ManyToMany(targetEntity="user", mappedBy="roles")
+	 * @ORM\ManyToMany(targetEntity="User", mappedBy="roles")
 	 *
 	 */
 	private $users;
@@ -53,26 +57,26 @@ class Role
     }
 
     /**
-     * Set name
+     * Set role
      *
      * @param string $name
      * @return Role
      */
-    public function setName($name)
+    public function setRole($role)
     {
-        $this->name = $name;
+        $this->role = $role;
     
         return $this;
     }
 
     /**
-     * Get name
+     * Get role
      *
      * @return string 
      */
-    public function getName()
+    public function getRole()
     {
-        return $this->name;
+        return $this->role;
     }
 
     /**
@@ -137,4 +141,13 @@ class Role
     {
         return $this->users;
     }
+    
+    public function __toString(){
+		return $this->role;
+	}
+ 
+	//~ public function getRole(){
+		//~ return $this->role;	
+	//~ }
+    
 }

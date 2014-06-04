@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass="Silvanus\SecurityBundle\Entity\UserRepository")
  * @UniqueEntity(fields={"username"}, message="Already in use")
  */
-class User
+class User implements UserInterface, \Serializable
 {
     /**
      * @var integer
@@ -56,8 +56,12 @@ class User
 
 	/**
 	 * 
-	 * @ORM\ManyToMany(targetEntity="Role", mappedBy="users")
-	 * 
+	 * @ORM\ManyToMany(targetEntity="Role", inversedBy="users")
+     * @ORM\JoinTable(name="user_role",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")}
+     *      )
+
 	 */
 	private $roles;
 	
@@ -200,6 +204,49 @@ class User
      */
     public function getRoles()
     {
-        return $this->roles;
+        //return $this->roles;
+        return $this->roles->toArray();
     }
+    
+    public function getSalt(){
+		
+		return "566c4d0c16ac5b1e753e63e83a536cff";
+	}
+
+    /**
+     * @see \Serializable::serialize()
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->username,
+            $this->password,
+            // see section on salt below
+            // $this->salt,
+        ));
+    }
+
+    /**
+     * @see \Serializable::unserialize()
+     */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->username,
+            $this->password,
+            // see section on salt below
+            // $this->salt
+        ) = unserialize($serialized);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function eraseCredentials()
+    {
+    }
+
+
 }

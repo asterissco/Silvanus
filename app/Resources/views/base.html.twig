@@ -60,7 +60,24 @@
 					</li>
 				</ul>
 
-								
+				<ul class="nav navbar-nav">
+
+					{% if 'security' in app.request.getRequestURI() %}					
+						<li class="dropdown active">
+					{% else %}
+						<li class="dropdown">
+					{% endif%}
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">	Security <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="{{ path('role') }}">Roles</a></li>
+							<li><a href="{{ path('user') }}">Users</a></li>
+						</ul>
+
+					</li>
+
+				</ul>
+
 			</div>
 		</div>
 	</div>        
