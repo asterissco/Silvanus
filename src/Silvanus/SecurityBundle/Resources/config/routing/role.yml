@@ -1,0 +1,30 @@
+role:
+    pattern:  /
+    defaults: { _controller: "SilvanusSecurityBundle:Role:index" }
+
+role_show:
+    pattern:  /{id}/show
+    defaults: { _controller: "SilvanusSecurityBundle:Role:show" }
+
+role_new:
+    pattern:  /new
+    defaults: { _controller: "SilvanusSecurityBundle:Role:new" }
+
+role_create:
+    pattern:  /create
+    defaults: { _controller: "SilvanusSecurityBundle:Role:create" }
+    requirements: { _method: post }
+
+role_edit:
+    pattern:  /{id}/edit
+    defaults: { _controller: "SilvanusSecurityBundle:Role:edit" }
+
+role_update:
+    pattern:  /{id}/update
+    defaults: { _controller: "SilvanusSecurityBundle:Role:update" }
+    requirements: { _method: post|put }
+
+role_delete:
+    pattern:  /{id}/delete
+    defaults: { _controller: "SilvanusSecurityBundle:Role:delete" }
+    requirements: { _method: post|delete }

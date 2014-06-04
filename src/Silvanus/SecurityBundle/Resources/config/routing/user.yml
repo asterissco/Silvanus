@@ -1,0 +1,30 @@
+user:
+    pattern:  /
+    defaults: { _controller: "SilvanusSecurityBundle:User:index" }
+
+user_show:
+    pattern:  /{id}/show
+    defaults: { _controller: "SilvanusSecurityBundle:User:show" }
+
+user_new:
+    pattern:  /new
+    defaults: { _controller: "SilvanusSecurityBundle:User:new" }
+
+user_create:
+    pattern:  /create
+    defaults: { _controller: "SilvanusSecurityBundle:User:create" }
+    requirements: { _method: post }
+
+user_edit:
+    pattern:  /{id}/edit
+    defaults: { _controller: "SilvanusSecurityBundle:User:edit" }
+
+user_update:
+    pattern:  /{id}/update
+    defaults: { _controller: "SilvanusSecurityBundle:User:update" }
+    requirements: { _method: post|put }
+
+user_delete:
+    pattern:  /{id}/delete
+    defaults: { _controller: "SilvanusSecurityBundle:User:delete" }
+    requirements: { _method: post|delete }

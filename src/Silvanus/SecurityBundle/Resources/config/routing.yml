@@ -1,0 +1,12 @@
+silvanus_security_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: SilvanusSecurityBundle:Default:index }
+
+SilvanusSecurityBundle_user:
+    resource: "@SilvanusSecurityBundle/Resources/config/routing/user.yml"
+    prefix:   /security/user
+
+SilvanusSecurityBundle_role:
+    resource: "@SilvanusSecurityBundle/Resources/config/routing/role.yml"
+    prefix:   /security/role
+

@@ -1,0 +1,7 @@
+parameters:
+#    silvanus_security.example.class: Silvanus\SecurityBundle\Example
+
+services:
+#    silvanus_security.example:
+#        class: %silvanus_security.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
