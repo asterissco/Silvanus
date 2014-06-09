@@ -1,13 +1,12 @@
 # security
 
 silvanus_security_index:
-    pattern:  /
+    pattern:  /index
     defaults: { _controller: SilvanusSecurityBundle:Default:index }
 
 public_area_corporate_login:
     pattern: /security/login
     defaults: { _controller: SilvanusSecurityBundle:Default:login }
-
 
 silvanus_security_login_check:
     pattern: /security/login_check

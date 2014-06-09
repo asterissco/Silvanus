@@ -1,6 +1,6 @@
 role:
-    pattern:  /
-    defaults: { _controller: "SilvanusSecurityBundle:Role:index" }
+    pattern:  /list/{message}
+    defaults: { _controller: "SilvanusSecurityBundle:Role:index", message: '' }
 
 role_show:
     pattern:  /{id}/show
@@ -27,4 +27,4 @@ role_update:
 role_delete:
     pattern:  /{id}/delete
     defaults: { _controller: "SilvanusSecurityBundle:Role:delete" }
-    requirements: { _method: post|delete }
+    requirements: { _method: post|delete|get }

@@ -19,14 +19,15 @@ class RoleController extends Controller
      * Lists all Role entities.
      *
      */
-    public function indexAction()
+    public function indexAction($message)
     {
         $em = $this->getDoctrine()->getManager();
 
         $entities = $em->getRepository('SilvanusSecurityBundle:Role')->findAll();
 
         return $this->render('SilvanusSecurityBundle:Role:index.html.twig', array(
-            'entities' => $entities,
+            'entities' 		=> $entities,
+            'message'		=> $message,
         ));
     }
     /**
@@ -44,7 +45,7 @@ class RoleController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('role_show', array('id' => $entity->getId())));
+            return $this->redirect($this->generateUrl('role', array('message' => 'Create successful: '.$entity->getRole())));
         }
 
         return $this->render('SilvanusSecurityBundle:Role:new.html.twig', array(
@@ -67,7 +68,7 @@ class RoleController extends Controller
             'method' => 'POST',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Create'));
+        //$form->add('submit', 'submit', array('label' => 'Create'));
 
         return $form;
     }
@@ -146,7 +147,7 @@ class RoleController extends Controller
             'method' => 'PUT',
         ));
 
-        $form->add('submit', 'submit', array('label' => 'Update'));
+        //$form->add('submit', 'submit', array('label' => 'Update'));
 
         return $form;
     }
@@ -171,7 +172,7 @@ class RoleController extends Controller
         if ($editForm->isValid()) {
             $em->flush();
 
-            return $this->redirect($this->generateUrl('role_edit', array('id' => $id)));
+            return $this->redirect($this->generateUrl('role', array('message' => 'Updated successful: '.$entity->getRole())));
         }
 
         return $this->render('SilvanusSecurityBundle:Role:edit.html.twig', array(
@@ -186,22 +187,19 @@ class RoleController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
-        $form = $this->createDeleteForm($id);
-        $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('SilvanusSecurityBundle:Role')->find($id);
 
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Role entity.');
-            }
+		$em = $this->getDoctrine()->getManager();
+		$entity = $em->getRepository('SilvanusSecurityBundle:Role')->find($id);
 
-            $em->remove($entity);
-            $em->flush();
-        }
+		if (!$entity) {
+			throw $this->createNotFoundException('Unable to find Role entity.');
+		}
 
-        return $this->redirect($this->generateUrl('role'));
+		$em->remove($entity);
+		$em->flush();
+
+        return $this->redirect($this->generateUrl('role', array('message'=>'Deleted successful')));
     }
 
     /**

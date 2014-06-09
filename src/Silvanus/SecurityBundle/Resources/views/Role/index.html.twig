@@ -1,12 +1,36 @@
 {% extends '::base.html.twig' %}
+{% block javascripts %}
+
+	<script type="text/javascript">
+
+
+		$(document).ready(function(){
+
+
+			
+		});
+	
+	</script>
+
+{% endblock %}
+
 
 {% block body -%}
-    <h1>Role list</h1>
 
-    <table class="records_list">
+    <div class="page-header"><h1>Roles <small>list</small></h1></div>
+    
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}
+
+	<legend>Role</legend>
+
+
+    <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
                 <th>Description</th>
                 <th>Actions</th>
@@ -15,29 +39,18 @@
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('role_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.role }}</td>
                 <td>{{ entity.description }}</td>
                 <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('role_show', { 'id': entity.id }) }}">show</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('role_edit', { 'id': entity.id }) }}">edit</a>
-                    </li>
-                </ul>
-                </td>
+                <td>
+					<button class="btn btn-success" onclick="window.location.href='{{ path('role_edit', { 'id': entity.id }) }}'" >Update</button>
+					<button class="btn btn-danger" 	onclick="confirm_redirect('{{ path('role_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
+				</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-        <ul>
-        <li>
-            <a href="{{ path('role_new') }}">
-                Create a new entry
-            </a>
-        </li>
-    </ul>
+	<button class="btn btn-success"  onclick="window.location.href='{{ path('role_new') }}'">New Role</button>
+
     {% endblock %}

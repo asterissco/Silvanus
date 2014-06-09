@@ -1,47 +1,69 @@
 {% extends '::base.html.twig' %}
 
-{% block body -%}
-    <h1>User list</h1>
+{% block javascripts %}
 
-    <table class="records_list">
+	<script type="text/javascript">
+
+
+		$(document).ready(function(){
+
+
+			
+		});
+	
+	</script>
+
+{% endblock %}
+
+
+{% block body -%}
+
+    <div class="page-header"><h1>Users <small>list</small></h1></div>
+    
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}
+
+	<legend>List</legend>
+
+
+    <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
                 <th>Username</th>
                 <th>Email</th>
-                <th>Password</th>
+                <th>Roles</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('user_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
                 <td>{{ entity.name }}</td>
                 <td>{{ entity.username }}</td>
                 <td>{{ entity.email }}</td>
-                <td>{{ entity.password }}</td>
                 <td>
-                <ul>
-                    <li>
-                        <a href="{{ path('user_show', { 'id': entity.id }) }}">show</a>
-                    </li>
-                    <li>
-                        <a href="{{ path('user_edit', { 'id': entity.id }) }}">edit</a>
-                    </li>
-                </ul>
+                
+					{% for role in entity.roles %}
+					 
+						{{ role }} 
+					
+					{% endfor %}
+                
                 </td>
+                <td>
+					<button class="btn btn-success" onclick="window.location.href='{{ path('user_edit', { 'id': entity.id }) }}'" >Update</button>
+					<button class="btn btn-success" onclick="window.location.href='{{ path('user_change_password', { 'id': entity.id }) }}'" >Password</button>
+					<button class="btn btn-danger" 	onclick="confirm_redirect('{{ path('user_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
+				</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-        <ul>
-        <li>
-            <a href="{{ path('user_new') }}">
-                Create a new entry
-            </a>
-        </li>
-    </ul>
+	<button class="btn btn-success"  onclick="window.location.href='{{ path('user_new') }}'">New User</button>
+	
     {% endblock %}

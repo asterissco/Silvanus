@@ -1,17 +1,41 @@
-<form action="{{ path('silvanus_security_login_check') }}" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="_username" value="" />
- 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="_password" />
- 
-    {#
-        añade lo siguiente si quieres redirigir al usuario a una
-        URL concreta después del login (explicado más adelante)
-        <input type="hidden" name="_target_path" value="/account" />
-    #}
- 
-    <button type="submit">login</button>
+{% extends '::base.public.html.twig' %}
+
+{% block body -%}
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>Welcome to Silvanus</h1>
+    <p>Advance Firewall administrador for IPTABLES</p>
+    <p>{# <a class="btn btn-primary btn-lg">Learn more</a>#}</p>
+  </div>
+</div>
+    
+
+<form action="{{ path('silvanus_security_login_check') }}" class="form" method="post">
+        	
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12"><label>User</label></div>
+			<div class="col-md-8"><input type="text" 		class="form-control" placeholder="username" id="username" name="_username" /></div>
+			<div class="col-md-4"></div>
+			
+		</div>
+    </div>
+
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12"><label>Password</label></div>
+			<div class="col-md-8"><input type="password" 	class="form-control" placeholder="password" id="password" name="_password" /></div>
+			<div class="col-md-4"></div>
+			
+		</div>
+    </div>
+
+        <p>
+            <button class="btn btn-success" type="submit">Login</button>
+        </p>
     
     {% if error is defined %}
     
@@ -20,3 +44,6 @@
 	{% endif %}
     
 </form>
+
+
+{% endblock %}

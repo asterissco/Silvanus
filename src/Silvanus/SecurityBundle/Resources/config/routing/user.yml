@@ -1,6 +1,6 @@
 user:
-    pattern:  /
-    defaults: { _controller: "SilvanusSecurityBundle:User:index" }
+    pattern:  /list/{message}
+    defaults: { _controller: "SilvanusSecurityBundle:User:index", message: '' }
 
 user_show:
     pattern:  /{id}/show
@@ -27,4 +27,12 @@ user_update:
 user_delete:
     pattern:  /{id}/delete
     defaults: { _controller: "SilvanusSecurityBundle:User:delete" }
-    requirements: { _method: post|delete }
+    requirements: { _method: post|delete|get }
+
+user_change_password:
+    pattern:  /changepassword/{id}
+    defaults: { _controller: "SilvanusSecurityBundle:User:changePassword" }
+
+user_update_password:
+    pattern: /updatepassword/{id}
+    defaults: { _controller: "SilvanusSecurityBundle:User:updatePassword" }

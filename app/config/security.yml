@@ -34,7 +34,7 @@ security:
                 default_target_path: /home
             logout:
                 path: /security/logout
-                target: /
+                target: /index
 
         secured_area:
             provider: users
@@ -45,12 +45,13 @@ security:
                 login_path:  /security/login
                 check_path:  /security/login_check
                 always_use_default_target_path: true
-                default_target_path: /home
+                default_target_path: /index
                 
             logout:
                 path: /security/logout
-                target: /
+                target: /index
 
     access_control:
-        - { path: ^/home, roles: ROLE_ADMIN }
-#        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY } 
+        - { path: ^/security/(login|login_check|logout), roles: IS_AUTHENTICATED_ANONYMOUSLY } 
+        - { path: ^/, roles: ROLE_ADMIN }
+        

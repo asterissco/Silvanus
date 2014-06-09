@@ -17,4 +17,25 @@ class SyncController extends Controller
 			'entities'=>$entities,
 		));
     }
+    
+    /**
+     * 
+     * Get the pendings rules to dispatch
+     * 
+     * */
+    public function syncCountAjaxAction(){
+
+		$em = $this->getDoctrine()->getManager();
+		$entities=$em->getRepository('SilvanusSyncBundle:Sync')->findAll();
+	
+		
+        return $this->render('SilvanusSyncBundle:Sync:syncCountAjax.html.twig', array(
+			'count'	=> count($entities),
+		));
+
+		
+		
+		
+	}
+    
 }

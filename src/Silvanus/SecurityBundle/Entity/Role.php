@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\SecurityBundle\Entity\RoleRepository")
+ * @UniqueEntity(fields={"role"}, message="Already in use")
  */
 class Role implements RoleInterface
 {
