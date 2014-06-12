@@ -1,7 +1,11 @@
-Silvanus v0.6
+Silvanus 0.7
 ========================
 
-Current version:
+New in this version:
+
+- Security context
+
+Features:
 
  - Support multiple chains add to trusted iptables chains (INPUT, FORDWARD, OUTPUT)
  - Support multiple Rules for chains
@@ -9,17 +13,12 @@ Current version:
  - Debug information of synchronization in webpage
  - Synchronization status list
  - Support Magic Word "/host/" (see How To Use)
-<br>
 
-**This is no tested version, use with careful**
+Description:
 
-<br>
+Iptables firewall web administrator to set up custom chains for large and advance configuration.
 
-Welcome to Silvanus iptables firewall web administrator to set up custom chains for large and advance configuration.
-
-Silvanus is Symfony2 project.
-
-This version is functional Beta, dont support security (recommended use htpassword). Use with careful
+**This is beta no tested version, use with careful**
 
 1) Requeriments 
 ----------------------------------
@@ -100,11 +99,15 @@ Generate fixtures
 	administrador@lab2:/var/www/silvanustest/Silvanus$ php app/console doctrine:fixtures:load
 
 
-### Publish Symfony2 web directory in your Web Server
-
-Follow the official instructions for Symfony2 project
+Publish Symfony2 web directory in your Web Server, follow the official instructions for Symfony2 project
 
 	http://symfony.com/doc/current/cookbook/configuration/web_server_configuration.html
+
+Default access:
+
+	username: admin
+	password: admin    
+
 	
 4) How to use (example)
 ----------------------------------
@@ -151,9 +154,7 @@ Show the magic effect
 	
 
 
-5) Insert sync script in Cron (Recommended)
-
-Like root
+Insert sync script in Cron (Recommended), like root
 
 	root@lab2:/var/www/silvanustest/Silvanus# crontab -e
 
@@ -162,6 +163,7 @@ Add 1 minutes execute
 	*/1 * * * * php /var/www/silvanustest/Silvanus/app/console silvanus:sync >> /var/log/silvanus.log
 
 6) This project use
+----------------------------------
 
  - Symfony 2
  - iptables

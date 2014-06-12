@@ -10,7 +10,7 @@
 
 			
         {% endblock %}
-        {# <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" /> #}
+        <link rel="icon" type="image/x-icon" href="{{ asset('bundles/silvanus/img/silvanus_logo.png') }}" />
 
 
 			<script type="text/javascript" src="{{ asset('bundles/silvanus/js/jquery-2.0.3.min.js') }}"></script>
@@ -22,7 +22,19 @@
 
 			<script type="text/javascript">
 			
-			
+				//get the numbers of sync pending to dispatch
+				$(document).ready(function(){
+
+					$.getJSON( "{{ path('sync_count') }}", function( data ) {
+						
+						if(data['count']>0){			
+							$('#navbar_sync').append("("+data['count']+")");
+						}
+					});				
+					
+				});
+							
+					
 			</script>
     
     </head>
@@ -51,16 +63,39 @@
 				</ul>
 
 				<ul class="nav navbar-nav">
+
+					{% if 'security' in app.request.getRequestURI() %}					
+						<li class="dropdown active">
+					{% else %}
+						<li class="dropdown">
+					{% endif%}
+						<a class="dropdown-toggle" data-toggle="dropdown" href="#">	Security <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="{{ path('role') }}">Roles</a></li>
+							<li><a href="{{ path('user') }}">Users</a></li>
+						</ul>
+
+					</li>
+
+				</ul>
+
+				<ul class="nav navbar-nav">
 					{% if 'sync' in app.request.getRequestURI() %}					
 						<li class="active">
 					{% else %}						
 						<li>						
 					{% endif %}	
-						<a href="{{ path('sync') }}">Sync</a>
+						<a href="{{ path('sync') }}"><div id="navbar_sync">Sync </div></a>
 					</li>
 				</ul>
 
-								
+
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="{{ path('silvanus_security_logout') }}" class="navbar-link">logout</a></li>
+				</ul>
+
+
 			</div>
 		</div>
 	</div>        

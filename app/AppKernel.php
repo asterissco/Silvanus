@@ -21,6 +21,7 @@ class AppKernel extends Kernel
 	    new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle(),
             new Silvanus\ChainsBundle\SilvanusChainsBundle(),
             new Silvanus\FrontendBundle\SilvanusFrontendBundle(),
+            new Silvanus\SecurityBundle\SilvanusSecurityBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

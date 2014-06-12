@@ -1,0 +1,26 @@
+# security
+
+silvanus_security_index:
+    pattern:  /index
+    defaults: { _controller: SilvanusSecurityBundle:Default:index }
+
+public_area_corporate_login:
+    pattern: /security/login
+    defaults: { _controller: SilvanusSecurityBundle:Default:login }
+
+silvanus_security_login_check:
+    pattern: /security/login_check
+
+silvanus_security_logout:
+    pattern: /security/logout
+
+# entities
+
+SilvanusSecurityBundle_user:
+    resource: "@SilvanusSecurityBundle/Resources/config/routing/user.yml"
+    prefix:   /security/user
+
+SilvanusSecurityBundle_role:
+    resource: "@SilvanusSecurityBundle/Resources/config/routing/role.yml"
+    prefix:   /security/role
+

@@ -1,0 +1,47 @@
+{% extends '::base.public.html.twig' %}
+
+{% block body -%}
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>Welcome to Silvanus</h1>
+    <p>Advance Firewall administrador for IPTABLES</p>
+    <p>{# <a class="btn btn-primary btn-lg">Learn more</a>#}</p>
+  </div>
+</div>
+
+{% if error %}
+    <div class="alert alert-danger">{{ error.message }}</div>
+{% endif %}    
+
+
+<form action="{{ path('silvanus_security_login_check') }}" class="form" method="post">
+        	
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12"><label>User</label></div>
+			<div class="col-md-8"><input type="text" 		class="form-control" placeholder="username" id="username" name="_username" /></div>
+			<div class="col-md-4"></div>
+			
+		</div>
+    </div>
+
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12"><label>Password</label></div>
+			<div class="col-md-8"><input type="password" 	class="form-control" placeholder="password" id="password" name="_password" /></div>
+			<div class="col-md-4"></div>
+			
+		</div>
+    </div>
+
+	<p>
+		<button class="btn btn-success" type="submit">Login</button>
+	</p>
+        
+</form>
+
+
+{% endblock %}

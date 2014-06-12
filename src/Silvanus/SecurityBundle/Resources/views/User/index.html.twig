@@ -1,0 +1,69 @@
+{% extends '::base.html.twig' %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+
+
+		$(document).ready(function(){
+
+
+			
+		});
+	
+	</script>
+
+{% endblock %}
+
+
+{% block body -%}
+
+    <div class="page-header"><h1>Users <small>list</small></h1></div>
+    
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}
+
+	<legend>List</legend>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td>{{ entity.name }}</td>
+                <td>{{ entity.username }}</td>
+                <td>{{ entity.email }}</td>
+                <td>
+                
+					{% for role in entity.roles %}
+					 
+						{{ role }} 
+					
+					{% endfor %}
+                
+                </td>
+                <td>
+					<button class="btn btn-success" onclick="window.location.href='{{ path('user_edit', { 'id': entity.id }) }}'" >Update</button>
+					<button class="btn btn-success" onclick="window.location.href='{{ path('user_change_password', { 'id': entity.id }) }}'" >Password</button>
+					<button class="btn btn-danger" 	onclick="confirm_redirect('{{ path('user_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
+				</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+	<button class="btn btn-success"  onclick="window.location.href='{{ path('user_new') }}'">New User</button>
+	
+    {% endblock %}

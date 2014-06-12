@@ -38,7 +38,7 @@ class Trusted
 
     /**
      *
-     * @ORM\ManyToMany(targetEntity="Chain", mappedBy="trusted")
+     * @ORM\ManyToMany(targetEntity="Chain")
      * 
      */
 	private $chains;

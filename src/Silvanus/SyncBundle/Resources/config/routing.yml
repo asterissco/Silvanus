@@ -1,3 +1,7 @@
 sync:
-    pattern:  /sync
+    pattern:  /sync/list
     defaults: { _controller: SilvanusSyncBundle:Sync:index }
+
+sync_count:
+    pattern:  /sync/syncCountAjax
+    defaults: { _controller: SilvanusSyncBundle:Sync:syncCountAjax }
