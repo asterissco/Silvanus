@@ -31,7 +31,7 @@ security:
                 login_path:  /security/login
                 check_path:  /security/login_check
                 always_use_default_target_path: true
-                default_target_path: /home
+                default_target_path: /
             logout:
                 path: /security/logout
                 target: /index
@@ -45,11 +45,11 @@ security:
                 login_path:  /security/login
                 check_path:  /security/login_check
                 always_use_default_target_path: true
-                default_target_path: /index
+                default_target_path: /
                 
             logout:
                 path: /security/logout
-                target: /index
+                target: /
 
     access_control:
         - { path: ^/security/(login|login_check|logout), roles: IS_AUTHENTICATED_ANONYMOUSLY } 

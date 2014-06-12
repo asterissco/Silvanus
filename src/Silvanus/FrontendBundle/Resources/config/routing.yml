@@ -1,3 +1,3 @@
 frontend:
-    pattern:  /home
+    pattern:  /
     defaults: { _controller: SilvanusFrontendBundle:Frontend:index }

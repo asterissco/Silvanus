@@ -9,7 +9,11 @@
     <p>{# <a class="btn btn-primary btn-lg">Learn more</a>#}</p>
   </div>
 </div>
-    
+
+{% if error %}
+    <div class="alert alert-danger">{{ error.message }}</div>
+{% endif %}    
+
 
 <form action="{{ path('silvanus_security_login_check') }}" class="form" method="post">
         	
@@ -33,16 +37,10 @@
 		</div>
     </div>
 
-        <p>
-            <button class="btn btn-success" type="submit">Login</button>
-        </p>
-    
-    {% if error is defined %}
-    
-		{{ error }}
-		
-	{% endif %}
-    
+	<p>
+		<button class="btn btn-success" type="submit">Login</button>
+	</p>
+        
 </form>
 
 
