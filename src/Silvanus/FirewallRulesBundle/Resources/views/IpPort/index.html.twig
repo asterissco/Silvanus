@@ -1,0 +1,96 @@
+{% extends '::base.html.twig' %}
+
+{# {% form_theme filter_form _self %} #}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+				
+			<div class="col-md-3">{{ form_label(form) }}</div>
+			<div class="col-md-6">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-3">{{ form_errors(form) }}</div>	
+		
+    </div>
+    
+{% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+		
+		});
+	
+	</script>
+
+{% endblock %}
+
+{% block body -%}
+    <div class="page-header"><h1>IP Ports <small>list</small></h1></div>
+
+
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}
+
+	<legend>List</legend>
+	<table class="table">
+            <tr>
+                <th>Service</th>
+                <th>Number</th>
+                <th>Transport Protocol</th>
+                <th>Description</th>
+                <th>Reference</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td>{{ entity.service }}</td>
+                <td>{{ entity.number }}</td>
+                <td>{{ entity.protocol }}</td>
+                <td>{{ entity.description }}</td>
+                <td>{{ entity.reference }}</td>
+                <td>
+					<button class="btn btn-warning"  onclick="window.location.href='{{ path('ipport_edit', { 'id': entity.id }) }}'">Edit</button>
+					<button class="btn btn-danger"  onclick="confirm_redirect('{{ path('ipport_delete', { 'id': entity.id }) }}','Are you sure?')">Delete</button>                
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+            <button class="btn btn-success" onclick="window.location.href='{{ path('ipport_new') }}'">New rule</button>
+
+<div id="myModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<!-- dialog body -->
+				<div class="modal-body">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				Hello world!
+				</div>
+			<!-- dialog buttons -->
+			<div class="modal-footer"><button type="button" class="btn btn-primary">OK</button></div>
+		</div>
+	</div>
+</div>
+
+    {% endblock %}

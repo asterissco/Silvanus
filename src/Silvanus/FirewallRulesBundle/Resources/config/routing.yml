@@ -5,3 +5,8 @@
 silvanus_firewall_rules:
     resource: "@SilvanusFirewallRulesBundle/Resources/config/routing/firewallrules.yml"
     prefix:   /firewallrules
+
+SilvanusFirewallRulesBundle_ipport:
+    resource: "@SilvanusFirewallRulesBundle/Resources/config/routing/ipport.yml"
+    prefix:   /ipport
+

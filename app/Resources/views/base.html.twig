@@ -63,6 +63,17 @@
 				</ul>
 
 				<ul class="nav navbar-nav">
+					{% if 'ipport' in app.request.getRequestURI() %}					
+						<li class="active">
+					{% else %}						
+						<li>						
+					{% endif %}	
+						<a href="{{ path('ipport') }}">Ip Ports</a>
+					</li>
+				</ul>
+
+
+				<ul class="nav navbar-nav">
 
 					{% if 'security' in app.request.getRequestURI() %}					
 						<li class="dropdown active">

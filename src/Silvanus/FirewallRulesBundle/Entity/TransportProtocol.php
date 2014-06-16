@@ -61,4 +61,10 @@ class TransportProtocol
     {
         return $this->name;
     }
+    
+    public function __toString(){
+		
+			return $this->name;
+	}
+    
 }

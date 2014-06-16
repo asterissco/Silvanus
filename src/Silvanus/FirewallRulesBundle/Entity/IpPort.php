@@ -156,4 +156,27 @@ class IpPort
     {
         return $this->reference;
     }
+
+    /**
+     * Set protocol
+     *
+     * @param \Silvanus\FirewallRulesBundle\Entity\TransportProtocol $protocol
+     * @return IpPort
+     */
+    public function setProtocol(\Silvanus\FirewallRulesBundle\Entity\TransportProtocol $protocol = null)
+    {
+        $this->protocol = $protocol;
+    
+        return $this;
+    }
+
+    /**
+     * Get protocol
+     *
+     * @return \Silvanus\FirewallRulesBundle\Entity\TransportProtocol 
+     */
+    public function getProtocol()
+    {
+        return $this->protocol;
+    }
 }
