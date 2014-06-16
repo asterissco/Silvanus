@@ -1,6 +1,8 @@
 <?php
 
 namespace Silvanus\FirewallRulesBundle\Entity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -9,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\FirewallRulesBundle\Entity\IpPortRepository")
+ * @UniqueEntity(fields={"service"}, message="Already in use")
+ * @UniqueEntity(fields={"number"}, message="Already in use")
  */
 class IpPort
 {
@@ -38,20 +42,20 @@ class IpPort
     /**
      * @var string
      *
-     * @ORM\Column(name="description", type="string", length=255)
+     * @ORM\Column(name="description", type="string", length=255, nullable=true)
      */
     private $description;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="reference", type="string", length=255)
+     * @ORM\Column(name="reference", type="string", length=255, nullable=true)
      */
     private $reference;
 
     /**
      * @ORM\ManyToOne(targetEntity="TransportProtocol")
-     * @ORM\JoinColumn(name="protocol_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="protocol_id", referencedColumnName="id", nullable=false)
      */
     private $protocol;
 
