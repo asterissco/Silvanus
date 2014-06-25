@@ -34,10 +34,12 @@
 		
 		
 		});
+		
 	
 	</script>
 
 {% endblock %}
+
 
 {% block body -%}
     <div class="page-header"><h1>IP Ports <small>list</small></h1></div>
@@ -50,6 +52,12 @@
     {% endif%}
 
 	<legend>List</legend>
+
+	<div class="navigation">
+		{{ knp_pagination_render(pagination, '::pagination.html.twig') }}
+		
+	</div>
+	
 	<table class="table">
             <tr>
                 <th>Service</th>
@@ -61,7 +69,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for entity in entities %}
+        {% for entity in pagination %}
             <tr>
                 <td>{{ entity.service }}</td>
                 <td>{{ entity.number }}</td>
@@ -77,8 +85,32 @@
         </tbody>
     </table>
 
-            <button class="btn btn-success" onclick="window.location.href='{{ path('ipport_new') }}'">New rule</button>
+	<br>
 
+	<div clas="row">
+		<div class="col-md-8">
+			<form action="{{ path('ipport_iana') }}" method="post" {{ form_enctype(form_iana) }} class="form-inline" id="iana_form">
+			
+				<button class="btn btn-success" type="button" onclick="confirm_submit($('#iana_form'),'This action erease all registers of protocols and ports, are you sure?')">Import IANA</button>
+				<div class="form-group">
+					
+					{{ form_widget(form_iana.attachment) }}			
+				</div>					
+					
+					
+
+				<input type="hidden" name="_method" value="UPDATE" />			
+			</form>		
+		</div>
+
+		<div class="col-md-4">
+			<button class="btn btn-success" onclick="window.location.href='{{ path('ipport_new') }}'">New rule</button>
+		</div>
+
+
+	</div>
+	{# http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml #}
+	
 <div id="myModal" class="modal fade">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -88,7 +120,8 @@
 				Hello world!
 				</div>
 			<!-- dialog buttons -->
-			<div class="modal-footer"><button type="button" class="btn btn-primary">OK</button></div>
+			<div class="modal-footer"><button type="button" class="btn btn-primary">OK</button></div>			
+			
 		</div>
 	</div>
 </div>

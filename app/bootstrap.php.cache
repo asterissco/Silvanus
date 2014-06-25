@@ -2171,11 +2171,11 @@ protected $booted;
 protected $name;
 protected $startTime;
 protected $loadClassCache;
-const VERSION ='2.3.13';
-const VERSION_ID ='20313';
+const VERSION ='2.3.16';
+const VERSION_ID ='20316';
 const MAJOR_VERSION ='2';
 const MINOR_VERSION ='3';
-const RELEASE_VERSION ='13';
+const RELEASE_VERSION ='16';
 const EXTRA_VERSION ='';
 public function __construct($environment, $debug)
 {

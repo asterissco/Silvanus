@@ -3,9 +3,14 @@
 namespace Silvanus\FirewallRulesBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 use Silvanus\FirewallRulesBundle\Entity\IpPort;
+use Silvanus\FirewallRulesBundle\Entity\TransportProtocol;
+
 use Silvanus\FirewallRulesBundle\Form\IpPortType;
 
 /**
@@ -19,15 +24,22 @@ class IpPortController extends Controller
      * Lists all IpPort entities.
      *
      */
-    public function indexAction($message=null)
+    public function indexAction($page, $message=null)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entities = $em->getRepository('SilvanusFirewallRulesBundle:IpPort')->findAll();
+		$paginator  = $this->get('knp_paginator');
+        //$entities = $em->getRepository('SilvanusFirewallRulesBundle:IpPort')->findAll();
+
+		$pagination = $paginator->paginate($em->createQuery('SELECT p FROM Silvanus\FirewallRulesBundle\Entity\IpPort p'),  $this->get('request')->query->get('page', $page), 60);
+
+		$form_iana = $this->createIanaForm();
 
         return $this->render('SilvanusFirewallRulesBundle:IpPort:index.html.twig', array(
-            'entities' 	=> $entities,
-            'message'	=> $message,
+            //'entities' 	=> $entities,
+            'pagination' 	=> $pagination,
+            'message'		=> $message,
+            'form_iana'		=> $form_iana->createView(),
 		));
     }
     /**
@@ -217,4 +229,123 @@ class IpPortController extends Controller
             ->getForm()
         ;
     }
+    
+    /**
+     * Insert iana ports from file to database
+     * 
+     * 
+     * */
+    public function ianaAction(Request $request){
+	
+		$form = $this->createIanaForm();
+		$form->handleRequest($request);
+		
+		//get the temp file path
+		foreach($request->files as $file){
+			
+			if(isset($file['attachment'])){			
+				$f = $file['attachment'];
+			}			
+		}
+
+		$em = $this->getDoctrine()->getManager();
+
+		//truncate tables
+		$connection = $em->getConnection();
+		$platform   = $connection->getDatabasePlatform();
+		$connection->executeUpdate($platform->getTruncateTableSQL('IpPort', true /* whether to cascade */));		
+		$connection->executeUpdate($platform->getTruncateTableSQL('TransportProtocol', true /* whether to cascade */));		
+		
+		$n=0;
+		$fields=array();
+		$protocols=array();
+		$handle = @fopen($f->getPathname(), "r");
+		if ($handle) {
+			while (($buffer = fgets($handle, 4096)) !== false) {
+				$arrLine=explode(",",$buffer);
+				if($n==0){
+
+					for($y=0;$y<count($arrLine);$y++){
+						$fields[$arrLine[$y]]=$y;						
+					}
+					
+				}else{
+					
+					if(count($arrLine)>3 and strpos($arrLine[0],"IANA assigned this well-formed service name as a replacement for")===false){
+					
+						if(!in_array($arrLine[$fields['Transport Protocol']],$protocols)){
+						
+							$protocol=$em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->findBy(array('name'=>strtoupper($arrLine[$fields['Transport Protocol']])));
+							
+							if(!$protocol){
+								
+								$protocol = new TransportProtocol();
+								$protocol->setName(strtoupper($arrLine[$fields['Transport Protocol']]));							
+								$em->persist($protocol);
+								
+								$protocols[]=$arrLine[$fields['Transport Protocol']];
+								
+							}
+						
+							$entProtocol[$arrLine[$fields['Transport Protocol']]]=$protocol;
+						
+						}
+						
+						
+						$entity = new IpPort();
+						
+						if(isset($arrLine[$fields['Service Name']])){
+							$entity->setService($arrLine[$fields['Service Name']]);
+						}
+						
+						if(isset($arrLine[$fields['Port Number']])){
+							$entity->setNumber($arrLine[$fields['Port Number']]);
+						}
+						
+						if(isset($arrLine[$fields['Description']])){
+							$entity->setDescription($arrLine[$fields['Description']]);
+						}
+						
+						if(isset($arrLine[$fields['Reference']])){
+							$entity->setReference($arrLine[$fields['Reference']]);
+						}
+						
+						
+						$entity->setProtocol($entProtocol[$arrLine[$fields['Transport Protocol']]]);
+										
+						$em->persist($entity);
+						
+					}					
+				}
+				$n++;
+			}
+	
+			if (!feof($handle)) {
+				echo "Error: unexpected fgets() fail\n";
+			}
+			fclose($handle);
+		}		
+
+		$em->flush();
+		
+		return $this->redirect($this->generateUrl('ipport', array('message'=>'Import success')));
+		//return new Response ('<br><br>OK');
+		 
+	}
+    
+    /**
+     * Import Iana file Form
+     * 
+     * */
+	private function createIanaForm(){
+
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('ipport_iana'))
+            ->setMethod('POST')
+            ->add('attachment', 'file', array('required' => true, 'data_class' => null, 'mapped'=>false))
+            ->getForm();
+				
+		
+	}
+
 }

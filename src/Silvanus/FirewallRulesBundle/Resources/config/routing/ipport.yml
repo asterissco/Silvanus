@@ -1,6 +1,6 @@
 ipport:
-    pattern:  /index/{message}
-    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:index", message: '' }
+    pattern:  /index/{page}/{message}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:index", page: 1, message: '' }
 
 ipport_show:
     pattern:  /{id}/show
@@ -28,3 +28,9 @@ ipport_delete:
     pattern:  /{id}/delete
     defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:delete" }
     requirements: { _method: post|delete|get }
+    
+ipport_iana: 
+    pattern:  /import_iana
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:iana" }
+    requirements: { _method: post|update }
+
