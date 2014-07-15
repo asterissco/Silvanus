@@ -20,6 +20,34 @@ use Silvanus\FirewallRulesBundle\Form\IpPortType;
 class IpPortController extends Controller
 {
 
+	public function ajaxSearchPortAction(Request $request, $service){
+	
+		$em 	= $this->getDoctrine()->getManager();
+		
+		$dql	= "SELECT DISTINCT p.service AS p_service, p.number AS p_number, t.name AS t_name FROM Silvanus\FirewallRulesBundle\Entity\IpPort p ";
+		$dql   .= "INNER JOIN Silvanus\FirewallRulesBundle\Entity\TransportProtocol t WHERE p.service LIKE ?1 AND p.protocol = t";
+		
+		$quey 	= $em->createQuery($dql);
+		$quey->setParameter(1, "%".$service."%");
+		
+		$arr = array();
+		foreach($quey->getResult() as $entity){
+						
+			$arr[] = $entity['p_service']." (".$entity['p_number'].") [".$entity['t_name']."]";
+			
+		}
+		
+		
+		
+		
+		
+		return $this->render('SilvanusFirewallRulesBundle:IpPort:ajaxsearchport.html.twig', array(
+			'arr'	=> 	$arr,
+		));
+		
+			
+	}
+
     /**
      * Lists all IpPort entities.
      *

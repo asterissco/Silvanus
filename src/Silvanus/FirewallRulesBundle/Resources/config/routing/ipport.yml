@@ -34,3 +34,7 @@ ipport_iana:
     defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:iana" }
     requirements: { _method: post|update }
 
+ipport_ajaxsearch: 
+    pattern:  /ajax/search/{service}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:ajaxSearchPort" }
+    requirements: { _method: get }

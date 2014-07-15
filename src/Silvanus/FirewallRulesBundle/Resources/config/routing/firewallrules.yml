@@ -28,3 +28,13 @@ firewallrules_delete:
     pattern:  /{id}/delete
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:delete" }
     requirements: { _method: post|delete|get }
+
+firewallrules_easy_new:
+    pattern:  /easy/new/{id_chain}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:easynew" }
+    requirements: { _method: post|delete|get }
+
+firewallrules_easy_create:
+    pattern:  /easy/create/{id_chain}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:easycreate" }
+    requirements: { _method: post|delete|get }
