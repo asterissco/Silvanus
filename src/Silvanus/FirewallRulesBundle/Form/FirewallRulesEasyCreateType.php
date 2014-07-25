@@ -9,8 +9,8 @@ use Doctrine\ORM\EntityRepository;
 
 class FirewallRulesEasyCreateType extends AbstractType
 {
-	
-	
+
+    
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
@@ -28,32 +28,16 @@ class FirewallRulesEasyCreateType extends AbstractType
 				'label'=>'Destination (IP/NETWORK)',
 				'mapped'=>false,
 				'required'=>true,
-				//~ 'attr'=>array(
-						//~ 'disabled'=>'disabled',
-					//~ )
             ))
 			->add('protocol', 'entity', array(
 				'class' => 'SilvanusFirewallRulesBundle:TransportProtocol',
+				'mapped' => false,
 				'query_builder' => function(EntityRepository $er) {
 					return $er->createQueryBuilder('t')
 						->orderBy('t.name', 'ASC');
 					},
+				//'data' => $this->defaults['protocol'],
 			))
-            //~ ->add('protocol','choice',array(
-				//~ 'label'=>'Protocol',
-				//~ 'mapped'=>false,
-				//~ 'required'=>false,
-				//~ 'choices'=>array(
-					//~ 'tcp'=> 'TCP',
-					//~ 'udp'=> 'UDP',
-					//~ 'udplite'=> 'UDPLITE',
-					//~ 'icmp'=> 'ICMP',
-					//~ 'esp'=> 'ESP',
-					//~ 'ah'=> 'AH',
-					//~ 'sctp'=> 'SCTP',
-					//~ 'all'=> 'ALL',
-				//~ )
-            //~ ))
             ->add('source_port','text',array(
 				'label'=>'Source port (type number or find service)',
 				'mapped'=>false,
@@ -98,6 +82,24 @@ class FirewallRulesEasyCreateType extends AbstractType
 				)
 			)
 		;
+
+		//~ ->add('protocol','choice',array(
+			//~ 'label'=>'Protocol',
+			//~ 'mapped'=>false,
+			//~ 'required'=>false,
+			//~ 'choices'=>array(
+				//~ 'tcp'=> 'TCP',
+				//~ 'udp'=> 'UDP',
+				//~ 'udplite'=> 'UDPLITE',
+				//~ 'icmp'=> 'ICMP',
+				//~ 'esp'=> 'ESP',
+				//~ 'ah'=> 'AH',
+				//~ 'sctp'=> 'SCTP',
+				//~ 'all'=> 'ALL',
+			//~ )
+		//~ ))
+
+
     }
 
 	// -s ip -d ip -sport -dport 

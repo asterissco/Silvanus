@@ -10,11 +10,11 @@ use Silvanus\FirewallRulesBundle\Entity\FirewallRules;
 use Silvanus\ChainsBundle\Entity\Chain;
 use Silvanus\SyncBundle\Entity\Sync;
 
-
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesType;
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesCreateType;
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesUpdateType;
 use Silvanus\FirewallRulesBundle\Form\FirewallRulesEasyCreateType;
+use Silvanus\FirewallRulesBundle\Form\FirewallRulesEasyUpdateType;
 
 /**
  * FirewallRules controller.
@@ -57,57 +57,19 @@ class FirewallRulesController extends Controller
 		//$form->handleRequest($request);
 		$form->submit($request);
 
-		if($arrForm['priority']<1){
-			$form->get('priority')->addError(new FormError('Priority must be more than 0'));
+		if(isset($arrForm['priority'])){
+			if($arrForm['priority']<1){
+				$form->get('priority')->addError(new FormError('Priority must be more than 0'));
+			}
 		}
 
 		if($form->isValid()){
 
 			$em 		= $this->getDoctrine()->getManager();
 			
-			$rule="";
-			if(!empty($arrForm['source'])){
-				$rule.=" -s ".$arrForm['source']." ";
-			}
-			if(!empty($arrForm['destination'])){
-				$rule.=" -d ".$arrForm['destination']." ";
-			}
-			if(!empty($arrForm['protocol'])){
-				$rule.=" -p ".$arrForm['protocol']." ";
-			}
-			if(!empty($arrForm['source_port'])){
-				if(is_numeric($arrForm['source_port'])){
-					$rule.=" --sport ".$arrForm['source_port']." ";
-				}else{
-					$ap=strpos($arrForm['source_port'],"(")+1;
-					$cp=strpos($arrForm['source_port'],")")-strlen($arrForm['source_port']);
-					$rule.=" --sport ".substr($arrForm['source_port'],$ap,$cp)." ";	
-				}
-			}
-			if(!empty($arrForm['destination_port'])){
-				if(is_numeric($arrForm['destination_port'])){
-					$rule.=" --dport ".$arrForm['destination_port']." ";
-				}else{
-					$ap=strpos($arrForm['destination_port'],"(")+1;
-					$cp=strpos($arrForm['destination_port'],")")-strlen($arrForm['destination_port']);
-					$rule.=" --dport ".substr($arrForm['destination_port'],$ap,$cp)." ";	
-				}
-			}
-			if(!empty($arrForm['interface_input'])){
-				$rule.=" -i ".$arrForm['interface_input']." ";
-			}
-			if(!empty($arrForm['interface_output'])){
-				$rule.=" -o ".$arrForm['interface_output']." ";
-			}
-			if(!empty($arrForm['action'])){
-				$rule.=" -j ".$arrForm['action']." ";
-			}
-			
-			//echo $rule;
-
 			$entity = new FirewallRules();
 			$entity->setChainId($id_chain);
-			$entity->setRule($rule);
+			$entity->setRule($this->contructFirewallRule($arrForm));
 			
 			if(isset($arrForm['priority'])){
 				$entity->setPriority($arrForm['priority']);	
@@ -187,6 +149,183 @@ class FirewallRulesController extends Controller
 
     }
 
+    /**
+     * Displays a form to edit an existing FirewallRules entity.
+     *
+     */
+    public function easyeditAction($id, $id_chain)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        //$entity = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findOneBy(array('id'=>$id));
+        $entity = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->find($id);
+		$arrRule = $this->deconstructFirewallRule($entity->getRule());
+		
+		
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find FirewallRules entity.');
+        }
+
+		if(isset($arrRule['protocol'])){	$defaults['protocol']=$arrRule['protocol'];				}
+
+		
+
+		$editForm = $this->createForm(new FirewallRulesEasyUpdateType(),$entity);
+		
+		foreach($arrRule as $key => $val){
+
+			if($key==='protocol'){
+				$entityProtocol = $em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->findOneBy(array('id'=>$val));
+				$editForm->get($key)->setData($entityProtocol);
+			}else{
+				$editForm->get($key)->setData($val);
+			}
+			
+		}
+
+        $deleteForm = $this->createDeleteForm($id);
+
+        return $this->render('SilvanusFirewallRulesBundle:FirewallRules:easyedit.html.twig', array(
+            'entity'      	=> $entity,
+            'edit_form'   	=> $editForm->createView(),
+            'delete_form' 	=> $deleteForm->createView(),
+            'id_chain'		=> $id_chain,
+        ));
+    }
+
+	/*
+	 * Update a rule in simple mode
+	 * 
+	 * */
+	public function easyupdateAction(Request $request,$id,$id_chain){
+
+		$arrForm	= $this->get('request')->request->get('silvanus_firewallrulesbundle_firewallrulestype');			
+			
+		$em 		= $this->getDoctrine()->getManager();
+		$entity 	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findOneBy(array('id'=>$id));
+		
+	
+		$editForm=$this->createForm(new FirewallRulesEasyUpdateType(),$entity);
+		$editForm->submit($request);
+		
+		if($editForm->isValid()){
+		
+			$rule = $this->contructFirewallRule($arrForm);			
+			$entity->setRule($rule);
+
+			$em->persist($entity);
+			$em->flush();
+
+			$this->fixPriority($id_chain);
+			
+			/* add sync petition */
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id_chain));
+			if(!$syncEntity){
+
+				$syncEntity = new sync();
+				$syncEntity->setChainId($id_chain);
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$syncEntity->setAction('u');
+				$em->persist($syncEntity);
+				$em->flush();
+			
+			}
+			
+			return $this->redirect($this->generateUrl('firewallrules', 
+				array(	'id_chain' => $id_chain, 
+					'message'=> 'Update successful',
+				)	
+			));
+
+			
+		}else{
+
+			$priorityError="";
+			/*
+			* Get the priority errors
+			* 
+			* */
+			foreach ($editForm->get('priority')->getErrors() as $err){
+
+				$priorityError=$err->getMessageTemplate();
+
+			}
+
+			/*
+			* If is true this condition, move the priority value of rules +1
+			* 
+			* */
+			if($priorityError=='This value is already used.' 
+				and count($editForm->get('priority')->getErrors())==1
+				and isset($arrForm['force'])
+				){
+
+					$firewallRepository = $this->getDoctrine()->getRepository('SilvanusFirewallRulesBundle:FirewallRules');
+
+					$builder = $firewallRepository->createQueryBuilder('f');
+
+					$query		= $builder
+					->where('f.priority >= :priority')
+					->andWhere('f.id != :id')
+					->andWhere('f.chain_id = :id_chain')
+					->setParameter(':priority',$arrForm['priority'])
+					->setParameter(':id',$entity->getId())
+					->setParameter(':id_chain',$id_chain)
+					->orderBy('f.priority','desc')
+					->getQuery();
+
+					$fixPrio	= $query->getResult();
+
+					foreach($fixPrio as $fix){
+
+						$fix->setPriority($fix->getPriority()+1);
+						$em->persist($fix);
+
+					}
+
+					$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+
+					$em->persist($entity);
+					$em->flush();
+
+					$this->fixPriority($id_chain);
+
+					/* add sync petition */
+					$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id_chain));
+					if(!$syncEntity){
+
+					$syncEntity = new sync();
+					$syncEntity->setChainId($id_chain);
+					$syncEntity->setTime(new \DateTime('now'));
+					$syncEntity->setError(false);
+					$syncEntity->setAction('u');
+					$em->persist($syncEntity);
+					$em->flush();
+
+				}
+
+
+				return $this->redirect($this->generateUrl('firewallrules', 
+					array(	'id_chain' => $id_chain, 
+						'message'=> 'Update successful',
+					)	
+				));
+		
+			}
+		
+		}
+				 
+		$deleteForm = $this->createDeleteForm($id);
+	
+		return $this->render('SilvanusFirewallRulesBundle:FirewallRules:easyedit.html.twig',array(
+			'entity'		=> $entity,
+			'edit_form'		=> $editForm->createView(),
+			'delete_form'	=> $deleteForm->createView(),
+			'id_chain'		=> $id_chain,
+		));
+		
+	}
 
     /**
      * Lists all FirewallRules entities.
@@ -568,7 +707,7 @@ class FirewallRulesController extends Controller
         
         }else{
 		
-		
+			$priorityError="";
 			/*
 			 * Get the priority errors
 			 * 
@@ -578,7 +717,6 @@ class FirewallRulesController extends Controller
 				$priorityError=$err->getMessageTemplate();
 				
 			}
-		
 			
 			/*
 			 * If is true this condition, move the priority value of rules +1
@@ -698,8 +836,6 @@ class FirewallRulesController extends Controller
  
     }
 
-####################################################################################################### aqui
-
     /**
      * Fixed the priority in all chain
      * 
@@ -786,15 +922,89 @@ class FirewallRulesController extends Controller
         ;
     }
 
+	/*
+	 * Get rule of array
+	 * 
+	 * */
+	private function contructFirewallRule($arr){
+		
+		$em = $this->getDoctrine()->getManager();
+		
+		$rule="";
+		if(!empty($arr['source'])){
+			$rule.=" -s ".$arr['source']." ";
+		}
+		if(!empty($arr['destination'])){
+			$rule.=" -d ".$arr['destination']." ";
+		}
+		if(!empty($arr['protocol'])){
+			
+			$entity = $em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->find($arr['protocol']);
+			if($entity->getName()!==''){
+				$rule.=" -p ".$entity->getName()." ";
+			}			
+		}
+		if(!empty($arr['source_port'])){
+			if(is_numeric($arr['source_port'])){
+				$rule.=" --sport ".$arr['source_port']." ";
+			}else{
+				$ap=strpos($arr['source_port'],"(")+1;
+				$cp=strpos($arr['source_port'],")")-strlen($arr['source_port']);
+				$rule.=" --sport ".substr($arr['source_port'],$ap,$cp)." ";	
+			}
+		}
+		if(!empty($arr['destination_port'])){
+			if(is_numeric($arr['destination_port'])){
+				$rule.=" --dport ".$arr['destination_port']." ";
+			}else{
+				$ap=strpos($arr['destination_port'],"(")+1;
+				$cp=strpos($arr['destination_port'],")")-strlen($arr['destination_port']);
+				$rule.=" --dport ".substr($arr['destination_port'],$ap,$cp)." ";	
+			}
+		}
+		if(!empty($arr['interface_input'])){
+			$rule.=" -i ".$arr['interface_input']." ";
+		}
+		if(!empty($arr['interface_output'])){
+			$rule.=" -o ".$arr['interface_output']." ";
+		}
+		if(!empty($arr['action'])){
+			$rule.=" -j ".$arr['action']." ";
+		}
+		
+		return $rule;
+		
+		
+	}
+
+	/*
+	 * Get fields of rule in array from rule
+	 * 
+	 * */
+	private function deconstructFirewallRule($rule){
+		
+		$rule=explode(" ",$rule);
+		$em = $this->getDoctrine()->getManager();
+		$arr = array();
+		for($n=0;$n<count($rule);$n++){
+			
+			if($rule[$n]=="-s"){		$arr['source']=$rule[$n+1];						}
+			if($rule[$n]=="-d"){		$arr['destination']=$rule[$n+1];				}
+			if($rule[$n]=="-p"){				
+				$entity = $em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->findOneBy(array('name'=>$rule[$n+1]));										
+				$arr['protocol']=$entity->getId();
+			}
+			if($rule[$n]=="--sport"){		$arr['source_port']=$rule[$n+1];			}
+			if($rule[$n]=="--dport"){		$arr['destination_port']=$rule[$n+1];		}
+			if($rule[$n]=="-i")		{		$arr['interface_input']=$rule[$n+1];		}
+			if($rule[$n]=="-o")		{		$arr['interface_output']=$rule[$n+1];		}
+			if($rule[$n]=="-j")		{		$arr['action']=$rule[$n+1];					}
+			
+		}
+		
+		return $arr;
+		
+	}
+
+
 }
-
-
-
-
-
-
-
-
-
-
-

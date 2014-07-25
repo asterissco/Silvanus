@@ -38,3 +38,11 @@ firewallrules_easy_create:
     pattern:  /easy/create/{id_chain}
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:easycreate" }
     requirements: { _method: post|delete|get }
+
+firewallrules_easy_edit:
+    pattern:  /easy/edit/{id}/{id_chain}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:easyedit" }
+
+firewallrules_easy_update:
+    pattern:  /easy/update/{id}/{id_chain}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:easyupdate" }
