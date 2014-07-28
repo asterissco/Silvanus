@@ -81,6 +81,18 @@ class SyncCommand extends ContainerAwareCommand
 				$firewallRulesEntities = $query->getResult();
 				
 				$errorHandle = false;
+
+				for($n=0;$n<count($firewallRulesEntities);$n++){
+				
+					if(strpos($firewallRulesEntities[$n]->getRule(),'[')!==false){
+						
+						$firewallRulesEntities[$n]->setRule(str_replace("[","",$firewallRulesEntities[$n]->getRule()));
+						$firewallRulesEntities[$n]->setRule(str_replace("]","",$firewallRulesEntities[$n]->getRule()));
+						
+					}
+					
+				}
+
 				
 				//test loop
 				foreach($firewallRulesEntities as $firewallRulesEntity){
@@ -110,7 +122,7 @@ class SyncCommand extends ContainerAwareCommand
 					echo $rule;
 					
 					if($errorHandle){
-						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>3)));
+						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'Sync ERROR')));
 						$firewallRulesEntity->setSyncErrorMessage(serialize($output));
 						$this->em->persist($firewallRulesEntity);
 					}
@@ -147,7 +159,7 @@ class SyncCommand extends ContainerAwareCommand
 						$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
 						
 						
-						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>2)));
+						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'Sync OK')));
 						$firewallRulesEntity->setSyncErrorMessage('');
 						
 						$this->em->persist($firewallRulesEntity);				

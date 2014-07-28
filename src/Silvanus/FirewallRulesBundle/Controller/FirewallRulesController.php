@@ -1008,7 +1008,7 @@ class FirewallRulesController extends Controller
 				
 				if(strpos($rule[$y],']')!==false){
 					
-					$mode.=" ".trim(substr($rule[$y],0,-1));
+					$mode.=trim(substr($rule[$y],0,-1));
 					$flag = false;
 					
 				}else{
