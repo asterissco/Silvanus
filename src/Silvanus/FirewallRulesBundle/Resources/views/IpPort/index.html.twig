@@ -77,8 +77,8 @@
                 <td>{{ entity.description }}</td>
                 <td>{{ entity.reference }}</td>
                 <td>
-					<button class="btn btn-warning"  onclick="window.location.href='{{ path('ipport_edit', { 'id': entity.id }) }}'">Edit</button>
-					<button class="btn btn-danger"  onclick="confirm_redirect('{{ path('ipport_delete', { 'id': entity.id }) }}','Are you sure?')">Delete</button>                
+					<button class="btn btn-warning btn-xs"  onclick="window.location.href='{{ path('ipport_edit', { 'id': entity.id }) }}'">Edit</button>
+					<button class="btn btn-danger btn-xs"  onclick="confirm_redirect('{{ path('ipport_delete', { 'id': entity.id }) }}','Are you sure?')">Delete</button>                
                 </td>
             </tr>
         {% endfor %}

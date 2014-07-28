@@ -43,8 +43,8 @@
                 <td>{{ entity.description }}</td>
                 <td>
                 <td>
-					<button class="btn btn-success" onclick="window.location.href='{{ path('role_edit', { 'id': entity.id }) }}'" >Update</button>
-					<button class="btn btn-danger" 	onclick="confirm_redirect('{{ path('role_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
+					<button class="btn btn-success btn-xs" onclick="window.location.href='{{ path('role_edit', { 'id': entity.id }) }}'" >Update</button>
+					<button class="btn btn-danger btn-xs" 	onclick="confirm_redirect('{{ path('role_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
 				</td>
             </tr>
         {% endfor %}
