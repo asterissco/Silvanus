@@ -19,6 +19,11 @@ class FirewallRulesEasyUpdateType extends AbstractType
     {
         $builder
             //->add('rule')
+            ->add('module','text',array(
+				'label'=>'Module (type a module to load like "-m state --state RELATED,ESTABLISHED")',
+				'mapped'=>false,
+				'required'=>false,
+            ))
             ->add('source','text',array(
 				'label'=>'Source (IP/NETWORK)',
 				'mapped'=>false,

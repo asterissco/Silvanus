@@ -399,7 +399,16 @@ class FirewallRulesController extends Controller
 			
 		}
 		
+		for($n=0;$n<count($entities);$n++){
 		
+			if(strpos($entities[$n]->getRule(),'[')!==false){
+				
+				$entities[$n]->setRule(str_replace("[","",$entities[$n]->getRule()));
+				$entities[$n]->setRule(str_replace("]","",$entities[$n]->getRule()));
+				
+			}
+			
+		}
 
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:index.html.twig', array(
             'entities' 			=> $entities,
@@ -968,10 +977,13 @@ class FirewallRulesController extends Controller
 		if(!empty($arr['interface_output'])){
 			$rule.=" -o ".$arr['interface_output']." ";
 		}
+		if(!empty($arr['module'])){
+			$rule.=" [".$arr['module']."] ";
+		}
 		if(!empty($arr['action'])){
 			$rule.=" -j ".$arr['action']." ";
 		}
-		
+				
 		return $rule;
 		
 		
@@ -986,6 +998,49 @@ class FirewallRulesController extends Controller
 		$rule=explode(" ",$rule);
 		$em = $this->getDoctrine()->getManager();
 		$arr = array();
+
+		$flag	= false;
+		$mode	= "";
+		$srule	= array();
+		for($y=0;$y<count($rule);$y++){
+				
+			if($flag===true){
+				
+				if(strpos($rule[$y],']')!==false){
+					
+					$mode.=" ".trim(substr($rule[$y],0,-1));
+					$flag = false;
+					
+				}else{
+					
+					$mode.=" ".trim($rule[$y]);
+						
+				}
+							
+			}
+
+			if(strpos($rule[$y],'[')!==false){
+
+				$mode.=trim(substr($rule[$y],1));
+				$flag=true;
+
+			}
+			
+			if($flag===false){
+			
+				$srule[] = $rule[$y];
+				
+			}
+
+		}
+
+		if(count($srule)>0){
+		
+			$rule 				= $srule;
+			$arr['module']		= $mode;
+						
+		}
+		
 		for($n=0;$n<count($rule);$n++){
 			
 			if($rule[$n]=="-s"){		$arr['source']=$rule[$n+1];						}

@@ -147,4 +147,30 @@
 		
 	</div>
 
+		<br>
+		<br>
+		<br>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">INSTRUCTIONS</div>
+				<div class="panel-body">				
+					1- Type the rule without table and chain
+					<br>
+					<br>
+						
+						<center>-s 192.168.100.25 -d 192.168.100.5 -p TCP --sport 21 -j DROP </center>
+						
+					<br>
+					<br>
+					
+					If you want to use "mode" in the rule, you must be put inside a context [ mode ], for example: 
+					<br>
+					<br>
+						<center>-s 192.168.100.25 -d 192.168.100.5 -p TCP [ -m state --state RELATED,ESTABLISHED ] -j ACCEPT </center>
+						
+					<br>
+				</div>
+			</div>			
+
+
 {% endblock %}
