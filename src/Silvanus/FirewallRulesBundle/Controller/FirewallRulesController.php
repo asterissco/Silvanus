@@ -112,7 +112,7 @@ class FirewallRulesController extends Controller
 			}
          
          
-			$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+			$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'No sync')));
          
             $em->persist($entity);
             $em->flush();
@@ -213,6 +213,8 @@ class FirewallRulesController extends Controller
 			$rule = $this->contructFirewallRule($arrForm);			
 			$entity->setRule($rule);
 
+			$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'No sync')));
+
 			$em->persist($entity);
 			$em->flush();
 
@@ -284,7 +286,8 @@ class FirewallRulesController extends Controller
 
 					}
 
-					$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+					$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'No sync')));
+					
 
 					$em->persist($entity);
 					$em->flush();
@@ -357,13 +360,16 @@ class FirewallRulesController extends Controller
 				
 			}
 
-			if($formData['sync_error']!=''){
+			if(isset($formData['sync_error'])){
 
-				if($formData['sync_error']=='true'){	$sync_error=true;	}
-				if($formData['sync_error']=='false'){	$sync_error=false;	}
-					
-				$builder->andWhere($builder->expr()->eq('f.syncError',':sync_error'));
-				$builder->setParameter(':sync_error',$sync_error);
+				if($formData['sync_error']!=''){
+
+					if($formData['sync_error']=='true'){	$sync_error=true;	}
+					if($formData['sync_error']=='false'){	$sync_error=false;	}
+						
+					$builder->andWhere($builder->expr()->eq('f.syncError',':sync_error'));
+					$builder->setParameter(':sync_error',$sync_error);
+				}
 				
 			}
 
@@ -475,7 +481,7 @@ class FirewallRulesController extends Controller
 			}
          
          
-			$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+			$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'No sync')));
          
             $em->persist($entity);
             $em->flush();
@@ -554,7 +560,7 @@ class FirewallRulesController extends Controller
 						
 					}
 					
-					$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+					$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'No sync')));
 												
 					$em->persist($entity);
 					$em->flush();
@@ -686,7 +692,7 @@ class FirewallRulesController extends Controller
 		
         if ($editForm->isValid()) {
 
-				$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+				$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'No sync')));
 			
 				$em->persist($entity);
 				$em->flush();
@@ -760,7 +766,7 @@ class FirewallRulesController extends Controller
 					
 				}
 			
-				$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>1)));
+				$entity->setSyncStatus($em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'No sync')));
 			
 				$em->persist($entity);
 				$em->flush();
@@ -1008,7 +1014,7 @@ class FirewallRulesController extends Controller
 				
 				if(strpos($rule[$y],']')!==false){
 					
-					$mode.=trim(substr($rule[$y],0,-1));
+					$mode.=" ".trim(substr($rule[$y],0,-1));
 					$flag = false;
 					
 				}else{

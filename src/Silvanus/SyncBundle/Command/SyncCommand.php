@@ -86,8 +86,6 @@ class SyncCommand extends ContainerAwareCommand
 				
 					if(strpos($firewallRulesEntities[$n]->getRule(),'[')!==false){
 						
-						$firewallRulesEntities[$n]->setRule(str_replace("[","",$firewallRulesEntities[$n]->getRule()));
-						$firewallRulesEntities[$n]->setRule(str_replace("]","",$firewallRulesEntities[$n]->getRule()));
 						
 					}
 					
@@ -96,8 +94,11 @@ class SyncCommand extends ContainerAwareCommand
 				
 				//test loop
 				foreach($firewallRulesEntities as $firewallRulesEntity){
+
+					$fixed_rule=str_replace("[","",$firewallRulesEntity->getRule());
+					$fixed_rule=str_replace("]","",$fixed_rule);
 					
-					$rule = $this->iptables_path." -I ".$this->test_chain." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
+					$rule = $this->iptables_path." -I ".$this->test_chain." ".$firewallRulesEntity->getPriority()." ".$fixed_rule." 2>&1 ";
 					
 					if($chainEntity->getHost()!=''){
 					
@@ -123,7 +124,7 @@ class SyncCommand extends ContainerAwareCommand
 					
 					if($errorHandle){
 						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'Sync ERROR')));
-						$firewallRulesEntity->setSyncErrorMessage(serialize($output));
+						$firewallRulesEntity->setSyncErrorMessage(serialize($output));					
 						$this->em->persist($firewallRulesEntity);
 					}
 						

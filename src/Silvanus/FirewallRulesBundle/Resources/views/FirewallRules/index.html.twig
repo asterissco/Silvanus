@@ -84,10 +84,8 @@
 	<table class="table">
         <thead>
             <tr>
-                
-                <th>P</th>
+                <th> </th>
                 <th>Rule</th>
-                <th>Sync Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -99,10 +97,22 @@
             
 			
 				<tr>
-					<td>{{ entity.priority }}</td>
-					<td>{{ entity.rule }}</td>
 					<td>
 
+						{% if entity.syncStatus == 'No sync'  %}
+						
+							<button style="cursor:default" class="btn btn-default btn-xs" )'>{{ entity.priority }}</button>
+													
+						{% endif %}
+
+
+						{% if entity.syncStatus == 'Sync OK'  %}
+						
+							<button style="cursor:default" class="btn btn-success btn-xs" )'>{{ entity.priority }}</button>
+													
+						{% endif %}
+
+					
 						{% if entity.syncStatus == 'Sync ERROR'  %}
 
 							{% set error = ''%}
@@ -112,19 +122,14 @@
 						
 							{% endfor %}
 						
-							<button class="btn btn-danger" onclick='bootbox.alert("{{ error }}")'>{{ entity.syncStatus }}</button>
+							<button class="btn btn-danger btn-xs" onclick='bootbox.alert("{{ error }}")'>{{ entity.priority }}</button>
 
-						
-						{% else %}
-						
-							<button class="btn btn-success" )'>{{ entity.syncStatus }}</button>
-							
 						
 						{% endif %}
-
-
+						
 					
 					</td>
+					<td>{{ entity.rule }}</td>
 					<td>
 					
 							{# <button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button> #}
