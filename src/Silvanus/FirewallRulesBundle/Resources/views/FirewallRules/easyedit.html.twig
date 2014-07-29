@@ -34,9 +34,53 @@
 	<script type="text/javascript">
 	
 		$(document).ready(function(){
-		
+
+			/*
+			* Autocomplete 
+			*
+			*/
+			$('#silvanus_firewallrulesbundle_firewallrulestype_source_port').autocomplete({
+				source: function(request, response){
+					var url_to_ajax = '{{ path('ipport_ajaxsearch', {'service':'service_name'}) }}'
+					url_to_ajax		= url_to_ajax.replace('service_name',request.term);
+					$.ajax({
+						url: url_to_ajax,
+						dataType: "json",	
+						success: function( data ) {
+							response(data); 						
+						}
+					});
+				},
+				select: function( event, ui ) {
+					
+					//something
+
+				},			
+      
+			});
+
+			/*
+			* Autocomplete 
+			*
+			*/
+			$('#silvanus_firewallrulesbundle_firewallrulestype_destination_port').autocomplete({
+				source: function(request, response){
+					var url_to_ajax = '{{ path('ipport_ajaxsearch', {'service':'service_name'}) }}'
+					url_to_ajax		= url_to_ajax.replace('service_name',request.term);
+					$.ajax({
+						url: url_to_ajax,
+						dataType: "json",	
+						success: function( data ) {
+							response(data); 						
+						}
+					});
+				},			
+      
+			});
+
 		
 		});
+		
 	
 	</script>
 

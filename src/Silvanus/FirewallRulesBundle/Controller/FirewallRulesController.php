@@ -63,6 +63,22 @@ class FirewallRulesController extends Controller
 			}
 		}
 
+		if(!empty($arrForm['source_port'])){
+			if(!is_numeric($arrForm['source_port'])){
+				if(!preg_match('/([a-z])\w+ \([0-9]\w+\) \[([A-Z])\w+\]$/',$arrForm['source_port'])){
+					$form->get('source_port')->addError(new FormError('Select a port o type a number'));
+				}
+			}	
+		}
+		if(!empty($arrForm['destination_port'])){
+			if(!is_numeric($arrForm['destination_port'])){
+				if(!preg_match('/([a-z])\w+ \([0-9]\w+\) \[([A-Z])\w+\]$/',$arrForm['destination_port'])){
+					$form->get('destination_port')->addError(new FormError('Select a port o type a number'));
+				}
+			}	
+		}
+
+
 		if($form->isValid()){
 
 			$em 		= $this->getDoctrine()->getManager();
@@ -963,18 +979,22 @@ class FirewallRulesController extends Controller
 			if(is_numeric($arr['source_port'])){
 				$rule.=" --sport ".$arr['source_port']." ";
 			}else{
-				$ap=strpos($arr['source_port'],"(")+1;
-				$cp=strpos($arr['source_port'],")")-strlen($arr['source_port']);
-				$rule.=" --sport ".substr($arr['source_port'],$ap,$cp)." ";	
+				if(preg_match('/([a-z])\w+ \([0-9]\w+\) \[([A-Z])\w+\]$/',$arr['source_port'])){
+					$ap=strpos($arr['source_port'],"(")+1;
+					$cp=strpos($arr['source_port'],")")-strlen($arr['source_port']);
+					$rule.=" --sport ".substr($arr['source_port'],$ap,$cp)." ";	
+				}
 			}
 		}
 		if(!empty($arr['destination_port'])){
 			if(is_numeric($arr['destination_port'])){
 				$rule.=" --dport ".$arr['destination_port']." ";
 			}else{
-				$ap=strpos($arr['destination_port'],"(")+1;
-				$cp=strpos($arr['destination_port'],")")-strlen($arr['destination_port']);
-				$rule.=" --dport ".substr($arr['destination_port'],$ap,$cp)." ";	
+				if(preg_match('/([a-z])\w+ \([0-9]\w+\) \[([A-Z])\w+\]$/',$arr['destination_port'])){
+					$ap=strpos($arr['destination_port'],"(")+1;
+					$cp=strpos($arr['destination_port'],")")-strlen($arr['destination_port']);
+					$rule.=" --dport ".substr($arr['destination_port'],$ap,$cp)." ";	
+				}
 			}
 		}
 		if(!empty($arr['interface_input'])){
