@@ -1,6 +1,6 @@
 {% extends '::base.html.twig' %}
 
-{# {% form_theme filter_form _self %} #}
+{% form_theme filter_form _self %}
 
 {% block form_errors %}
     {% spaceless %}
@@ -18,9 +18,9 @@
     
     <div class="form-group">
 				
-			<div class="col-md-3">{{ form_label(form) }}</div>
-			<div class="col-md-6">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
-			<div class="col-md-3">{{ form_errors(form) }}</div>	
+			{# <div class="col-md-4">{{ form_label(form) }}</div> #}
+			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>	
 		
     </div>
     
@@ -31,8 +31,12 @@
 	<script type="text/javascript">
 	
 		$(document).ready(function(){
-		
-		
+
+/*
+			$('#form_sort_by').multiselect();
+			$('#form_sort_direction').multiselect();
+			$('#form_protocol').multiselect();
+*/			
 		});
 		
 	
@@ -50,6 +54,44 @@
 		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
     
     {% endif%}
+
+	<legend>Filter</legend>
+	
+		
+		<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('ipport', {'page':page} ) }}" method="POST" class="form-horizontal"> 
+
+			<div class="row">
+
+				<div class="col-md-4">
+				
+					{{ form_row(filter_form.sort_by) }}
+					{{ form_row(filter_form.sort_direction) }}
+					{{ form_row(filter_form.reference) }}
+			
+				</div>
+
+				<div class="col-md-4">					
+
+					{{ form_row(filter_form.service) }}
+					{{ form_row(filter_form.number) }}
+					<button  class="btn btn-success" type="submit">Filter</button>
+					
+				</div>					
+
+				<div class="col-md-4">					
+
+					{{ form_row(filter_form.description) }}
+					{{ form_row(filter_form.protocol) }}
+		
+				
+				</div>
+			
+			</div>
+			
+		</form>
+		
+	<br><br>
+
 
 	<legend>List</legend>
 

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Doctrine\ORM\EntityRepository;
 
 use Silvanus\FirewallRulesBundle\Entity\IpPort;
 use Silvanus\FirewallRulesBundle\Entity\TransportProtocol;
@@ -52,22 +53,77 @@ class IpPortController extends Controller
      * Lists all IpPort entities.
      *
      */
-    public function indexAction($page, $message=null)
+    public function indexAction(Request $request, $page, $message=null)
     {
+
+		//createIpPortFilterForm
+
         $em = $this->getDoctrine()->getManager();
-
 		$paginator  = $this->get('knp_paginator');
-        //$entities = $em->getRepository('SilvanusFirewallRulesBundle:IpPort')->findAll();
-
-		$pagination = $paginator->paginate($em->createQuery('SELECT p FROM Silvanus\FirewallRulesBundle\Entity\IpPort p'),  $this->get('request')->query->get('page', $page), 60);
-
+		$formFilter = $this->createIpPortFilterForm();
 		$form_iana = $this->createIanaForm();
+
+		if($request->getMethod()=='POST'){
+
+			
+			$formFilter->submit($request);
+			
+			$formData = $formFilter->getData();
+						
+			$ipportRepository = $em->getRepository('SilvanusFirewallRulesBundle:IpPort');
+			
+			$builder = $ipportRepository->createQueryBuilder('p');
+
+			if(!empty($formData['service'])){				
+				$builder->andWhere($builder->expr()->like('p.service', ':service'));
+				$builder->setParameter(':service','%'.strtoupper($formData['service']).'%');				
+			}
+			if(!empty($formData['number'])){				
+				$builder->andWhere($builder->expr()->like('p.number', ':number'));
+				$builder->setParameter(':number',strtoupper($formData['number']));				
+			}
+			if(!empty($formData['description'])){				
+				$builder->andWhere($builder->expr()->like('p.description', ':description'));
+				$builder->setParameter(':description','%'.strtoupper($formData['description']).'%');				
+			}
+			if(!empty($formData['reference'])){				
+				$builder->andWhere($builder->expr()->like('p.reference', ':reference'));
+				$builder->setParameter(':reference','%'.strtoupper($formData['reference']).'%');				
+			}
+			if(empty($formData['sort_by'])){
+				$sb='number';
+			}else{
+				$sb=$formData['sort_by'];
+			}
+			if(empty($formData['sort_direction'])){
+				$sd="ASC";
+			}else{	
+				$sd=$formData['sort_direction'];
+			}
+		
+
+			$builder->orderBy('p.'.$sb,$sd);
+
+			$pagination = $paginator->paginate($builder->getQuery(),  $this->get('request')->query->get('page', $page), 60);
+			
+			
+		}else{
+			
+			//$entities = $em->getRepository('SilvanusFirewallRulesBundle:IpPort')->findAll();
+
+			$pagination = $paginator->paginate($em->createQuery('SELECT p FROM Silvanus\FirewallRulesBundle\Entity\IpPort p'),  $this->get('request')->query->get('page', $page), 60);
+
+			
+
+		}
 
         return $this->render('SilvanusFirewallRulesBundle:IpPort:index.html.twig', array(
             //'entities' 	=> $entities,
             'pagination' 	=> $pagination,
             'message'		=> $message,
             'form_iana'		=> $form_iana->createView(),
+            'filter_form'	=> $formFilter->createView(),
+            'page'			=> $page,
 		));
     }
     /**
@@ -375,5 +431,87 @@ class IpPortController extends Controller
 				
 		
 	}
+
+    /**
+     * Creates a form to filter rules list
+     *
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createIpPortFilterForm()
+    {
+        return $this->createFormBuilder(array())
+            ->add('sort_by', 'choice',array(
+					'choices'=>array(
+							'service'=>'Service',
+							'number'=>'Number',						
+							'description'=>'Description',
+						),
+					'label'=>'Sort by',	
+					'required' => false,
+					'empty_value' => ' -- Sort by --',
+				))
+            ->add('sort_direction', 'choice',array(
+					'choices'=>array(
+							'asc'=>'Asc',
+							'desc'=>'Desc',
+						),
+					'label'=>'Sort direction',	
+					'required' => false,
+					'empty_value' => ' -- Sort direction --',	
+				))
+            //~ ->add('show_free_rules', 'choice',array(
+				//~ 'choices'=>array(
+						//~ '0'=>'No',
+						//~ '1'=>'Yes',
+					//~ ),
+				//~ 'label'=>'Show free rules',	
+				//~ ))
+            ->add('service', 'text',array(
+					'label'=>'Service',
+					'required' => false,
+					'attr' => array(
+						'placeholder' => 'Service',
+					),										
+				))
+            ->add('number', 'text',array(
+					'label'=>'Number',
+					'required' => false,
+					'attr' => array(
+						'placeholder' => 'Number',
+					),					
+				))
+				
+            ->add('description', 'text',array(
+					'label'=>'Description',
+					'required' => false,
+					'attr' => array(
+						'placeholder' => 'Description',
+					),					
+				))
+            ->add('reference', 'text',array(
+					'label'=>'Reference',
+					'required' => false,
+					'attr' => array(
+						'placeholder' => 'Reference',
+					),
+					
+				))
+            ->add('protocol', 'entity',array(
+					'class' => 'SilvanusFirewallRulesBundle:TransportProtocol',
+					'label'=>'Protocol',					
+					'required' => false,
+					'mapped' => false,
+					'query_builder' => function(EntityRepository $er) {
+					return $er->createQueryBuilder('t')
+						->orderBy('t.name', 'ASC');
+					},
+					'required' => true,
+					'empty_value' => ' -- Transport protocol --',
+				))
+            ->getForm()
+        ;
+    }
+	
 
 }

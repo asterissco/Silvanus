@@ -421,6 +421,7 @@ class FirewallRulesController extends Controller
 			
 		}
 		
+		//erase special char for mode escape
 		for($n=0;$n<count($entities);$n++){
 		
 			if(strpos($entities[$n]->getRule(),'[')!==false){
