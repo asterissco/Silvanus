@@ -1,6 +1,6 @@
 ipport:
-    pattern:  /index/{page}/{message}
-    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:index", page: 1, message: '' }
+    pattern:  /index/{message}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:index", message: '' }
 
 ipport_show:
     pattern:  /{id}/show

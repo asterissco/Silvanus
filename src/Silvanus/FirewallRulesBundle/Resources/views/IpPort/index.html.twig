@@ -39,6 +39,12 @@
 */			
 		});
 		
+		function requestPage(page){
+		
+			$('#form_page').val(page);
+			$('#filter_form').submit();
+		
+		}
 	
 	</script>
 
@@ -53,12 +59,12 @@
     
 		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
     
-    {% endif%}
+    {% endif%}	
 
 	<legend>Filter</legend>
 	
 		
-		<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('ipport', {'page':page} ) }}" method="POST" class="form-horizontal"> 
+		<form name="filter_form" id="filter_form" {{ form_enctype(filter_form) }} action="{{ path('ipport') }}" method="POST" class="form-horizontal"> 
 
 			<div class="row">
 
@@ -74,7 +80,7 @@
 
 					{{ form_row(filter_form.service) }}
 					{{ form_row(filter_form.number) }}
-					<button  class="btn btn-success" type="submit">Filter</button>
+					<button  class="btn btn-success" onclick="requestPage(1)">Filter</button>
 					
 				</div>					
 
@@ -82,7 +88,7 @@
 
 					{{ form_row(filter_form.description) }}
 					{{ form_row(filter_form.protocol) }}
-		
+					{{ form_row(filter_form.page) }}
 				
 				</div>
 			
@@ -133,7 +139,7 @@
 		<div class="col-md-8">
 			<form action="{{ path('ipport_iana') }}" method="post" {{ form_enctype(form_iana) }} class="form-inline" id="iana_form">
 			
-				<button class="btn btn-success" type="button" onclick="confirm_submit($('#iana_form'),'This action erease all registers of protocols and ports, are you sure?')">Import IANA</button>
+				<button class="btn btn-success btn-xs" type="button" onclick="confirm_submit($('#iana_form'),'This action erease all registers of protocols and ports, are you sure?')">Import IANA</button>
 				<div class="form-group">
 					
 					{{ form_widget(form_iana.attachment) }}			
@@ -146,11 +152,16 @@
 		</div>
 
 		<div class="col-md-4">
-			<button class="btn btn-success" onclick="window.location.href='{{ path('ipport_new') }}'">New port</button>
+			<button class="btn btn-success btn-xs" onclick="window.location.href='{{ path('ipport_new') }}'">New port</button>
 		</div>
 
 
 	</div>
+	<br>
+	<br>
+	<br>
+
+
 	{# http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml #}
 	
 <div id="myModal" class="modal fade">

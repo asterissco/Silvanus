@@ -38,10 +38,6 @@ class IpPortController extends Controller
 			
 		}
 		
-		
-		
-		
-		
 		return $this->render('SilvanusFirewallRulesBundle:IpPort:ajaxsearchport.html.twig', array(
 			'arr'	=> 	$arr,
 		));
@@ -53,27 +49,31 @@ class IpPortController extends Controller
      * Lists all IpPort entities.
      *
      */
-    public function indexAction(Request $request, $page, $message=null)
+    public function indexAction(Request $request, $message=null)
     {
 
-		//createIpPortFilterForm
+		//yes, this is a crap
+		foreach($request->request->all() as $r){	
+			$protocol = $r['protocol'];		
+		}
 
-        $em = $this->getDoctrine()->getManager();
+        $em 		= $this->getDoctrine()->getManager();
 		$paginator  = $this->get('knp_paginator');
 		$formFilter = $this->createIpPortFilterForm();
-		$form_iana = $this->createIanaForm();
+		$form_iana 	= $this->createIanaForm();
+
 
 		if($request->getMethod()=='POST'){
-
-			
-			$formFilter->submit($request);
-			
-			$formData = $formFilter->getData();
-						
-			$ipportRepository = $em->getRepository('SilvanusFirewallRulesBundle:IpPort');
-			
+		
+			$formFilter->submit($request);			
+			$formData = $formFilter->getData();									
+			$ipportRepository = $em->getRepository('SilvanusFirewallRulesBundle:IpPort');			
 			$builder = $ipportRepository->createQueryBuilder('p');
 
+			if(!empty($protocol)){
+					$builder->join('p.protocol', 't');
+					$builder->andWhere('t.id = '.$protocol);
+			}
 			if(!empty($formData['service'])){				
 				$builder->andWhere($builder->expr()->like('p.service', ':service'));
 				$builder->setParameter(':service','%'.strtoupper($formData['service']).'%');				
@@ -101,19 +101,15 @@ class IpPortController extends Controller
 				$sd=$formData['sort_direction'];
 			}
 		
-
 			$builder->orderBy('p.'.$sb,$sd);
 
-			$pagination = $paginator->paginate($builder->getQuery(),  $this->get('request')->query->get('page', $page), 60);
-			
+			$pagination = $paginator->paginate($builder->getQuery(),  $this->get('request')->query->get('page', $formData['page']), 60);
+			$page = $formData['page'];
 			
 		}else{
-			
-			//$entities = $em->getRepository('SilvanusFirewallRulesBundle:IpPort')->findAll();
 
-			$pagination = $paginator->paginate($em->createQuery('SELECT p FROM Silvanus\FirewallRulesBundle\Entity\IpPort p'),  $this->get('request')->query->get('page', $page), 60);
-
-			
+			$pagination = $paginator->paginate($em->createQuery('SELECT p FROM Silvanus\FirewallRulesBundle\Entity\IpPort p ORDER BY p.number'),  $this->get('request')->query->get('page', 1), 60);
+			$page = 1;
 
 		}
 
@@ -320,100 +316,113 @@ class IpPortController extends Controller
      * 
      * */
     public function ianaAction(Request $request){
+
+		try{
 	
-		$form = $this->createIanaForm();
-		$form->handleRequest($request);
-		
-		//get the temp file path
-		foreach($request->files as $file){
+			$form = $this->createIanaForm();
+			$form->handleRequest($request);
 			
-			if(isset($file['attachment'])){			
-				$f = $file['attachment'];
-			}			
-		}
+			//get the temp file path
+			foreach($request->files as $file){
+				
+				if(isset($file['attachment'])){			
+					$f = $file['attachment'];
+				}			
+			}
 
-		$em = $this->getDoctrine()->getManager();
+			$em = $this->getDoctrine()->getManager();
 
-		//truncate tables
-		$connection = $em->getConnection();
-		$platform   = $connection->getDatabasePlatform();
-		$connection->executeUpdate($platform->getTruncateTableSQL('IpPort', true /* whether to cascade */));		
-		$connection->executeUpdate($platform->getTruncateTableSQL('TransportProtocol', true /* whether to cascade */));		
-		
-		$n=0;
-		$fields=array();
-		$protocols=array();
-		$handle = @fopen($f->getPathname(), "r");
-		if ($handle) {
-			while (($buffer = fgets($handle, 4096)) !== false) {
-				$arrLine=explode(",",$buffer);
-				if($n==0){
+			//truncate tables
+			$connection = $em->getConnection();
+			$platform   = $connection->getDatabasePlatform();
+			$connection->executeUpdate($platform->getTruncateTableSQL('IpPort', true /* whether to cascade */));		
+			$connection->executeUpdate($platform->getTruncateTableSQL('TransportProtocol', true /* whether to cascade */));		
+			
+			$n=0;
+			$fields=array();
+			$protocols=array();
+			$handle = @fopen($f->getPathname(), "r");
+			if ($handle) {
+				while (($buffer = fgets($handle, 4096)) !== false) {
+					$arrLine=explode(",",$buffer);
+					if($n==0){
 
-					for($y=0;$y<count($arrLine);$y++){
-						$fields[$arrLine[$y]]=$y;						
-					}
-					
-				}else{
-					
-					if(count($arrLine)>3 and strpos($arrLine[0],"IANA assigned this well-formed service name as a replacement for")===false){
-					
-						if(!in_array($arrLine[$fields['Transport Protocol']],$protocols)){
+						for($y=0;$y<count($arrLine);$y++){
+							$fields[$arrLine[$y]]=$y;						
+						}
 						
-							$protocol=$em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->findBy(array('name'=>strtoupper($arrLine[$fields['Transport Protocol']])));
+					}else{
+						
+						if(count($arrLine)>3 and strpos($arrLine[0],"IANA assigned this well-formed service name as a replacement for")===false){
+						
+							if(!in_array($arrLine[$fields['Transport Protocol']],$protocols)){
 							
-							if(!$protocol){
+								$protocol=$em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->findBy(array('name'=>strtoupper($arrLine[$fields['Transport Protocol']])));
 								
-								$protocol = new TransportProtocol();
-								$protocol->setName(strtoupper($arrLine[$fields['Transport Protocol']]));							
-								$em->persist($protocol);
-								
-								$protocols[]=$arrLine[$fields['Transport Protocol']];
-								
+								if(!$protocol){
+									
+									$protocol = new TransportProtocol();
+									$protocol->setName(strtoupper($arrLine[$fields['Transport Protocol']]));							
+									$em->persist($protocol);
+									
+									$protocols[]=$arrLine[$fields['Transport Protocol']];
+									
+								}
+							
+								$entProtocol[$arrLine[$fields['Transport Protocol']]]=$protocol;
+							
 							}
-						
-							$entProtocol[$arrLine[$fields['Transport Protocol']]]=$protocol;
-						
-						}
-						
-						
-						$entity = new IpPort();
-						
-						if(isset($arrLine[$fields['Service Name']])){
-							$entity->setService($arrLine[$fields['Service Name']]);
-						}
-						
-						if(isset($arrLine[$fields['Port Number']])){
-							$entity->setNumber($arrLine[$fields['Port Number']]);
-						}
-						
-						if(isset($arrLine[$fields['Description']])){
-							$entity->setDescription($arrLine[$fields['Description']]);
-						}
-						
-						if(isset($arrLine[$fields['Reference']])){
-							$entity->setReference($arrLine[$fields['Reference']]);
-						}
-						
-						
-						$entity->setProtocol($entProtocol[$arrLine[$fields['Transport Protocol']]]);
-										
-						$em->persist($entity);
-						
-					}					
+							
+							
+							$entity = new IpPort();
+							
+							if(isset($arrLine[$fields['Service Name']])){
+								$entity->setService($arrLine[$fields['Service Name']]);
+							}
+							
+							if(isset($arrLine[$fields['Port Number']])){
+								$entity->setNumber($arrLine[$fields['Port Number']]);
+							}
+							
+							if(isset($arrLine[$fields['Description']])){
+								$entity->setDescription($arrLine[$fields['Description']]);
+							}
+							
+							if(isset($arrLine[$fields['Reference']])){
+								$entity->setReference($arrLine[$fields['Reference']]);
+							}
+							
+							
+							$entity->setProtocol($entProtocol[$arrLine[$fields['Transport Protocol']]]);
+											
+							$em->persist($entity);
+							
+							
+						}					
+					}
+					$n++;
 				}
-				$n++;
-			}
-	
-			if (!feof($handle)) {
-				echo "Error: unexpected fgets() fail\n";
-			}
-			fclose($handle);
-		}		
-
-		$em->flush();
 		
-		return $this->redirect($this->generateUrl('ipport', array('message'=>'Import success')));
-		//return new Response ('<br><br>OK');
+				if (!feof($handle)) {
+					echo "Error: unexpected fgets() fail\n";
+				}
+				fclose($handle);
+			}else{
+			
+
+				
+			}
+
+			$em->flush();
+			
+			return $this->redirect($this->generateUrl('ipport', array('message'=>'Import success')));
+			//return new Response ('<br><br>OK');
+
+		}catch(Exception $e){
+		
+				echo $e->getLine()." ".$e->getMessage();
+			
+		}
 		 
 	}
     
@@ -441,7 +450,7 @@ class IpPortController extends Controller
     private function createIpPortFilterForm()
     {
         return $this->createFormBuilder(array())
-            ->add('sort_by', 'choice',array(
+            ->add('sort_by','choice',array(
 					'choices'=>array(
 							'service'=>'Service',
 							'number'=>'Number',						
@@ -451,7 +460,7 @@ class IpPortController extends Controller
 					'required' => false,
 					'empty_value' => ' -- Sort by --',
 				))
-            ->add('sort_direction', 'choice',array(
+            ->add('sort_direction','choice',array(
 					'choices'=>array(
 							'asc'=>'Asc',
 							'desc'=>'Desc',
@@ -467,14 +476,14 @@ class IpPortController extends Controller
 					//~ ),
 				//~ 'label'=>'Show free rules',	
 				//~ ))
-            ->add('service', 'text',array(
+            ->add('service','text',array(
 					'label'=>'Service',
 					'required' => false,
 					'attr' => array(
 						'placeholder' => 'Service',
 					),										
 				))
-            ->add('number', 'text',array(
+            ->add('number','integer',array(
 					'label'=>'Number',
 					'required' => false,
 					'attr' => array(
@@ -482,32 +491,33 @@ class IpPortController extends Controller
 					),					
 				))
 				
-            ->add('description', 'text',array(
+            ->add('description','text',array(
 					'label'=>'Description',
 					'required' => false,
 					'attr' => array(
 						'placeholder' => 'Description',
 					),					
 				))
-            ->add('reference', 'text',array(
+            ->add('reference','text',array(
 					'label'=>'Reference',
 					'required' => false,
 					'attr' => array(
 						'placeholder' => 'Reference',
-					),
-					
+					),			
 				))
-            ->add('protocol', 'entity',array(
+            ->add('protocol','entity',array(
 					'class' => 'SilvanusFirewallRulesBundle:TransportProtocol',
-					'label'=>'Protocol',					
-					'required' => false,
+					'label'=>'Protocol',
+					'required' => false,					
 					'mapped' => false,
 					'query_builder' => function(EntityRepository $er) {
 					return $er->createQueryBuilder('t')
 						->orderBy('t.name', 'ASC');
 					},
-					'required' => true,
 					'empty_value' => ' -- Transport protocol --',
+				))
+            ->add('page','hidden',array(
+					'required' => false,					
 				))
             ->getForm()
         ;
