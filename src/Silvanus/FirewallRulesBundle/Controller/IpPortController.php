@@ -336,12 +336,14 @@ class IpPortController extends Controller
 			$connection = $em->getConnection();
 			$platform   = $connection->getDatabasePlatform();
 			$connection->executeUpdate($platform->getTruncateTableSQL('IpPort', true /* whether to cascade */));		
-			$connection->executeUpdate($platform->getTruncateTableSQL('TransportProtocol', true /* whether to cascade */));		
+			//$connection->executeUpdate($platform->getTruncateTableSQL('TransportProtocol', true /* whether to cascade */));		
 			
 			$n=0;
 			$fields=array();
 			$protocols=array();
 			$handle = @fopen($f->getPathname(), "r");
+		
+			
 			if ($handle) {
 				while (($buffer = fgets($handle, 4096)) !== false) {
 					$arrLine=explode(",",$buffer);
@@ -357,7 +359,7 @@ class IpPortController extends Controller
 						
 							if(!in_array($arrLine[$fields['Transport Protocol']],$protocols)){
 							
-								$protocol=$em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->findBy(array('name'=>strtoupper($arrLine[$fields['Transport Protocol']])));
+								$protocol=$em->getRepository('SilvanusFirewallRulesBundle:TransportProtocol')->findOneBy(array('name'=>trim(strtoupper($arrLine[$fields['Transport Protocol']]))));
 								
 								if(!$protocol){
 									
@@ -366,7 +368,7 @@ class IpPortController extends Controller
 									$em->persist($protocol);
 									
 									$protocols[]=$arrLine[$fields['Transport Protocol']];
-									
+																		
 								}
 							
 								$entProtocol[$arrLine[$fields['Transport Protocol']]]=$protocol;
@@ -409,7 +411,7 @@ class IpPortController extends Controller
 				fclose($handle);
 			}else{
 			
-
+				//nothing to do
 				
 			}
 

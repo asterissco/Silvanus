@@ -112,7 +112,7 @@ class ChainController extends Controller
 
 			/* add sync petition */
 			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
-			if(!$syncEntity){
+			if(!$syncEntity and $entity->getActive()){
 
 				$syncEntity = new sync();
 				$syncEntity->setChainId($entity->getId());
@@ -239,13 +239,15 @@ class ChainController extends Controller
 				$syncEntity->setChainId($id);
 				$syncEntity->setTime(new \DateTime('now'));
 				$syncEntity->setError(false);
-				$syncEntity->setAction('u');
+				if($entity->getActive()){
+					$syncEntity->setAction('u');
+				}else{
+					$syncEntity->setAction('d');
+				}
 				$em->persist($syncEntity);
 				$em->flush();
 
 			}
-
-
 
             //return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
 			return $this->redirect($this->generateUrl('chains', array('message'=>'Update successful: '.$entity->getName())));
@@ -323,9 +325,8 @@ class ChainController extends Controller
 			
 		}
 		
-		$firewallRulesEntities = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->findBy(array('chain_id'=>$id));
-		
-		foreach($firewallRulesEntities as $firewalRulesEntity){
+				
+		foreach($entity->getRules() as $firewalRulesEntity){
 			$em->remove($firewalRulesEntity);
 		}
 		

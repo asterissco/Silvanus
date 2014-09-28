@@ -21,8 +21,9 @@ class Chain
 
     public function __construct(){
         
-        $this->trusted = new \Doctrine\Common\Collections\ArrayCollection();
-
+        $this->trusted 	= new \Doctrine\Common\Collections\ArrayCollection();
+		$this->rules 	= new \Doctrine\Common\Collections\ArrayCollection();
+		
     }
 
 
@@ -66,6 +67,19 @@ class Chain
      * @ORM\Column(name="error", type="boolean", nullable=TRUE)
      */
     private $error;
+
+	/**
+	 * @var boolean
+	 * 
+	 * @ORM\Column(name="active", type="boolean", nullable=TRUE)
+	 * */
+	private $active = true;
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="Silvanus\FirewallRulesBundle\Entity\FirewallRules", mappedBy="chain")
+     */    
+    private $rules;
 
     /**
      * Get id
@@ -195,4 +209,83 @@ class Chain
         return $this->error;
     }    
     
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return Chain
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean 
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * Add trusted
+     *
+     * @param \Silvanus\ChainsBundle\Entity\Trusted $trusted
+     * @return Chain
+     */
+    public function addTrusted(\Silvanus\ChainsBundle\Entity\Trusted $trusted)
+    {
+        $this->trusted[] = $trusted;
+    
+        return $this;
+    }
+
+    /**
+     * Remove trusted
+     *
+     * @param \Silvanus\ChainsBundle\Entity\Trusted $trusted
+     */
+    public function removeTrusted(\Silvanus\ChainsBundle\Entity\Trusted $trusted)
+    {
+        $this->trusted->removeElement($trusted);
+    }
+
+    /**
+     * Add rules
+     *
+     * @param \Silvanus\ChainsBundle\Entity\FirewallRules $rules
+     * @return Chain
+     */
+    public function addRule(\Silvanus\FirewallRulesBundle\Entity\FirewallRules $rules)
+    {
+        $this->rules[] = $rules;
+    
+        return $this;
+    }
+
+    /**
+     * Remove rules
+     *
+     * @param \Silvanus\ChainsBundle\Entity\FirewallRules $rules
+     */
+    public function removeRule(\Silvanus\FirewallRulesBundle\Entity\FirewallRules $rules)
+    {
+        $this->rules->removeElement($rules);
+    }
+
+    /**
+     * Get rules
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getRules()
+    {
+        return $this->rules;
+    }
 }

@@ -19,8 +19,8 @@
     <div class="form-group">
 		<div class="row">	
 			
-			<div class="col-md-12">{{ form_label(form) }}</div>
-			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_label(form) }}</div>
+			<div class="col-md-4">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
 			<div class="col-md-4">{{ form_errors(form) }}</div>
 			
 		</div>
@@ -123,7 +123,74 @@
 				
 			});
 		
+		
+			/*
+			* Autocomplete 
+			*
+			*/
+			$('#silvanus_firewallrulesbundle_firewallrulestype_source_port').autocomplete({
+				source: function(request, response){
+					var url_to_ajax = '{{ path('ipport_ajaxsearch', {'service':'service_name'}) }}'
+					url_to_ajax		= url_to_ajax.replace('service_name',request.term);
+					$.ajax({
+						url: url_to_ajax,
+						dataType: "json",	
+						success: function( data ) {
+							response(data); 						
+						}
+					});
+				},
+				select: function( event, ui ) {
+
+/*				
+
+					var protocol = ui.item.label.substring(ui.item.label.indexOf("[")+1,ui.item.label.indexOf("]"));
+					$('#silvanus_firewallrulesbundle_firewallrulestype_protocol').val(protocol.toLowerCase());								
+					$('#silvanus_firewallrulesbundle_firewallrulestype_protocol').prop('disabled', true);
+
+*/				
+
+				},			
+      
+			});
+
+			/*
+			* Autocomplete 
+			*
+			*/
+			$('#silvanus_firewallrulesbundle_firewallrulestype_destination_port').autocomplete({
+				source: function(request, response){
+					var url_to_ajax = '{{ path('ipport_ajaxsearch', {'service':'service_name'}) }}'
+					url_to_ajax		= url_to_ajax.replace('service_name',request.term);
+					$.ajax({
+						url: url_to_ajax,
+						dataType: "json",	
+						success: function( data ) {
+							response(data); 						
+						}
+					});
+				},			
+      
+			});
+
+		
 		});
+
+/*
+							var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" ); 
+							response($.map(data, function(v,i){
+								var text = v.MainName;
+								console.log("Esto:");
+								return v.service;
+								if ( text && ( !request.term || matcher.test(text) ) ) {
+									return {
+											label: v.service,
+											value: v.service
+									};
+								}
+							}));
+*/
+
 	
 	</script>
 
@@ -131,9 +198,9 @@
 
 {% block body -%}
 
-    <div class="page-header"><h1>Firewall <small>create new rule</small></h1></div>
+    <div class="page-header"><h1>Firewall <small>create new rule </small></h1></div>
 
-    <form action="{{ path('firewallrules_create', {'id_chain':id_chain } ) }}" method="post" {{ form_enctype(form) }}>
+    <form action="{{ path('firewallrules_create', {'chain_id':chain_id } ) }}" method="post" {{ form_enctype(form) }}>
         {{ form_widget(form) }}
         <p>
             <button class="btn btn-success" type="submit">Create</button>
@@ -143,34 +210,9 @@
 	<div class="col-md-12">	
 			<br><br>
 			
-			<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules', {'id_chain': id_chain} ) }}'">Back</button>
+			<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules', {'chain_id': chain_id} ) }}'">Back</button>
 		
 	</div>
-
-		<br>
-		<br>
-		<br>
-
-			<div class="panel panel-default">
-				<div class="panel-heading">INSTRUCTIONS</div>
-				<div class="panel-body">				
-					1- Type the rule without table and chain
-					<br>
-					<br>
-						
-						<center>-s 192.168.100.25 -d 192.168.100.5 -p TCP --sport 21 -j DROP </center>
-						
-					<br>
-					<br>
-					
-					If you want to use "mode" in the rule, you must be put inside a context [ mode ], for example: 
-					<br>
-					<br>
-						<center>-s 192.168.100.25 -d 192.168.100.5 -p TCP [ -m state --state RELATED,ESTABLISHED ] -j ACCEPT </center>
-						
-					<br>
-				</div>
-			</div>			
 
 
 {% endblock %}

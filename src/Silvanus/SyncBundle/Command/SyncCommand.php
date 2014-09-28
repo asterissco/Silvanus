@@ -58,6 +58,7 @@ class SyncCommand extends ContainerAwareCommand
 				
 			}
 			
+			//create or update chain
 			if($syncEntity->getAction()=='c' or $syncEntity->getAction()=='u'){
 				
 			
@@ -81,24 +82,15 @@ class SyncCommand extends ContainerAwareCommand
 				$firewallRulesEntities = $query->getResult();
 				
 				$errorHandle = false;
-
-				for($n=0;$n<count($firewallRulesEntities);$n++){
-				
-					if(strpos($firewallRulesEntities[$n]->getRule(),'[')!==false){
-						
-						
-					}
-					
-				}
-
 				
 				//test loop
 				foreach($firewallRulesEntities as $firewallRulesEntity){
 
-					$fixed_rule=str_replace("[","",$firewallRulesEntity->getRule());
-					$fixed_rule=str_replace("]","",$fixed_rule);
-					
+					$fixed_rule=str_replace("["," ",$firewallRulesEntity->getRule());
+					$fixed_rule=str_replace("]"," ",$fixed_rule);
+										
 					$rule = $this->iptables_path." -I ".$this->test_chain." ".$firewallRulesEntity->getPriority()." ".$fixed_rule." 2>&1 ";
+					
 					
 					if($chainEntity->getHost()!=''){
 					
@@ -155,8 +147,12 @@ class SyncCommand extends ContainerAwareCommand
 					
 					//set the rules to chain
 					foreach($firewallRulesEntities as $firewallRulesEntity){
+	
+						$fixed_rule=str_replace("["," ",$firewallRulesEntity->getRule());
+						$fixed_rule=str_replace("]"," ",$fixed_rule);
+
 					
-						$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
+						$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$fixed_rule." 2>&1 ";
 						$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
 						
 						
@@ -190,8 +186,6 @@ class SyncCommand extends ContainerAwareCommand
 				
 				$this->em->persist($chainEntity);	
 				
-				
-
 			
 			}
 

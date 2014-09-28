@@ -54,7 +54,7 @@
 	<legend>Filter</legend>
 	
 		
-		<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('firewallrules', {'id_chain':id_chain} ) }}" method="POST" class="form-horizontal"> 
+		<form name="filter_form" {{ form_enctype(filter_form) }} action="{{ path('firewallrules', {'chain_id':chain_id} ) }}" method="POST" class="form-horizontal"> 
 
 			<div class="row">
 
@@ -133,8 +133,7 @@
 					<td>
 					
 							{# <button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules_show', { 'id': entity.id }) }}'">Show</button> #}
-							<button class="btn btn-warning btn-xs"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id, 'id_chain': id_chain }) }}'">Edit</button>
-							<button class="btn btn-warning btn-xs"  onclick="window.location.href='{{ path('firewallrules_easy_edit', { 'id': entity.id, 'id_chain': id_chain }) }}'">Edit simple mode</button>
+							<button class="btn btn-warning btn-xs"  onclick="window.location.href='{{ path('firewallrules_edit', { 'id': entity.id, 'chain_id': chain_id }) }}'">Edit</button>
 							<button class="btn btn-danger btn-xs"  onclick="confirm_redirect('{{ path('firewallrules_delete', { 'id': entity.id }) }}','Are you sure?')">Delete</button>
 
 					</td>
@@ -147,8 +146,7 @@
     </table>
 
 			
-            <button class="btn btn-success" onclick="window.location.href='{{ path('firewallrules_new', {'id_chain': id_chain}) }}'">New rule</button> 
-            <button class="btn btn-success" onclick="window.location.href='{{ path('firewallrules_easy_new', {'id_chain': id_chain}) }}'">New rule in easy mode</button>
+            <button class="btn btn-success" onclick="window.location.href='{{ path('firewallrules_new', {'chain_id': chain_id}) }}'">New rule</button> 
 
 <div id="myModal" class="modal fade">
 	<div class="modal-dialog">

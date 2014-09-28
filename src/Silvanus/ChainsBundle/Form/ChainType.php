@@ -22,6 +22,7 @@ class ChainType extends AbstractType
     {
         $builder
             ->add('name')
+            ->add('active')
             ->add('host')
             ->add('trusted');
 
