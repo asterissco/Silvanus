@@ -18,9 +18,9 @@
     
     <div class="form-group">
 				
-			<div class="col-md-3">{{ form_label(form) }}</div>
+			<div class="col-md-6">{{ form_label(form) }}</div>
 			<div class="col-md-6">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
-			<div class="col-md-3">{{ form_errors(form) }}</div>	
+			{# <div class="col-md-3">{{ form_errors(form) }}</div>	 #}
 		
     </div>
     
@@ -61,17 +61,22 @@
 				
 					{{ form_row(filter_form.sort_by) }}
 					{{ form_row(filter_form.sort_direction) }}
-				
+					{{ form_row(filter_form.name) }}
+					
 				</div>
 			
 				<div class="col-md-6">
 				
-					{{ form_row(filter_form.name) }}
+					
 					{{ form_row(filter_form.host) }}
-					<button type="submit" class="btn btn-success">Filter</button>
+					{{ form_row(filter_form.type) }}
 				
 				</div>
 
+				<div class="col-md-6">
+					
+					<button type="submit" class="btn btn-success">Filter</button>
+				</div>
 			</div>
 
 			{{ form_row(filter_form._token) }}
@@ -86,6 +91,7 @@
                 {# <th>Id</th> #}
                 <th>&nbsp;</th>
                 <th>Name</th>
+                <th>Type</th>
                 <th>Host</th>
                 <th>Trusted</th>
                 <th>Sync Status</th>
@@ -105,6 +111,7 @@
 					{% endif %}
                 </td>
                 <td>{{ entity.name }}</td>
+                <td>{{ entity.type }}</td>
                 <td>{{ entity.host }}</td>
                 <td>
 					{% for trusted in entity.trusted %}

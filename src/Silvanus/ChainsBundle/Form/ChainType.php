@@ -24,7 +24,15 @@ class ChainType extends AbstractType
             ->add('name')
             ->add('active')
             ->add('host')
-            ->add('trusted');
+            ->add('trusted')
+            ->add('type','choice',array(
+				'label' => 'Chain type',
+				'required'=>true,
+				'choices'=>array(
+					'normal' => 'Normal',
+					'special' => 'Special',
+				)				
+            ));
 
 
 //~ 

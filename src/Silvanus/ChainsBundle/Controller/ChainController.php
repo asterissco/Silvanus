@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Silvanus\ChainsBundle\Entity\Chain;
 use Silvanus\ChainsBundle\Form\ChainType;
+use Silvanus\ChainsBundle\Form\ChainSpecialType;
 
 use Silvanus\SyncBundle\Entity\Sync;
 
@@ -50,16 +51,24 @@ class ChainController extends Controller
 				if($formData['name']!=''){
 				
 					$builder->where($builder->expr()->like('c.name',':name'));
-					$builder->setParameter(':name','%'.$formData['name'].'%');
+					$builder->setParameter(':name',$formData['name']);
 				
 				}
 
 				if($formData['host']!=''){
 				
 					$builder->where($builder->expr()->like('c.host',':host'));
-					$builder->setParameter(':host','%'.$formData['host'].'%');
+					$builder->setParameter(':host',$formData['host']);
 				
 				}
+
+				if($formData['type']!=''){
+				
+					$builder->where($builder->expr()->like('c.type',':type'));
+					$builder->setParameter(':type',$formData['type']);
+				
+				}
+
 
 
 				$builder->orderBy('c.'.$formData['sort_by'],$formData['sort_direction']);
@@ -103,6 +112,11 @@ class ChainController extends Controller
         $entity  = new Chain();
         $form = $this->createForm(new ChainType(), $entity);
         $form->submit($request);
+
+		//~ if($form->get('type')->getData()==='special'){
+			//~ 
+		//~ }
+		
 
         if ($form->isValid()) {
 
@@ -196,7 +210,12 @@ class ChainController extends Controller
             throw $this->createNotFoundException('Unable to find Chain entity.');
         }
 
-        $editForm = $this->createForm(new ChainType(), $entity);
+		if($entity->getType()==='normal'){
+			$editForm = $this->createForm(new ChainType(), $entity);
+			$editForm->remove('type');
+		}else{
+			$editForm = $this->createForm(new ChainSpecialType(), $entity);
+		}
         $deleteForm = $this->createDeleteForm($id);
 
         return array(
@@ -219,15 +238,20 @@ class ChainController extends Controller
 
         $entity = $em->getRepository('SilvanusChainsBundle:Chain')->find($id);
 
+		$type  = $entity->getType();
+
         if (!$entity) {
             throw $this->createNotFoundException('Unable to find Chain entity.');
         }
 
         $deleteForm = $this->createDeleteForm($id);
-        $editForm = $this->createForm(new ChainType(), $entity);
+        $editForm = $this->createForm(new ChainType(), $entity);        
         $editForm->submit($request);
+		
 
         if ($editForm->isValid()) {
+			
+			$entity->setType($type);
             $em->persist($entity);
             $em->flush();
 
@@ -407,6 +431,16 @@ class ChainController extends Controller
 				'label' 	=> 		'Host',
 				'required'	=> 		false		
 				))
+            ->add('type','choice', array(
+				'label' 	=> 		'Type',
+				'required'	=> 		false,
+				'choices' 	=> 		array(
+					'normal'=>'Normal',
+					'special'=>'Special',
+					)
+						
+				))
+
             ->getForm()
         ;
     }

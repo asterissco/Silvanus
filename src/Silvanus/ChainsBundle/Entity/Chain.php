@@ -60,7 +60,6 @@ class Chain
 	 */
 	private $trusted;
 
-
     /**
      * @var boolean
      *
@@ -75,12 +74,19 @@ class Chain
 	 * */
 	private $active = true;
 
-
     /**
      * @ORM\OneToMany(targetEntity="Silvanus\FirewallRulesBundle\Entity\FirewallRules", mappedBy="chain")
      */    
     private $rules;
 
+	/**
+	 * @var string 
+	 * 
+	 * @ORM\Column(name="type", type="string")
+	 * 
+	 * */
+	private $type='normal';
+	
     /**
      * Get id
      *
@@ -287,5 +293,28 @@ class Chain
     public function getRules()
     {
         return $this->rules;
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     * @return Chain
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    
+        return $this;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string 
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 }

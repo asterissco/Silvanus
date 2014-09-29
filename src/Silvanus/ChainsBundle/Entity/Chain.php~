@@ -21,8 +21,8 @@ class Chain
 
     public function __construct(){
         
-        $this->trusted = new \Doctrine\Common\Collections\ArrayCollection();
-		$this->rules = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->trusted 	= new \Doctrine\Common\Collections\ArrayCollection();
+		$this->rules 	= new \Doctrine\Common\Collections\ArrayCollection();
 		
     }
 
@@ -60,7 +60,6 @@ class Chain
 	 */
 	private $trusted;
 
-
     /**
      * @var boolean
      *
@@ -75,12 +74,19 @@ class Chain
 	 * */
 	private $active = true;
 
-
     /**
      * @ORM\OneToMany(targetEntity="Silvanus\FirewallRulesBundle\Entity\FirewallRules", mappedBy="chain")
      */    
     private $rules;
 
+	/**
+	 * @var string
+	 * 
+	 * @ORM\Column(name="type", type="string", nullable=TRUE)
+	 * 
+	 * */
+	private $type;
+	
     /**
      * Get id
      *
@@ -262,7 +268,7 @@ class Chain
      * @param \Silvanus\ChainsBundle\Entity\FirewallRules $rules
      * @return Chain
      */
-    public function addRule(\Silvanus\ChainsBundle\Entity\FirewallRules $rules)
+    public function addRule(\Silvanus\FirewallRulesBundle\Entity\FirewallRules $rules)
     {
         $this->rules[] = $rules;
     
@@ -274,7 +280,7 @@ class Chain
      *
      * @param \Silvanus\ChainsBundle\Entity\FirewallRules $rules
      */
-    public function removeRule(\Silvanus\ChainsBundle\Entity\FirewallRules $rules)
+    public function removeRule(\Silvanus\FirewallRulesBundle\Entity\FirewallRules $rules)
     {
         $this->rules->removeElement($rules);
     }
