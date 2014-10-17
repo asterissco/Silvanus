@@ -1,0 +1,156 @@
+{% extends '::base.html.twig' %}
+
+{% form_theme form _self %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-4">{{ form_label(form) }}</div>
+			<div class="col-md-4">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>
+			
+		</div>
+    </div>
+    
+{% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+
+			if($("#form_append").is(':checked')){
+				$("#form_priority").attr("disabled","disabled");
+			}
+
+			var lastPriority	= "";
+			var lastForce		= false;
+			var lastAppend		= false;
+
+			/*
+			* Append checkbox
+			*
+			*/
+			$("#form_append").click(function(event){
+			
+				if($(this).is(':checked')){
+				
+					/*
+					* Priority textbox 
+					*
+					*/
+					lastPriority=$("#form_priority").val();
+					$("#form_priority").val("");
+					$("#form_priority").attr("disabled","disabled");
+
+					/*
+					* Force checkbox 
+					*
+					*/				
+					if($('#form_force').is(':checked')){
+						lastForce = true;
+					}else{
+						lastForce = false;
+					}
+					
+					$('#form_force').prop("checked",false);
+					$('#form_force').attr("disabled","disabled");  
+					
+				}
+				if(!$(this).is(':checked')){
+
+					/*
+					* Priority textbox 
+					*
+					*/				
+					$("#form_priority").removeAttr("disabled");
+					$("#form_priority").val(lastPriority);
+
+					/*
+					* Force checkbox 
+					*
+					*/				
+					$('#form_force').removeAttr("disabled");
+					$('#form_force').prop("checked",lastForce);
+									
+				}
+			
+			});
+
+
+			/*
+			* Force checkbox
+			*
+			*/
+			$("#form_force").click(function(event){
+			
+				if($(this).is(':checked')){
+									
+					if($('#form_append').is(':checked')){
+						lastAppend = true;
+					}else{
+						lastAppend = false;
+					}
+					
+					$('#form_append').prop("checked",false);
+					$('#form_append').attr("disabled","disabled");  
+						
+				
+				}
+
+				if(!$(this).is(':checked')){
+				
+					
+					$('#form_append').removeAttr("disabled","disabled");  
+					$('#form_append').prop("checked",lastAppend);
+				
+				}
+				
+			});
+		
+		
+		});
+	
+	</script>
+
+{% endblock %}
+
+
+{% block body -%}
+    
+    <div class="page-header"><h1>Stack Chains <small>update</small></h1></div>
+    
+
+    <form action="{{ path('stack_update', {'chain_parent':entity.chainParent.id,'chain_children':entity.chainChildren.id}) }}" method="post" {{ form_enctype(form) }} role="form" >
+        {{ form_widget(form) }}
+        <p>
+            <button class="btn btn-success" type="submit">Update</button>
+        </p>
+    </form>
+
+	<div class="col-md-12">	
+
+		<br><br>
+		
+		<button class="btn btn-info" onclick="window.location.href='{{ path('stack_chains', {'id':entity.chainParent.id}) }}'">Back</button>        
+
+	</div>
+
+
+
+{% endblock %}

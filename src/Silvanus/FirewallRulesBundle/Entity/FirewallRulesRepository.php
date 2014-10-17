@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityRepository;
 class FirewallRulesRepository extends EntityRepository
 {
 	
-	public function getLastPriorityByChain($chain_id){
+	public function getLastPriority($chain_id){
 
 		//$builder = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
 		$builder = $this->createQueryBuilder('f');

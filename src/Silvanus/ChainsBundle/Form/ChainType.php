@@ -30,7 +30,8 @@ class ChainType extends AbstractType
 				'required'=>true,
 				'choices'=>array(
 					'normal' => 'Normal',
-					'special' => 'Special',
+					'stack' => 'Stack',
+					'prototype' => 'Prototype',
 				)				
             ));
 

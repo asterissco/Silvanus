@@ -1,0 +1,23 @@
+stack_chains:
+    pattern:  /list/{id}/{message}
+    defaults: { _controller: "SilvanusChainsBundle:StackChain:index", message: '' }
+
+stack_add_chains:
+    pattern:  /add/{id}
+    defaults: { _controller: "SilvanusChainsBundle:StackChain:add" }
+
+stack_create_chains:
+    pattern:  /create/{id}
+    defaults: { _controller: "SilvanusChainsBundle:StackChain:create" }
+
+stack_modify:
+    pattern:  /modify/{chain_parent}/{chain_children}
+    defaults: { _controller: "SilvanusChainsBundle:StackChain:modify" }
+   
+stack_update:
+    pattern:  /update/{chain_parent}/{chain_children}
+    defaults: { _controller: "SilvanusChainsBundle:StackChain:update" }
+
+stack_remove:
+    pattern:  /remove/{chain_parent}/{chain_children}
+    defaults: { _controller: "SilvanusChainsBundle:StackChain:remove" }

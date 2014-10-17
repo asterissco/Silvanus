@@ -1,0 +1,73 @@
+{% extends '::base.html.twig' %}
+
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+
+
+		$(document).ready(function(){
+
+
+			
+		});
+	
+	</script>
+
+{% endblock %}
+
+{% block body -%}
+    
+    <div class="page-header"><h1>Stack Chains <small>list</small></h1></div>
+    
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}
+    
+	
+    <table class="table">
+        <thead>
+            <tr>
+                {# <th>Id</th> #}
+                <th>&nbsp;</th>
+                <th>Chain</th>
+                <th>Priority</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+        
+			<tr>
+				{% if entity.active == true %}
+					<td>A</td>
+				{% else %}
+					<td>I</td>
+				{% endif %}
+				<td>{{ entity.chainChildren.name }}</td>
+				<td>{{ entity.priority }}</td>
+				<td>
+					
+					<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('stack_modify',{'chain_parent':entity.chainParent.id,'chain_children':entity.chainChildren.id}) }}'" >Update</button>
+					
+					{% if id !=  entity.chainChildren.id %}
+					
+						<button class="btn btn-danger btn-xs" onclick="window.location.href='{{ path('stack_remove',{'chain_parent':entity.chainParent.id,'chain_children':entity.chainChildren.id}) }}'" >Remove</button>
+					
+					{% endif %}
+					
+				</td>
+				
+			</tr>
+        
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+	
+	<button class="btn btn-mini btn-success"  onclick="window.location.href='{{ path('stack_add_chains', {'id':id}) }}'">Add</button>
+
+{% endblock %}

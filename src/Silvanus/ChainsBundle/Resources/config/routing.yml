@@ -1,3 +1,7 @@
 silvanus_chains:
     resource: "@SilvanusChainsBundle/Resources/config/routing/chains.yml"
     prefix:   /chains
+
+silvanus_stack_chains:
+    resource: "@SilvanusChainsBundle/Resources/config/routing/stackchains.yml"
+    prefix:   /stack/chains

@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Silvanus\ChainsBundle\Entity\Chain;
+use Silvanus\ChainsBundle\Entity\StackChain;
 use Silvanus\ChainsBundle\Form\ChainType;
 use Silvanus\ChainsBundle\Form\ChainSpecialType;
 
@@ -112,10 +113,6 @@ class ChainController extends Controller
         $entity  = new Chain();
         $form = $this->createForm(new ChainType(), $entity);
         $form->submit($request);
-
-		//~ if($form->get('type')->getData()==='special'){
-			//~ 
-		//~ }
 		
 
         if ($form->isValid()) {
@@ -123,6 +120,16 @@ class ChainController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();
+
+			if($entity->getType()=='normal'){
+				$stack = new StackChain();
+				$stack->setChainParent($entity);
+				$stack->setChainChildren($entity);
+				$stack->setActive(true);
+				$stack->setPriority(1);
+				$em->persist($stack);
+				$em->flush();
+			}
 
 			/* add sync petition */
 			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
@@ -435,8 +442,9 @@ class ChainController extends Controller
 				'label' 	=> 		'Type',
 				'required'	=> 		false,
 				'choices' 	=> 		array(
-					'normal'=>'Normal',
-					'special'=>'Special',
+					'normal' => 'Normal',
+					'stack' => 'Stack',
+					'prototype' => 'Prototype',
 					)
 						
 				))
