@@ -130,6 +130,21 @@ class StackChainController extends Controller
 			$entity->setPriority($priority);
 			$em->persist($entity);
 			$em->flush();
+
+			/* add sync petition */
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
+			if(!$syncEntity and $entity->getActive()){
+
+				$syncEntity = new sync();
+				$syncEntity->setChainId($entity->getChainParent()->getId());
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$syncEntity->setAction('u');
+				$em->persist($syncEntity);
+				$em->flush();
+
+			}
+
 			
 			$entities 	= $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainParent'=>$id));
 			return $this->redirect(
@@ -165,8 +180,12 @@ class StackChainController extends Controller
 			'chainChildren'=>$chain_children,
 		));
 
-		$form 			= $this->createModifyForm();
-		$form->get('active')->setData($entity->getActive());
+		
+		if($entity->getActive()===false){
+			$form 			= $this->createModifyForm(false);
+		}else{
+			$form 			= $this->createModifyForm(true);
+		}
 		$form->get('priority')->setData($entity->getPriority());
 		
 		return $this->render('SilvanusChainsBundle:StackChain:modify.html.twig', array(
@@ -234,16 +253,43 @@ class StackChainController extends Controller
 				$isValid = false;					
 			}			
 		}			
+		
+		if($form->get('active')->getData()!=true){
+			if($chain_parent==$chain_children){
+				$form->get('active')->addError(new FormError("Default chain not be inactive"));
+				$isValid = false;					
+			}
+		}
+		
 							
 		if($isValid){
 		
 			
 			$entity->setChainParent($em->getRepository('SilvanusChainsBundle:Chain')->findOneBy(array('id'=>$chain_parent)));
 			$entity->setChainChildren($em->getRepository('SilvanusChainsBundle:Chain')->findOneBy(array('id'=>$chain_children)));
-			$entity->setActive($form->get('active')->getData());
+			if(!$form->get('active')->getData()){
+				$entity->setActive(false);
+			}else{
+				$entity->setActive(true);
+			}
+			
 			$entity->setPriority($form->get('priority')->getData());
 			$em->persist($entity);
 			$em->flush();
+
+			/* add sync petition */
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
+			if(!$syncEntity and $entity->getActive()){
+
+				$syncEntity = new sync();
+				$syncEntity->setChainId($entity->getChainParent()->getId());
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$syncEntity->setAction('u');
+				$em->persist($syncEntity);
+				$em->flush();
+
+			}
 			
 			$entities 	= $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainParent'=>$chain_parent));
 			return $this->redirect(
@@ -280,6 +326,20 @@ class StackChainController extends Controller
 		$em->remove($entity);
 		$em->flush();
 
+		/* add sync petition */
+		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
+		if(!$syncEntity and $entity->getActive()){
+
+			$syncEntity = new sync();
+			$syncEntity->setChainId($chain_parent);
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$syncEntity->setAction('u');
+			$em->persist($syncEntity);
+			$em->flush();
+
+		}
+
 		$em->getRepository('SilvanusChainsBundle:StackChain')->fixPriorityIndex($chain_parent);
 
 		$entities 	= $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainParent'=>$chain_parent));
@@ -313,7 +373,7 @@ class StackChainController extends Controller
         return $this->createFormBuilder()
 			->add('chainChildren','choice',array(
 				'label' => 'Chain to add',
-				'choices'=>$arr,
+				'choices'=> $arr,
             ))
             ->add('active','checkbox',array(
 				'label'=>'Active',
@@ -340,14 +400,20 @@ class StackChainController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createModifyForm()
+    private function createModifyForm($active=true)
     {
-			
+		
+		if($active===true){
+			$arr = array('checked'=>'checked');	
+		}else{
+			$arr = array();	
+		}
+					
         return $this->createFormBuilder()
             ->add('active','checkbox',array(
 				'label'=>'Active',
 				'required'=>false,
-				'data'=>true
+				'attr'=> $arr,
             ))
             ->add('priority','integer',array(
 				'label'=>'Priority',
