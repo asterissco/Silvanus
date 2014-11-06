@@ -56,6 +56,13 @@ class FirewallRules
      */
     private $syncErrorMessage;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="active", type="boolean",  nullable=TRUE)
+     */
+    private $active;
+
 
     /**
      * Get id
@@ -166,4 +173,27 @@ class FirewallRules
 
     
 
+
+    /**
+     * Set chain
+     *
+     * @param \Silvanus\ChainsBundle\Entity\Chain $chain
+     * @return FirewallRules
+     */
+    public function setChain(\Silvanus\ChainsBundle\Entity\Chain $chain = null)
+    {
+        $this->chain = $chain;
+    
+        return $this;
+    }
+
+    /**
+     * Get chain
+     *
+     * @return \Silvanus\ChainsBundle\Entity\Chain 
+     */
+    public function getChain()
+    {
+        return $this->chain;
+    }
 }

@@ -3,6 +3,7 @@
 namespace Silvanus\FirewallRulesBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormError;
 
@@ -187,7 +188,7 @@ class FirewallRulesController extends Controller
 
 		if($form->get('append')->getData()){
 		
-			$lastPriority	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->getLastPriorityByChain($chain_id);
+			$lastPriority	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->getLastPriority($chain_id);
 			$priority		= $lastPriority;
 															
 		}else{
@@ -332,7 +333,7 @@ class FirewallRulesController extends Controller
 
 		if($form->get('append')->getData()){
 		
-			$lastPriority	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->getLastPriorityByChain($chain_id);
+			$lastPriority	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->getLastPriority($chain_id);
 			$priority		= $lastPriority;
 															
 		}else{
@@ -444,6 +445,51 @@ class FirewallRulesController extends Controller
  
  
     }
+
+
+	/**
+     * Switch active/inactive rule
+     *
+     *
+     */
+	public function activeSwitchAction(Request $request,$chain_id,$id,$action){
+		
+		$em		= $this->getDoctrine()->getManager();
+		$entity	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->find($id);
+		
+		if($action=='set_active'){			
+			$entity->setActive(true);			
+			$message = 'Set active successful';
+		}else{
+			$entity->setActive(false);
+			$message = 'Set inactive successful';			
+		}
+		
+		$em->persist($entity);
+		$em->flush();
+
+		/* add sync petition */
+		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$chain_id));
+		if(!$syncEntity){
+
+			$syncEntity = new sync();
+			$syncEntity->setChainId($chain_id);
+			$syncEntity->setTime(new \DateTime('now'));
+			$syncEntity->setError(false);
+			$syncEntity->setAction('u');
+			$em->persist($syncEntity);
+			$em->flush();
+
+		}
+
+		
+		return $this->redirect($this->generateUrl('firewallrules', 
+			array(	'chain_id' => $chain_id, 
+					'message'=> $message,
+			)	
+		));
+		
+	}
 
 /*  PRIVATE CONTEXT */
 

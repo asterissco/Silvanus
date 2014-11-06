@@ -65,8 +65,9 @@ class FirewallRulesCreateType extends AbstractType
             ->add('action','choice',array(
 				'label'=>'Action',
 				'mapped'=>false,
-				'required'=>true,
+				'required'=>false,
 				'choices'=>array(
+					''	=> '',
 					'ACCEPT' => 'ACCEPT',
 					'DROP' => 'DROP',
 					'REJECT' => 'REJECT',

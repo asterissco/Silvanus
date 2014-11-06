@@ -138,11 +138,12 @@
 					<button class="btn btn-danger btn-xs" onclick="confirm_redirect('{{ path('chains_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
 					<button class="btn btn-success btn-xs" onclick="window.location.href='{{ path('chains_edit', { 'id': entity.id }) }}'" >Update</button>
 					{# <button class="btn btn-primary" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button> #}
-					<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('chains_force_sync', { 'id': entity.id }) }}'" >Force Sync</button>
+					
 					<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('firewallrules', { 'chain_id': entity.id }) }}'" >Admin firewall rules</button>
 					
 					{% if entity.type == 'normal' %}
-					
+						
+						<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('chains_force_sync', { 'id': entity.id }) }}'" >Force Sync</button>
 						<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('stack_chains', { 'id': entity.id }) }}'" >Admin stack</button>
 					
 					{% endif %}

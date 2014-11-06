@@ -56,6 +56,13 @@ class FirewallRules
      */
     private $syncErrorMessage;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="active", type="boolean",  nullable=TRUE)
+     */
+    private $active = true;
+
 
     /**
      * Get id
@@ -188,5 +195,28 @@ class FirewallRules
     public function getChain()
     {
         return $this->chain;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return FirewallRules
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean 
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 }

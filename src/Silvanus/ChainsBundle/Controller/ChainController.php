@@ -263,22 +263,55 @@ class ChainController extends Controller
             $em->flush();
 
 			/* add sync petition */
-			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id));
-			if(!$syncEntity){
+			if($entity->getType()==='normal'){
+				$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id));
+				if(!$syncEntity){
 
-				$syncEntity = new sync();
-				$syncEntity->setChainId($id);
-				$syncEntity->setTime(new \DateTime('now'));
-				$syncEntity->setError(false);
-				if($entity->getActive()){
-					$syncEntity->setAction('u');
-				}else{
-					$syncEntity->setAction('d');
+					$syncEntity = new sync();
+					$syncEntity->setChainId($id);
+					$syncEntity->setTime(new \DateTime('now'));
+					$syncEntity->setError(false);
+					if($entity->getActive()){
+						$syncEntity->setAction('u');
+					}else{
+						$syncEntity->setAction('d');
+					}
+					$em->persist($syncEntity);
+					$em->flush();
+
 				}
-				$em->persist($syncEntity);
-				$em->flush();
-
 			}
+
+			if($entity->getType()==='stack'){
+				//$entities=$em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainChildren'=>$id));
+				$builder = $em->getRepository('SilvanusChainsBundle:StackChain')->createQueryBuilder('s');
+				$builder->where('s.chainChildren = :id');
+				$builder->groupBy('s.chainParent');
+				$builder->setParameter(':id',$id);
+				//$entities = $builder->getQuery()->getResult();
+
+				foreach($builder->getQuery()->getResult() as $entityStack){
+					$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entityStack->getChainParent()->getId()));
+					if(!$syncEntity){
+
+						$syncEntity = new sync();
+						$syncEntity->setChainId($entityStack->getChainParent()->getId());
+						$syncEntity->setTime(new \DateTime('now'));
+						$syncEntity->setError(false);
+						$syncEntity->setAction('u');
+						$em->persist($syncEntity);
+						
+					}
+
+				}
+				
+				$em->flush();
+			}
+			
+
+			//~ if($entity->getType()==='prototype'){
+				//~ $id = $id;
+			//~ }
 
             //return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
 			return $this->redirect($this->generateUrl('chains', array('message'=>'Update successful: '.$entity->getName())));
