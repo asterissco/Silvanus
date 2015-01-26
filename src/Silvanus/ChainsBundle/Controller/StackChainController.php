@@ -132,13 +132,14 @@ class StackChainController extends Controller
 			$em->flush();
 
 			/* add sync petition */
-			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getChainParent()->getId()));
 			if(!$syncEntity and $entity->getActive()){
 
 				$syncEntity = new sync();
 				$syncEntity->setChainId($entity->getChainParent()->getId());
 				$syncEntity->setTime(new \DateTime('now'));
 				$syncEntity->setError(false);
+				$syncEntity->setChainName($entity->getChainParent()->getName());
 				$syncEntity->setAction('u');
 				$em->persist($syncEntity);
 				$em->flush();
@@ -278,13 +279,14 @@ class StackChainController extends Controller
 			$em->flush();
 
 			/* add sync petition */
-			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getChainParent()->getId()));
 			if(!$syncEntity and $entity->getActive()){
 
 				$syncEntity = new sync();
 				$syncEntity->setChainId($entity->getChainParent()->getId());
 				$syncEntity->setTime(new \DateTime('now'));
 				$syncEntity->setError(false);
+				$syncEntity->setChainName($entity->getChainParent()->getName());
 				$syncEntity->setAction('u');
 				$em->persist($syncEntity);
 				$em->flush();
@@ -327,13 +329,14 @@ class StackChainController extends Controller
 		$em->flush();
 
 		/* add sync petition */
-		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
+		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getChainParent()->getId()));
 		if(!$syncEntity and $entity->getActive()){
 
 			$syncEntity = new sync();
 			$syncEntity->setChainId($chain_parent);
 			$syncEntity->setTime(new \DateTime('now'));
 			$syncEntity->setError(false);
+			$syncEntity->setChainName($entity->getChainParent()->getName());
 			$syncEntity->setAction('u');
 			$em->persist($syncEntity);
 			$em->flush();

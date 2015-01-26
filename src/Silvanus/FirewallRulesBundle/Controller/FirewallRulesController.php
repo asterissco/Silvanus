@@ -147,12 +147,43 @@ class FirewallRulesController extends Controller
         $entity = new FirewallRules();
         $form   = $this->createForm(new FirewallRulesCreateType(), $entity);
 		$form->get('destination')->setData($chainEntity->getHost());
+		
+		if($this->container->get( 'kernel' )->getEnvironment()=='dev'){
+			
+			$randIP = "".mt_rand(0,255).".".mt_rand(0,255).".".mt_rand(0,255).".".mt_rand(0,255);
+			$form->get("source")->setData($randIP);
 
+			$randIP = "".mt_rand(0,255).".".mt_rand(0,255).".".mt_rand(0,255).".".mt_rand(0,255);
+			$form->get("destination")->setData($randIP);
+			
+			//$form->get("protocol")->setData(20);
+
+			$form->get("source_port")->setData(rand(1, 1250));
+			
+			$form->get("destination_port")->setData(rand(1, 1250));
+			
+			$arrRand 	= array("ETH0");
+			$form->get("interface_input")->setData($arrRand[array_rand($arrRand,1)]);
+
+			$arrRand 	= array("ETH0");
+			$form->get("interface_output")->setData($arrRand[array_rand($arrRand,1)]);
+
+			$arrRand 	= array("");
+			$form->get("more")->setData($arrRand[array_rand($arrRand,1)]);
+
+			$arrRand 	= array("ACCEPT","DROP","REJECT");
+			$form->get("action")->setData($arrRand[array_rand($arrRand,1)]);
+
+			
+		}
+		
+		
         return $this->render('SilvanusFirewallRulesBundle:FirewallRules:new.html.twig', array(
 			'form'   	=> $form->createView(),
             'chain_id' 	=> $chain_id,
         ));
     }
+
 
 	/*
 	 * Create a new rule
@@ -177,6 +208,9 @@ class FirewallRulesController extends Controller
 					$form->get('source_port')->addError(new FormError('Select a port o type a number'));
 				}
 			}	
+			if($form->get('protocol')->getData()!="TCP"){
+				$form->get('source_port')->addError(new FormError('Only TCP can use Source Port'));
+			}
 		}
 		if(!empty($arrForm['destination_port'])){
 			if(!is_numeric($arrForm['destination_port'])){
@@ -184,6 +218,9 @@ class FirewallRulesController extends Controller
 					$form->get('destination_port')->addError(new FormError('Select a port o type a number'));
 				}
 			}	
+			if($form->get('protocol')->getData()!="TCP"){
+				$form->get('destination_port')->addError(new FormError('Only TCP can use Destination Port'));
+			}
 		}
 
 		if($form->get('append')->getData()){
@@ -230,23 +267,12 @@ class FirewallRulesController extends Controller
 			$em->persist($ruleEntity);
 			$em->flush();
 
-			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$chain_id));
-			if(!$syncEntity and $ruleEntity->getChain()->getActive()){
+			$this->createSync($chainEntity->getId(),"u");
 
-				$syncEntity = new sync();
-				$syncEntity->setChainId($chain_id);
-				$syncEntity->setTime(new \DateTime('now'));
-				$syncEntity->setError(false);
-				$syncEntity->setAction('u');
-				$em->persist($syncEntity);
-				$em->flush();
-
-			}
-
-			$em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->fixPriorityIndex($chain_id);
+			$em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->fixPriorityIndex($chainEntity->getId());
 
 			return $this->redirect($this->generateUrl('firewallrules', 
-				array(	'chain_id' => $chain_id, 
+				array(	'chain_id' => $chainEntity->getId(), 
 						'message'=> 'Create successful',
 				)));
 						
@@ -321,14 +347,20 @@ class FirewallRulesController extends Controller
 				if(!preg_match('/([a-z])\w+ \([0-9]\w+\) \[([A-Z])\w+\]$/',$arrForm['source_port'])){
 					$form->get('source_port')->addError(new FormError('Select a port o type a number'));
 				}
-			}	
+			}
+			if($form->get('protocol')->getData()!="TCP"){
+				$form->get('source_port')->addError(new FormError('Only TCP can use Source Port'));
+			}								
 		}
 		if(!empty($arrForm['destination_port'])){
 			if(!is_numeric($arrForm['destination_port'])){
 				if(!preg_match('/([a-z])\w+ \([0-9]\w+\) \[([A-Z])\w+\]$/',$arrForm['destination_port'])){
 					$form->get('destination_port')->addError(new FormError('Select a port o type a number'));
 				}
-			}	
+			}
+			if($form->get('protocol')->getData()!="TCP"){
+				$form->get('destination_port')->addError(new FormError('Only TCP can use Destination Port'));
+			}
 		}
 
 		if($form->get('append')->getData()){
@@ -374,23 +406,12 @@ class FirewallRulesController extends Controller
 			$em->persist($ruleEntity);
 			$em->flush();
 
-			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$chain_id));
-			if(!$syncEntity and $ruleEntity->getChain()->getActive()){
-
-				$syncEntity = new sync();
-				$syncEntity->setChainId($chain_id);
-				$syncEntity->setTime(new \DateTime('now'));
-				$syncEntity->setError(false);
-				$syncEntity->setAction('u');
-				$em->persist($syncEntity);
-				$em->flush();
-
-			}
-
-			$em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->fixPriorityIndex($chain_id);
+			$this->createSync($chainEntity->getId(),"u");
+			
+			$em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->fixPriorityIndex($chainEntity->getId());
 			
 			return $this->redirect($this->generateUrl('firewallrules', 
-				array(	'chain_id' => $chain_id, 
+				array(	'chain_id' => $chainEntity->getId(), 
 						'message'=> 'Create successful',
 				)));
 						
@@ -410,35 +431,24 @@ class FirewallRulesController extends Controller
     public function deleteAction(Request $request, $id)
     {
  
-		$em 		= $this->getDoctrine()->getManager();
-		$entity 	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->find($id);
-		$chain_id	= $entity->getChain()->getId();
+		$em 			= $this->getDoctrine()->getManager();
+		$entity 		= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->find($id);
+		$chainEntity	= $entity->getChain();
 
 		if (!$entity) {
 			throw $this->createNotFoundException('Unable to find FirewallRules entity.');
 		}
 
+		$this->createSync($chainEntity->getId(),"d");
+
 		$em->remove($entity);
 		$em->flush();
 
-		/* add sync petition */
-		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$chain_id));
-		if(!$syncEntity){
 
-			$syncEntity = new sync();
-			$syncEntity->setChainId($chain_id);
-			$syncEntity->setTime(new \DateTime('now'));
-			$syncEntity->setError(false);
-			$syncEntity->setAction('u');
-			$em->persist($syncEntity);
-			$em->flush();
-
-		}
-
-		$em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->fixPriorityIndex($chain_id);
+		$em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->fixPriorityIndex($chainEntity->getId());
 
 		return $this->redirect($this->generateUrl('firewallrules', 
-			array(	'chain_id' => $chain_id, 
+			array(	'chain_id' => $chainEntity->getId(), 
 					'message'=> 'Delete successful',
 			)	
 		));
@@ -462,7 +472,7 @@ class FirewallRulesController extends Controller
 			$message = 'Set active successful';
 		}else{
 			$entity->setActive(false);
-			$message = 'Set inactive successful';			
+			$message = 'Set inactive successful';				
 		}
 		
 		$em->persist($entity);
@@ -492,6 +502,75 @@ class FirewallRulesController extends Controller
 	}
 
 /*  PRIVATE CONTEXT */
+
+	/* 
+	 * create syncronization petition 
+	 * 
+	 * */
+	private function createSync($chain_id,$action){
+
+		$em 			= $this->getDoctrine()->getManager();
+		$chainEntity	= $em->getRepository('SilvanusChainsBundle:Chain')->find($chain_id);
+
+		if($chainEntity->getType()=='normal'){
+
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findOneBy(array('chainId'=>$chainEntity->getId()));
+			
+			if(!$syncEntity){
+
+				$syncEntity = new sync();
+				
+			}
+
+			if($chainEntity->getActive()){
+			
+				$syncEntity->setChainId($chainEntity->getId());
+				$syncEntity->setChainName($chainEntity->getName());
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				$syncEntity->setAction($action);
+				$em->persist($syncEntity);
+				$em->flush();
+			
+			}
+			
+		}
+		
+		if($chainEntity->getType()=='stack'){
+		
+			$stackChainEntities = $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainChildren'=>$chainEntity->getId()));
+			
+			foreach($stackChainEntities as $stackChainEntity){
+				
+				unset($syncEntity);
+				$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findOneBy(array('chainId'=>$stackChainEntity->getChainParent()->getId()));				
+
+				if(!$syncEntity){
+
+					$syncEntity = new sync();
+					
+				}
+
+				if($stackChainEntity->getChainParent()->getActive()){
+				
+					$syncEntity->setChainId($stackChainEntity->getChainParent()->getId());
+					$syncEntity->setChainName($stackChainEntity->getChainParent()->getName());
+					$syncEntity->setTime(new \DateTime('now'));
+					$syncEntity->setError(false);
+					$syncEntity->setAction("u");
+					$em->persist($syncEntity);
+					$em->flush();
+				
+				}
+
+				
+			}
+
+			
+		}
+		
+	}
+
 
 	/**
      * Creates a form to filter rules list
@@ -593,6 +672,8 @@ class FirewallRulesController extends Controller
 		
 		
 	}
+
+
 
 	/*
 	 * Get fields of rule in array from rule

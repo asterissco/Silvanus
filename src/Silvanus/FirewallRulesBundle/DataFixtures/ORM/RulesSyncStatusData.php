@@ -14,17 +14,21 @@ class LoadRulesSyncStatusData implements FixtureInterface
     {
 
 		$syncStatus = new RulesSyncStatus();
-		$syncStatus->setName('No sync');
+		$syncStatus->setName('PENDING');
 		
 		$manager->persist($syncStatus);
 
 		$syncStatus = new RulesSyncStatus();
-		$syncStatus->setName('Sync OK');
+		$syncStatus->setName('OK ');
 		
 		$manager->persist($syncStatus);
 
 		$syncStatus = new RulesSyncStatus();
-		$syncStatus->setName('Sync ERROR');
+		$syncStatus->setName('ERROR');
+
+		$syncStatus = new RulesSyncStatus();
+		$syncStatus->setName('DISPATCH');
+
 		
 		$manager->persist($syncStatus);
 

@@ -122,28 +122,17 @@ class ChainController extends Controller
             $em->flush();
 
 			if($entity->getType()=='normal'){
-				$stack = new StackChain();
-				$stack->setChainParent($entity);
-				$stack->setChainChildren($entity);
-				$stack->setActive(true);
-				$stack->setPriority(1);
-				$em->persist($stack);
+				$stackChain = new StackChain();
+				$stackChain->setChainParent($entity);
+				$stackChain->setChainChildren($entity);
+				$stackChain->setPriority(1);
+				$stackChain->setActive(true);
+				$em->persist($stackChain);
 				$em->flush();
 			}
 
-			/* add sync petition */
-			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entity->getId()));
-			if(!$syncEntity and $entity->getActive()){
 
-				$syncEntity = new sync();
-				$syncEntity->setChainId($entity->getId());
-				$syncEntity->setTime(new \DateTime('now'));
-				$syncEntity->setError(false);
-				$syncEntity->setAction('c');
-				$em->persist($syncEntity);
-				$em->flush();
-
-			}
+			$this->createSync($entity->getId(),"c");
 
             //return $this->redirect($this->generateUrl('chains_show', array('id' => $entity->getId())));
             return $this->redirect($this->generateUrl('chains',array('message'=>'Create successful: '.$entity->getName())));
@@ -262,52 +251,7 @@ class ChainController extends Controller
             $em->persist($entity);
             $em->flush();
 
-			/* add sync petition */
-			if($entity->getType()==='normal'){
-				$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$id));
-				if(!$syncEntity){
-
-					$syncEntity = new sync();
-					$syncEntity->setChainId($id);
-					$syncEntity->setTime(new \DateTime('now'));
-					$syncEntity->setError(false);
-					if($entity->getActive()){
-						$syncEntity->setAction('u');
-					}else{
-						$syncEntity->setAction('d');
-					}
-					$em->persist($syncEntity);
-					$em->flush();
-
-				}
-			}
-
-			if($entity->getType()==='stack'){
-				//$entities=$em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainChildren'=>$id));
-				$builder = $em->getRepository('SilvanusChainsBundle:StackChain')->createQueryBuilder('s');
-				$builder->where('s.chainChildren = :id');
-				$builder->groupBy('s.chainParent');
-				$builder->setParameter(':id',$id);
-				//$entities = $builder->getQuery()->getResult();
-
-				foreach($builder->getQuery()->getResult() as $entityStack){
-					$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findBy(array('chainId'=>$entityStack->getChainParent()->getId()));
-					if(!$syncEntity){
-
-						$syncEntity = new sync();
-						$syncEntity->setChainId($entityStack->getChainParent()->getId());
-						$syncEntity->setTime(new \DateTime('now'));
-						$syncEntity->setError(false);
-						$syncEntity->setAction('u');
-						$em->persist($syncEntity);
-						
-					}
-
-				}
-				
-				$em->flush();
-			}
-			
+			$this->createSync($entity->getId(),"u");
 
 			//~ if($entity->getType()==='prototype'){
 				//~ $id = $id;
@@ -315,6 +259,7 @@ class ChainController extends Controller
 
             //return $this->redirect($this->generateUrl('chains_edit', array('id' => $id)));
 			return $this->redirect($this->generateUrl('chains', array('message'=>'Update successful: '.$entity->getName())));
+
         }
 
         return array(
@@ -362,23 +307,6 @@ class ChainController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
-		/*
-        $form = $this->createDeleteForm($id);
-        $form->submit($request);
-
-        if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $entity = $em->getRepository('SilvanusChainsBundle:Chain')->find($id);
-
-            if (!$entity) {
-                throw $this->createNotFoundException('Unable to find Chain entity.');
-            }
-
-            $em->remove($entity);
-            $em->flush();
-        }
-		
-		*/
 		
 		$em 	= $this->getDoctrine()->getManager();
 		$entity	= $em->getRepository('SilvanusChainsBundle:Chain')->find($id);
@@ -389,42 +317,123 @@ class ChainController extends Controller
 			
 		}
 		
-				
+		
+		//remove rules
 		foreach($entity->getRules() as $firewalRulesEntity){
 			$em->remove($firewalRulesEntity);
 		}
 		
-		$chainName=$entity->getName();
+		//remove relantions with other chains
+		$stackChainEntity 	= $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainParent'=>$entity->getId()));
 		
-		$em->remove($entity);
-		$em->flush();
-
-		/* add sync petition */
-		$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findOneBy(array('chainId'=>$id));
-		if(!$syncEntity){
-
-			$syncEntity = new sync();
-			$syncEntity->setChainId($id);
-			$syncEntity->setTime(new \DateTime('now'));
-			$syncEntity->setError(false);
-			$syncEntity->setAction('d');
-			$syncEntity->setChainName($chainName);
-			$em->persist($syncEntity);
+		foreach($stackChainEntity as $stackChainE){
+			$em->remove($stackChainE);
 			$em->flush();
-
-		}else{
+		}
 		
-			$syncEntity->setAction('d');
-			$syncEntity->setChainName($chainName);
+		if($entity->getType()=='normal'){
+			$stackChainEntities = $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array("chainParent"=>$entity->getId()));
 			
+			foreach($stackChainEntities as $stackChainEntity){
+				$em->remove($stackChainEntity);
+			}
 		}
 
-		$em->persist($syncEntity);
+		if($entity->getType()=='stack'){
+			$stackChainEntities = $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array("chainChildren"=>$entity->getId()));
+			
+			foreach($stackChainEntities as $stackChainEntity){
+				$em->remove($stackChainEntity);
+			}
+		}
+		
+		
+		$this->createSync($entity->getId(),"d");
+
+		$em->remove($entity);		
 		$em->flush();
 
 
         return $this->redirect($this->generateUrl('chains',array('message'=>'Delete successful: '.$entity->getName())));
     }
+
+	/* 
+	 * create syncronization petition 
+	 * 
+	 * */
+	private function createSync($chain_id,$action){
+
+		$em 			= $this->getDoctrine()->getManager();
+		$chainEntity	= $em->getRepository('SilvanusChainsBundle:Chain')->find($chain_id);
+
+		if($chainEntity->getType()=='normal'){
+
+			$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findOneBy(array('chainId'=>$chainEntity->getId()));
+			
+			if(!$syncEntity){
+
+				$syncEntity = new sync();
+				
+			}
+
+			if($chainEntity->getActive()){
+			
+				$syncEntity->setChainId($chainEntity->getId());
+				$syncEntity->setChainName($chainEntity->getName());
+				$syncEntity->setTime(new \DateTime('now'));
+				$syncEntity->setError(false);
+				if($action=='d'){
+					$syncEntity->setAction('d');
+				}else{
+					if($chainEntity->getActive()){
+						$syncEntity->setAction($action);
+					}else{
+						$syncEntity->setAction('d');
+					}
+				}
+				$syncEntity->setAction($action);
+				$em->persist($syncEntity);
+				$em->flush();
+			
+			}
+			
+		}
+		
+		if($chainEntity->getType()=='stack'){
+		
+			$stackChainEntities = $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainChildren'=>$chainEntity->getId()));
+			
+			foreach($stackChainEntities as $stackChainEntity){
+				
+				unset($syncEntity);
+				$syncEntity = $em->getRepository('SilvanusSyncBundle:Sync')->findOneBy(array('chainId'=>$stackChainEntity->getChainParent()->getId()));				
+
+				if(!$syncEntity){
+
+					$syncEntity = new sync();
+					
+				}
+
+				if($stackChainEntity->getChainParent()->getActive()){
+				
+					$syncEntity->setChainId($stackChainEntity->getChainParent()->getId());
+					$syncEntity->setChainName($stackChainEntity->getChainParent()->getName());
+					$syncEntity->setTime(new \DateTime('now'));
+					$syncEntity->setError(false);
+					$syncEntity->setAction("u");
+					$em->persist($syncEntity);
+					$em->flush();
+				
+				}
+
+				
+			}
+
+			
+		}
+		
+	}
+
 
     /**
      * Creates a form to delete a Chain entity by id.
