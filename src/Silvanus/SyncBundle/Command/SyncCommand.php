@@ -100,18 +100,21 @@ class SyncCommand extends ContainerAwareCommand
 									->getQuery();
 					
 					$firewallRulesEntities = $query->getResult();
-
-					//~ foreach($firewallRulesEntities as $e){
-						//~ echo $e->getRule()."\n";
-					//~ }
 					
 					$testChain->setHost($parentChain->getHost());
-					$errorHandle = $this->addRulesToChain($firewallRulesEntities, $testChain, false);
-					if($errorHandle){
-						break;
+					if($this->addRulesToChain($firewallRulesEntities, $testChain, false)){
+						$stackChainEntity->getChainChildren()->setError(true);
+						$syncEntity->setError(true);
+						$this->em->persist($syncEntity);						
+						$errorHandle = true;
+						//break;
+					}else{
+						$stackChainEntity->getChainChildren()->setError(false);	
+						
 					}
 
 				}
+									
 									
 				//delete test chain
 				exec($this->iptables_path.'  -F '.$this->test_chain.' 2>&1',$trash);
@@ -158,14 +161,14 @@ class SyncCommand extends ContainerAwareCommand
 						
 					}
 					
-					
-				}else{
-					
-					$chainEntity->setError(true);
-					$syncEntity->setError(true);
-					$this->em->persist($syncEntity);
-					
 				}
+				//}else{
+					
+					//~ $chainEntity->setError(true);
+					//~ $syncEntity->setError(true);
+					//~ $this->em->persist($syncEntity);
+					//~ 
+				//~ }
 				
 				$this->em->persist($parentChain);	
 				
@@ -228,7 +231,6 @@ class SyncCommand extends ContainerAwareCommand
 				return true;				
 			}else{
 				$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'Sync OK')));
-				//$firewallRulesEntity->setSyncErrorMessage(serialize($output));									
 			}
 			
 		}

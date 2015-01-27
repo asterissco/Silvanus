@@ -34,6 +34,7 @@ class ChainController extends Controller
 
 		$em = $this->getDoctrine()->getManager();
 
+		$paginator  = $this->get('knp_paginator');
 		
 		/* form filter */
 		if($request->getMethod()=='POST'){
@@ -69,25 +70,36 @@ class ChainController extends Controller
 					$builder->setParameter(':type',$formData['type']);
 				
 				}
+				if(empty($formData['sort_by'])){
+					$sb='id';
+				}else{
+					$sb=$formData['sort_by'];
+				}
+				if(empty($formData['sort_direction'])){
+					$sd="ASC";
+				}else{	
+					$sd=$formData['sort_direction'];
+				}
 
+				//echo $formData['page'];exit();
 
+				$builder->orderBy('c.'.$sb,$sd);
 
-				$builder->orderBy('c.'.$formData['sort_by'],$formData['sort_direction']);
-				
-				$entities=$builder->getQuery()->getResult();
-				
-				
+				$pagination = $paginator->paginate($builder->getQuery(),  $this->get('request')->query->get('page', $formData['page']), 60);
+				$page = $formData['page'];
 				
 			}else{
-				
-				$entities = $em->getRepository('SilvanusChainsBundle:Chain')->findAll();
-				
-			}
+
+				$pagination = $paginator->paginate($em->createQuery('SELECT c FROM Silvanus\ChainsBundle\Entity\Chain c ORDER BY c.id'),  $this->get('request')->query->get('page', 1), 60);
+				$page = 1;
+
+			}			
 			
 		}else{
 
 
-			$entities = $em->getRepository('SilvanusChainsBundle:Chain')->findAll();
+			$pagination = $paginator->paginate($em->createQuery('SELECT c FROM Silvanus\ChainsBundle\Entity\Chain c ORDER BY c.id'),  $this->get('request')->query->get('page', 1), 60);
+			$page = 1;
 
 			$filter_form = $this->createFilterForm();
 
@@ -96,9 +108,10 @@ class ChainController extends Controller
 		
 
         return array(
-            'entities' 		=> $entities,
+            'pagination' 	=> $pagination,
             'filter_form'	=> $filter_form->createView(),
             'message'		=> $message,
+            'page'			=> $page,
         );
     }
     /**
@@ -175,17 +188,50 @@ class ChainController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
 
-        $entity = $em->getRepository('SilvanusChainsBundle:Chain')->find($id);
+        $parentChain = $em->getRepository('SilvanusChainsBundle:Chain')->find($id);
 
-        if (!$entity) {
+        if (!$parentChain) {
             throw $this->createNotFoundException('Unable to find Chain entity.');
         }
 
-        $deleteForm = $this->createDeleteForm($id);
+		//get stack rules
+		
+		$stackChains = $em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainParent'=>$id),array('priority'=>'ASC'));
+		
+		$rules = array();
+		foreach($parentChain->getTrusted() as $trusted){
+			$rules[] = "-A ".$trusted->getName();
+		}
+		
+		foreach($stackChains as $stackChain){
+			
+			$builder 	= $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
+			$query 		= $builder
+							->where('f.chain = :chain_id')
+							->setParameter(':chain_id',$stackChain->getChainChildren()->getId())
+							->orderBy('f.priority','asc')
+							->getQuery();
+			
+			$firewallRulesEntities = $query->getResult();
+			
+			foreach($firewallRulesEntities as $firewallRulesEntity){
+				
+				$rule = $firewallRulesEntity->getRule();
+				if($parentChain->getHost()!=''){			
+					$rule = str_replace('/host/',' '.$parentChain->getHost().' ',$rule);			
+				}
+
+				
+				$rules[]="-A ".trim($rule);
+			}
+			
+			
+			
+		}
 
         return array(
-            'entity'      => $entity,
-            'delete_form' => $deleteForm->createView(),
+            'parentChain'      	=> $parentChain,
+            'rules'				=> $rules,            
         );
     }
 
@@ -462,8 +508,10 @@ class ChainController extends Controller
 				'label' 	=> 		'Sort by',
 				'choices' 	=> 		array(
 					'id'=>'ID',
-					'name'=>'Name',
-					)
+					'name'=>'Name',					
+					),
+				'required' => false,
+				'empty_value' => ' -- Sort by --',					
 				))
             ->add('sort_direction','choice',array(
 				'choices'=>array(
@@ -471,14 +519,23 @@ class ChainController extends Controller
 						'DESC'=>'Desc',
 					),
 				'label'=>'Sort direction',	
+				'required' => false,
+				'empty_value' => ' -- Sort direction --',					
+				
 				))				
             ->add('name','text', array(
 				'label' 	=> 		'Name',
-				'required'	=> 		false		
+				'required'	=> 		false,
+				'attr' => array(
+					'placeholder' => 'Name',
+				),					
 				))
             ->add('host','text', array(
 				'label' 	=> 		'Host',
-				'required'	=> 		false		
+				'required'	=> 		false,
+				'attr' => array(
+					'placeholder' => 'Host',
+				),					
 				))
             ->add('type','choice', array(
 				'label' 	=> 		'Type',
@@ -487,10 +544,13 @@ class ChainController extends Controller
 					'normal' => 'Normal',
 					'stack' => 'Stack',
 					'prototype' => 'Prototype',
-					)
-						
+					),
+				'required' => false,
+				'empty_value' => ' -- Type --',											
 				))
-
+            ->add('page','hidden',array(
+					'required' => false,					
+				))
             ->getForm()
         ;
     }
