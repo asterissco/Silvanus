@@ -1,0 +1,182 @@
+{% extends '::base.html.twig' %}
+
+{% form_theme filter_form _self %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+		
+		{# <div class="col-md-4">{{ form_label(form) }}</div> #}
+		<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+		<div class="col-md-4">{{ form_errors(form) }}</div>	
+		
+    </div>
+    
+{% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+
+/*
+			$('#form_sort_by').multiselect();
+			$('#form_sort_direction').multiselect();
+			$('#form_protocol').multiselect();
+*/			
+		});
+		
+		function requestPage(page){
+		
+			$('#form_page').val(page);
+			$('#filter_form').submit();
+		
+		}
+	
+	</script>
+
+{% endblock %}
+
+
+{% block body -%}
+    <div class="page-header"><h1>IP Ports <small>list</small></h1></div>
+
+
+    {% if message != '' %}
+    
+		<div class="alert alert-success" id="message"><button type="button" onclick="$('#message').fadeOut()" class="close" aria-hidden="true">&times;</button>{{ message }}</div>
+    
+    {% endif%}	
+
+	<legend>Filter</legend>
+	
+		
+		<form name="filter_form" id="filter_form" {{ form_enctype(filter_form) }} action="{{ path('ipport') }}" method="POST" class="form-horizontal"> 
+
+			<div class="row">
+
+				<div class="col-md-4">
+				
+					{{ form_row(filter_form.sort_by) }}
+					{{ form_row(filter_form.sort_direction) }}
+					{{ form_row(filter_form.reference) }}
+			
+				</div>
+
+				<div class="col-md-4">					
+
+					{{ form_row(filter_form.service) }}
+					{{ form_row(filter_form.number) }}
+					<button  class="btn btn-success" onclick="requestPage(1)">Filter</button>
+					
+				</div>					
+
+				<div class="col-md-4">					
+
+					{{ form_row(filter_form.description) }}
+					{{ form_row(filter_form.protocol) }}
+					{{ form_row(filter_form.page) }}
+				
+				</div>
+			
+			</div>
+			
+		</form>
+		
+	<br><br>
+
+
+	<legend>List</legend>
+
+	<div class="navigation">
+		{{ knp_pagination_render(pagination, '::pagination.html.twig') }}
+		
+	</div>
+	
+	<table class="table">
+            <tr>
+                <th>Service</th>
+                <th>Number</th>
+                <th>Transport Protocol</th>
+                <th>Description</th>
+                <th>Reference</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in pagination %}
+            <tr>
+                <td>{{ entity.service }}</td>
+                <td>{{ entity.number }}</td>
+                <td>{{ entity.protocol }}</td>
+                <td>{{ entity.description }}</td>
+                <td>{{ entity.reference }}</td>
+                <td>
+					<button class="btn btn-warning btn-xs"  onclick="window.location.href='{{ path('ipport_edit', { 'id': entity.id }) }}'">Edit</button>
+					<button class="btn btn-danger btn-xs"  onclick="confirm_redirect('{{ path('ipport_delete', { 'id': entity.id }) }}','Are you sure?')">Delete</button>                
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+	<br>
+
+	<div clas="row">
+		<div class="col-md-8">
+			<form action="{{ path('ipport_iana') }}" method="post" {{ form_enctype(form_iana) }} class="form-inline" id="iana_form">
+			
+				<button class="btn btn-success btn-xs" type="button" onclick="confirm_submit($('#iana_form'),'This action erease all registers of protocols and ports, are you sure?')">Import IANA</button>
+				<div class="form-group">
+					
+					{{ form_widget(form_iana.attachment) }}			
+				</div>					
+					
+					
+
+				<input type="hidden" name="_method" value="UPDATE" />			
+			</form>		
+		</div>
+
+		<div class="col-md-4">
+			<button class="btn btn-success btn-xs" onclick="window.location.href='{{ path('ipport_new') }}'">New port</button>
+		</div>
+
+
+	</div>
+	<br>
+	<br>
+	<br>
+
+
+	{# http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml #}
+	
+<div id="myModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<!-- dialog body -->
+				<div class="modal-body">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				Hello world!
+				</div>
+			<!-- dialog buttons -->
+			<div class="modal-footer"><button type="button" class="btn btn-primary">OK</button></div>			
+			
+		</div>
+	</div>
+</div>
+
+    {% endblock %}

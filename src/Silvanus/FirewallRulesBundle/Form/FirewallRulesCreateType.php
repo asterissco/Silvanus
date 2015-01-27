@@ -5,9 +5,12 @@ namespace Silvanus\FirewallRulesBundle\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Doctrine\ORM\EntityRepository;
 
 class FirewallRulesCreateType extends AbstractType
 {
+
+    
     /**
      * @param FormBuilderInterface $builder
      * @param array $options
@@ -15,21 +18,77 @@ class FirewallRulesCreateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('rule')
+            ->add('source','text',array(
+				'label'=>'Source (IP/NETWORK)',
+				'mapped'=>false,
+				'required'=>false,
+            ))
+            ->add('destination','text',array(
+				'label'=>'Destination (IP/NETWORK)',
+				'mapped'=>false,
+				'required'=>true,
+            ))
+			->add('protocol', 'entity', array(
+				'class' => 'SilvanusFirewallRulesBundle:TransportProtocol',
+				'mapped' => false,
+				'query_builder' => function(EntityRepository $er) {
+					return $er->createQueryBuilder('t')
+						->orderBy('t.name', 'ASC');
+					},
+				//'data' => $this->defaults['protocol'],
+			))
+            ->add('source_port','text',array(
+				'label'=>'Source port (type number or find service)',
+				'mapped'=>false,
+				'required'=>false,
+            ))
+            ->add('destination_port','text',array(
+				'label'=>'Destination port (type number or find service)',
+				'mapped'=>false,
+				'required'=>false,
+            ))
+            ->add('interface_input','text',array(
+				'label'=>'Input Network Interface',
+				'mapped'=>false,
+				'required'=>false,
+            ))
+            ->add('interface_output','text',array(
+				'label'=>'Output Network Interface',
+				'mapped'=>false,
+				'required'=>false,
+            ))
+            ->add('more','text',array(
+				'label'=>'More options, like modules',
+				'mapped'=>false,
+				'required'=>false,
+            ))
+            ->add('action','choice',array(
+				'label'=>'Action',
+				'mapped'=>false,
+				'required'=>false,
+				'choices'=>array(
+					''	=> '',
+					'ACCEPT' => 'ACCEPT',
+					'DROP' => 'DROP',
+					'REJECT' => 'REJECT',
+				)
+            ))
 			->add('priority')
 			->add('append','checkbox',array(
-						'label'=>'Append (set in the last)',
-						'mapped'=>false,
-						'required'=>false,
-					)
+				'label'=>'Append (set in the last)',
+				'mapped'=>false,
+				'required'=>false,
 				)
+			)
 			->add('force','checkbox',array(
-						'label'=>'Force priority',
-						'mapped'=>false,
-						'required'=>false,
-					)
+				'label'=>'Force priority',
+				'mapped'=>false,
+				'required'=>false,
 				)
+			)
+			
 		;
+
     }
 
     /**

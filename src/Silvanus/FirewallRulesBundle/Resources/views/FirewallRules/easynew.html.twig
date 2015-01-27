@@ -1,0 +1,218 @@
+{% extends '::base.html.twig' %}
+
+{% form_theme form _self %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12">{{ form_label(form) }}</div>
+			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>
+			
+		</div>
+    </div>
+    
+{% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+			if($("#silvanus_firewallrulesbundle_firewallrulestype_append").is(':checked')){
+				$("#silvanus_firewallrulesbundle_firewallrulestype_priority").attr("disabled","disabled");
+			}
+		
+			var lastPriority	= "";
+			var lastForce		= false;
+			var lastAppend		= false;
+
+			/*
+			* Append checkbox
+			*
+			*/
+			$("#silvanus_firewallrulesbundle_firewallrulestype_append").click(function(event){
+			
+				if($(this).is(':checked')){
+				
+					/*
+					* Priority textbox 
+					*
+					*/
+					lastPriority=$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val();
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val("");
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").attr("disabled","disabled");
+
+					/*
+					* Force checkbox 
+					*
+					*/				
+					if($('#silvanus_firewallrulesbundle_firewallrulestype_force').is(':checked')){
+						lastForce = true;
+					}else{
+						lastForce = false;
+					}
+					
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').prop("checked",false);
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').attr("disabled","disabled");  
+					
+				}
+				if(!$(this).is(':checked')){
+
+					/*
+					* Priority textbox 
+					*
+					*/				
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").removeAttr("disabled");
+					$("#silvanus_firewallrulesbundle_firewallrulestype_priority").val(lastPriority);
+
+					/*
+					* Force checkbox 
+					*
+					*/				
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').removeAttr("disabled");
+					$('#silvanus_firewallrulesbundle_firewallrulestype_force').prop("checked",lastForce);
+									
+				}
+			
+			});
+
+
+			/*
+			* Force checkbox
+			*
+			*/
+			$("#silvanus_firewallrulesbundle_firewallrulestype_force").click(function(event){
+			
+				if($(this).is(':checked')){
+									
+					if($('#silvanus_firewallrulesbundle_firewallrulestype_append').is(':checked')){
+						lastAppend = true;
+					}else{
+						lastAppend = false;
+					}
+					
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').prop("checked",false);
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').attr("disabled","disabled");  
+						
+				
+				}
+
+				if(!$(this).is(':checked')){
+				
+					
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').removeAttr("disabled","disabled");  
+					$('#silvanus_firewallrulesbundle_firewallrulestype_append').prop("checked",lastAppend);
+				
+				}
+				
+			});
+		
+		
+			/*
+			* Autocomplete 
+			*
+			*/
+			$('#silvanus_firewallrulesbundle_firewallrulestype_source_port').autocomplete({
+				source: function(request, response){
+					var url_to_ajax = '{{ path('ipport_ajaxsearch', {'service':'service_name'}) }}'
+					url_to_ajax		= url_to_ajax.replace('service_name',request.term);
+					$.ajax({
+						url: url_to_ajax,
+						dataType: "json",	
+						success: function( data ) {
+							response(data); 						
+						}
+					});
+				},
+				select: function( event, ui ) {
+
+/*				
+
+					var protocol = ui.item.label.substring(ui.item.label.indexOf("[")+1,ui.item.label.indexOf("]"));
+					$('#silvanus_firewallrulesbundle_firewallrulestype_protocol').val(protocol.toLowerCase());								
+					$('#silvanus_firewallrulesbundle_firewallrulestype_protocol').prop('disabled', true);
+
+*/				
+
+				},			
+      
+			});
+
+			/*
+			* Autocomplete 
+			*
+			*/
+			$('#silvanus_firewallrulesbundle_firewallrulestype_destination_port').autocomplete({
+				source: function(request, response){
+					var url_to_ajax = '{{ path('ipport_ajaxsearch', {'service':'service_name'}) }}'
+					url_to_ajax		= url_to_ajax.replace('service_name',request.term);
+					$.ajax({
+						url: url_to_ajax,
+						dataType: "json",	
+						success: function( data ) {
+							response(data); 						
+						}
+					});
+				},			
+      
+			});
+
+		
+		});
+
+/*
+							var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" ); 
+							response($.map(data, function(v,i){
+								var text = v.MainName;
+								console.log("Esto:");
+								return v.service;
+								if ( text && ( !request.term || matcher.test(text) ) ) {
+									return {
+											label: v.service,
+											value: v.service
+									};
+								}
+							}));
+*/
+
+	
+	</script>
+
+{% endblock %}
+
+{% block body -%}
+
+    <div class="page-header"><h1>Firewall <small>create new rule in simple mode</small></h1></div>
+
+    <form action="{{ path('firewallrules_easy_create', {'id_chain':id_chain } ) }}" method="post" {{ form_enctype(form) }}>
+        {{ form_widget(form) }}
+        <p>
+            <button class="btn btn-success" type="submit">Create</button>
+        </p>
+    </form>
+
+	<div class="col-md-12">	
+			<br><br>
+			
+			<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules', {'id_chain': id_chain} ) }}'">Back</button>
+		
+	</div>
+
+
+{% endblock %}

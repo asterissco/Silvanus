@@ -12,4 +12,106 @@ use Doctrine\ORM\EntityRepository;
  */
 class FirewallRulesRepository extends EntityRepository
 {
+	
+	public function getLastPriority($chain_id){
+
+		//$builder = $em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
+		$builder = $this->createQueryBuilder('f');
+			$builder->where('f.chain = :chain_id');
+			$builder->setParameter(':chain_id',$chain_id);
+			$builder->orderBy('f.priority','desc');
+			$builder->setMaxResults(1);
+		$query 		= $builder->getQuery();				
+		
+		if(count($query->getResult())===0){
+			return 1;
+		}else{
+			$entity 	= $query->getSingleResult();				
+			return $entity->getPriority()+1;
+		}
+		
+	}
+
+	public function checkPriorityExistsByChain($chain_id,$priority,$rule_id=null){
+
+		$builder = $this->createQueryBuilder('f');
+			$builder->where('f.chain = :chain_id');
+			$builder->andWhere('f.priority = :priority');
+			$builder->setParameter(':chain_id',$chain_id);
+			$builder->setParameter(':priority',$priority);
+			$builder->setMaxResults(1);
+		$query = $builder->getQuery();				
+		
+		if(count($query->getResult())>0){
+			
+			if($rule_id!==null){
+				
+				foreach($query->getResult() as $e){
+					if($e->getId()==$rule_id){
+						return false;
+					}
+				}
+				
+				return true;
+					
+			}else{
+				return true;
+			}
+			
+		}else{
+			return false;
+		}
+		
+	}
+	
+	/*
+	 * Fix the priority for insert/update new rule with priority conflict and force is enable
+	 * */
+	public function fixPriorityOffset($chain_id,$priority){
+	
+		$em = $this->getEntityManager();
+	
+		$builder = $this->createQueryBuilder('f');
+			$builder->where('f.chain = :chain_id');
+			$builder->andWhere('f.priority >= :priority');
+			$builder->setParameter(':chain_id',$chain_id);
+			$builder->setParameter(':priority',$priority);
+		$query = $builder->getQuery();				
+		
+		foreach($query->getResult() as $entity){
+			
+			$entity->setPriority($entity->getPriority()+1);
+			$em->persist($entity);
+			
+		}
+
+		$em->flush();
+	}
+	
+	/*
+	 * Fix the priority index
+	 * */
+	public function fixPriorityIndex($chain_id){
+	
+		$em = $this->getEntityManager();
+	
+		$builder = $this->createQueryBuilder('f');
+			$builder->where('f.chain = :chain_id');
+			$builder->setParameter(':chain_id',$chain_id);
+			$builder->orderBy('f.priority', 'ASC');
+		$query = $builder->getQuery();				
+		
+		$n=1;
+		foreach($query->getResult() as $entity){
+			
+			$entity->setPriority($n);
+			$em->persist($entity);
+			$n++;
+			
+		}
+
+		$em->flush();
+	}
+	
+	
 }

@@ -18,9 +18,11 @@
     
     <div class="form-group">
 				
-			<div class="col-md-3">{{ form_label(form) }}</div>
-			<div class="col-md-6">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
-			<div class="col-md-3">{{ form_errors(form) }}</div>	
+			{# <div class="col-md-4">{{ form_label(form) }}</div> #}
+			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>	
+		
+    
 		
     </div>
     
@@ -36,6 +38,13 @@
 
 			
 		});
+
+		function requestPage(page){
+		
+			$('#form_page').val(page);
+			$('#filter_form').submit();
+		
+		}
 	
 	</script>
 
@@ -53,38 +62,59 @@
     
 	<legend>Filter</legend>
 
-		<form action="{{ path('chains') }}" method="POST" class="form-horizontal">
+		<form name="filter_form" id="filter_form" action="{{ path('chains') }}" {{ form_enctype(filter_form) }} method="POST" class="form-horizontal">
 		
 			<div class="row">
 			
-				<div class="col-md-6">
-				
-					{{ form_row(filter_form.sort_by) }}
-					{{ form_row(filter_form.sort_direction) }}
-				
-				</div>
-			
-				<div class="col-md-6">
+				<div class="col-md-4">
 				
 					{{ form_row(filter_form.name) }}
 					{{ form_row(filter_form.host) }}
-					<button type="submit" class="btn btn-success">Filter</button>
+					
+				</div>
+			
+				<div class="col-md-4">
+									
+					{{ form_row(filter_form.type) }}
+					{{ form_row(filter_form.sort_by) }}
 				
 				</div>
 
+				<div class="col-md-4">
+				
+					{{ form_row(filter_form.sort_direction) }}										
+					{{ form_row(filter_form.page) }}
+					
+				</div>
+			
+				<div class="col-md-4">
+					
+					<button  class="btn btn-success" onclick="requestPage(1)">Filter</button>
+				
+				</div>
 			</div>
 
 			{{ form_row(filter_form._token) }}
 
 		</form>
 
+	<br><br>
+
 	<legend>List</legend>
+
+	<div class="navigation">
+		{{ knp_pagination_render(pagination, '::pagination.html.twig') }}
+		
+	</div>
+
 	
     <table class="table">
         <thead>
             <tr>
                 {# <th>Id</th> #}
+                <th>&nbsp;</th>
                 <th>Name</th>
+                <th>Type</th>
                 <th>Host</th>
                 <th>Trusted</th>
                 <th>Sync Status</th>
@@ -92,10 +122,19 @@
             </tr>
         </thead>
         <tbody>
-        {% for entity in entities %}
+        {% for entity in pagination %}
             <tr>
                 {# <td><a href="{{ path('chains_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td> #}
+                <td>
+                
+					{% if entity.active  %}
+						A
+					{% else %}
+                        I      
+					{% endif %}
+                </td>
                 <td>{{ entity.name }}</td>
+                <td>{{ entity.type }}</td>
                 <td>{{ entity.host }}</td>
                 <td>
 					{% for trusted in entity.trusted %}
@@ -119,11 +158,19 @@
                 
                 </td>
                 <td>
-					<button class="btn btn-danger" onclick="confirm_redirect('{{ path('chains_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
-					<button class="btn btn-success" onclick="window.location.href='{{ path('chains_edit', { 'id': entity.id }) }}'" >Update</button>
+					<button class="btn btn-danger btn-xs" onclick="confirm_redirect('{{ path('chains_delete', { 'id': entity.id }) }}','Are you sure?')" >Delete</button>
+					<button class="btn btn-success btn-xs" onclick="window.location.href='{{ path('chains_edit', { 'id': entity.id }) }}'" >Update</button>
 					{# <button class="btn btn-primary" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button> #}
-					<button class="btn btn-primary" onclick="window.location.href='{{ path('firewallrules', { 'id_chain': entity.id }) }}'" >Admin firewall rules</button>
-					<button class="btn btn-primary" onclick="window.location.href='{{ path('chains_force_sync', { 'id': entity.id }) }}'" >Force Sync</button>
+					
+					<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('firewallrules', { 'chain_id': entity.id }) }}'" >Admin firewall rules</button>
+					
+					{% if entity.type == 'normal' %}
+						
+						<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('chains_force_sync', { 'id': entity.id }) }}'" >Force Sync</button>
+						<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('stack_chains', { 'id': entity.id }) }}'" >Admin stack</button>
+						<button class="btn btn-primary btn-xs" onclick="window.location.href='{{ path('chains_show', { 'id': entity.id }) }}'" >Show</button>
+						
+					{% endif %}
 				
                 </td>
             </tr>

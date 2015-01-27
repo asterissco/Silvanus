@@ -1,0 +1,40 @@
+ipport:
+    pattern:  /index/{message}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:index", message: '' }
+
+ipport_show:
+    pattern:  /{id}/show
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:show" }
+
+ipport_new:
+    pattern:  /new
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:new" }
+
+ipport_create:
+    pattern:  /create
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:create" }
+    requirements: { _method: post }
+
+ipport_edit:
+    pattern:  /{id}/edit
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:edit" }
+
+ipport_update:
+    pattern:  /{id}/update
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:update" }
+    requirements: { _method: post|put }
+
+ipport_delete:
+    pattern:  /{id}/delete
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:delete" }
+    requirements: { _method: post|delete|get }
+    
+ipport_iana: 
+    pattern:  /import_iana
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:iana" }
+    requirements: { _method: post|update }
+
+ipport_ajaxsearch: 
+    pattern:  /ajax/search/{service}
+    defaults: { _controller: "SilvanusFirewallRulesBundle:IpPort:ajaxSearchPort" }
+    requirements: { _method: get }

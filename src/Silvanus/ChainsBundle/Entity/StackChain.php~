@@ -1,0 +1,156 @@
+<?php
+
+namespace Silvanus\ChainsBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\ExecutionContextInterface;
+
+/**
+ * Chain
+ *
+ * @ORM\Table()
+ * @ORM\Entity(repositoryClass="Silvanus\ChainsBundle\Entity\StackChainRepository")
+ * @UniqueEntity(fields={"chainParent","chainChildren","priority"})
+ * 
+ */
+class StackChain
+{
+
+    public function __construct(){
+        
+        $this->chainParent 		= new ArrayCollection();
+        $this->chainChildren 	= new ArrayCollection();
+		
+    }
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Silvanus\ChainsBundle\Entity\Chain", inversedBy="id")
+     * @ORM\JoinColumn(name="chainParent_id", referencedColumnName="id")
+     **/	
+	private $chainParent;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Silvanus\ChainsBundle\Entity\Chain", inversedBy="id")
+     * @ORM\JoinColumn(name="chainChildren_id", referencedColumnName="id")
+     **/	
+	private $chainChildren;
+
+	/**
+	 * @var integer
+	 * 
+	 * @ORM\Column(name="priority", type="integer")
+	 **/
+	private $priority;
+
+	/**
+	 * @var boolean
+	 * 
+	 * @ORM\Column(name="active", type="boolean", nullable=TRUE)
+	 **/
+	private $active;
+
+
+    /**
+     * Set chainParent
+     *
+     * @param \Silvanus\ChainsBundle\Entity\Chain $chainParent
+     * @return StackChain
+     */
+    public function setChainParent(\Silvanus\ChainsBundle\Entity\Chain $chainParent = null)
+    {
+        $this->chainParent = $chainParent;
+    
+        return $this;
+    }
+
+    /**
+     * Get chainParent
+     *
+     * @return \Silvanus\ChainsBundle\Entity\Chain 
+     */
+    public function getChainParent()
+    {
+        return $this->chainParent;
+    }
+
+    /**
+     * Set chainChildren
+     *
+     * @param \Silvanus\ChainsBundle\Entity\Chain $chainChildren
+     * @return StackChain
+     */
+    public function setChainChildren(\Silvanus\ChainsBundle\Entity\Chain $chainChildren = null)
+    {
+        $this->chainChildren = $chainChildren;
+    
+        return $this;
+    }
+
+    /**
+     * Get chainChildren
+     *
+     * @return \Silvanus\ChainsBundle\Entity\Chain 
+     */
+    public function getChainChildren()
+    {
+        return $this->chainChildren;
+    }
+
+    /**
+     * Set priority
+     *
+     * @param integer $priority
+     * @return StackChain
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    
+        return $this;
+    }
+
+    /**
+     * Get priority
+     *
+     * @return integer 
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return StackChain
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean 
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+}

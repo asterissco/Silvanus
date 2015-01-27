@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Silvanus\ChainsBundle\Entity\Chain;
 
 class SyncCommand extends ContainerAwareCommand
 {
@@ -39,6 +40,8 @@ class SyncCommand extends ContainerAwareCommand
 
 		$syncEntities 		= $this->em->getRepository('SilvanusSyncBundle:Sync')->findAll();
 		$trustedEntities 	= $this->em->getRepository('SilvanusChainsBundle:Trusted')->findAll();
+		$testChain 			= new Chain();
+		$testChain->setName($this->test_chain);		
 		
 		foreach($syncEntities as $syncEntity){
 		
@@ -58,6 +61,7 @@ class SyncCommand extends ContainerAwareCommand
 				
 			}
 			
+			//create or update chain
 			if($syncEntity->getAction()=='c' or $syncEntity->getAction()=='u'){
 				
 			
@@ -70,115 +74,104 @@ class SyncCommand extends ContainerAwareCommand
 				exec($this->iptables_path.'  -X '.$this->test_chain.' 2>&1',$trash);
 				exec($this->iptables_path.'  -N '.$this->test_chain.' 2>&1',$trash);
 				
-				//load and test rules for this chain
-				$builder 	= $this->em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
-				$query 		= $builder
-								->where('f.chain_id = :id_chain')
-								->setParameter(':id_chain',$chainEntity->getId())
-								->orderBy('f.priority','asc')
-								->getQuery();
+				//load and test rules for this chain				
+				//get firewall stack
+				$stackEntity = $this->em->getRepository('SilvanusChainsBundle:StackChain')->findBy(array('chainParent'=>$chainEntity->getId()),array('priority'=>'ASC'));
 				
-				$firewallRulesEntities = $query->getResult();
-				
-				$errorHandle = false;
-				
-				//test loop
-				foreach($firewallRulesEntities as $firewallRulesEntity){
-					
-					$rule = $this->iptables_path." -I ".$this->test_chain." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
-					
-					if($chainEntity->getHost()!=''){
-					
-						$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
-					
-					}
-					
-					unset($output);
-					exec($rule,$output);
-					
-					//error found
-					if(count($output)>0){
-						echo ' [error]	';
-						$errorHandle = true;
-					//no error found	
-					}else{
-						echo ' [ok]		';
-					}
-					
-					$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
-					$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
-					echo $rule;
-					
-					if($errorHandle){
-						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>3)));
-						$firewallRulesEntity->setSyncErrorMessage(serialize($output));
-						$this->em->persist($firewallRulesEntity);
-					}
-						
-					echo "\n";
+				//get normal chain into the stack
+				foreach($stackEntity as $stackChainEntity){
 
-					
+					if($stackChainEntity->getChainChildren()->getType()=='normal'){
+						$parentChain = $stackChainEntity->getChainChildren();
+					}
+
 				}
 
-				exec($this->iptables_path.'  -F '.$this->test_chain.' 2>&1',$trash);
-				exec($this->iptables_path.'  -X '.$this->test_chain.' 2>&1',$trash);
 
 				
-				//no errors found, inset rules into chain and chain into trusted chain
+				$errorHandle = false;				
+				foreach($stackEntity as $stackChainEntity){
+
+					$builder 	= $this->em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
+					$query 		= $builder
+									->where('f.chain = :chain_id')
+									->setParameter(':chain_id',$stackChainEntity->getChainChildren()->getId())
+									->orderBy('f.priority','asc')
+									->getQuery();
+					
+					$firewallRulesEntities = $query->getResult();
+					
+					$testChain->setHost($parentChain->getHost());
+					if($this->addRulesToChain($firewallRulesEntities, $testChain, false)){
+						$stackChainEntity->getChainChildren()->setError(true);
+						$syncEntity->setError(true);
+						$this->em->persist($syncEntity);						
+						$errorHandle = true;
+						//break;
+					}else{
+						$stackChainEntity->getChainChildren()->setError(false);	
+						
+					}
+
+				}
+									
+									
+				//delete test chain
+				exec($this->iptables_path.'  -F '.$this->test_chain.' 2>&1',$trash);
+				exec($this->iptables_path.'  -X '.$this->test_chain.' 2>&1',$trash);
+				
+				//no errors found, insert rules into chain and chain into trusted chain
 				if(!$errorHandle){
 
 					foreach($trustedEntities as $trustedEntity){
 					
-						exec($this->iptables_path.'  -D '.$trustedEntity->getName().' -j '.$chainEntity->getName().' 2>&1',$trash);
+						exec($this->iptables_path.'  -D '.$trustedEntity->getName().' -j '.$parentChain->getName().' 2>&1',$trash);
 						
 					}
 
-					$chainEntity->setError(false);
+					$parentChain->setError(false);
 				
 					//delete and create test chain
-					exec($this->iptables_path.'  -F '.$chainEntity->getName().' 2>&1',$trash);
-					exec($this->iptables_path.'  -X '.$chainEntity->getName().' 2>&1',$trash);
-					exec($this->iptables_path.'  -N '.$chainEntity->getName().' 2>&1',$trash);
-					
-					//set the rules to chain
-					foreach($firewallRulesEntities as $firewallRulesEntity){
-					
-						$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
-						$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
+					exec($this->iptables_path.'  -F '.$parentChain->getName().' 2>&1',$trash);
+					exec($this->iptables_path.'  -X '.$parentChain->getName().' 2>&1',$trash);
+					exec($this->iptables_path.'  -N '.$parentChain->getName().' 2>&1',$trash);
+
+					foreach($stackEntity as $stackChainEntity){
+
+						$builder 	= $this->em->getRepository('SilvanusFirewallRulesBundle:FirewallRules')->createQueryBuilder('f');
+						$query 		= $builder
+										->where('f.chain = :chain_id')
+										->setParameter(':chain_id',$stackChainEntity->getChainChildren()->getId())
+										->orderBy('f.priority','asc')
+										->getQuery();
 						
-						
-						$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('id'=>2)));
-						$firewallRulesEntity->setSyncErrorMessage('');
-						
-						$this->em->persist($firewallRulesEntity);				
-										
-						exec($rule.' 2>&1',$trash);
-						
+						$firewallRulesEntities = $query->getResult();
+
+						$errorHandle = $this->addRulesToChain($firewallRulesEntities, $parentChain, true);
+
 					}
+					
 				
 					//delete the petition
 					$this->em->remove($syncEntity);
 
 					foreach($chainEntity->getTrusted() as $trusted){
 					
-						exec($this->iptables_path.'  -A '.$trusted.' -j '.$chainEntity->getName().' 2>&1',$trash);
+						exec($this->iptables_path.'  -A '.$trusted.' -j '.$parentChain->getName().' 2>&1',$trash);
 						
 					}
 					
-					
-				}else{
-					
-					$chainEntity->setError(true);
-					$syncEntity->setError(true);
-					$this->em->persist($syncEntity);
-					
 				}
+				//}else{
+					
+					//~ $chainEntity->setError(true);
+					//~ $syncEntity->setError(true);
+					//~ $this->em->persist($syncEntity);
+					//~ 
+				//~ }
 				
+				$this->em->persist($parentChain);	
 				
-				$this->em->persist($chainEntity);	
-				
-				
-
 			
 			}
 
@@ -187,5 +180,64 @@ class SyncCommand extends ContainerAwareCommand
 		$this->em->flush();
 
 	}
+	
+	//private function addRulesToChain(\Silvanus\FirewallRulesBundle\FirewallRules $firewallRulesEntities, $chainName){
+	private function addRulesToChain($firewallRulesEntities, $chainEntity, $log){
+
+		foreach($firewallRulesEntities as $firewallRulesEntity){
+
+			$errorHandle = false;
+
+			//echo $firewallRulesEntity->getRule()."\n";
+
+			$fixed_rule=str_replace("["," ",$firewallRulesEntity->getRule());
+			$fixed_rule=str_replace("]"," ",$fixed_rule);
+								
+			$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$fixed_rule." 2>&1 ";
+	
+			if($chainEntity->getHost()!=''){			
+				$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);			
+			}
+
+
+			unset($output);
+			exec($rule,$output);
+			
+			//error found
+			if(count($output)>0){
+				if($log){
+					echo ' [error]	';
+				}
+				$errorHandle = true;
+			//no error found	
+			}else{
+				if($log){
+					echo ' [ok]		';
+				}
+				
+			}
+			
+			$rule = $this->iptables_path." -I ".$chainEntity->getName()." ".$firewallRulesEntity->getPriority()." ".$firewallRulesEntity->getRule()." 2>&1 ";
+			$rule = str_replace('/host/',' '.$chainEntity->getHost().' ',$rule);
+			if($log){
+				echo $rule;			
+				echo "\n";
+			}
+			
+			if($errorHandle){
+				$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'Sync ERROR')));
+				$firewallRulesEntity->setSyncErrorMessage(serialize($output));					
+				$this->em->persist($firewallRulesEntity);
+				return true;				
+			}else{
+				$firewallRulesEntity->setSyncStatus($this->em->getRepository('SilvanusFirewallRulesBundle:RulesSyncStatus')->findOneBy(array('name'=>'Sync OK')));
+			}
+			
+		}
+		
+		return false;
+							
+	}
+	
 
 }

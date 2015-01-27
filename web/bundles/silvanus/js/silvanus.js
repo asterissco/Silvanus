@@ -13,3 +13,18 @@ function confirm_redirect(path,message){
 
 }
 	
+function confirm_submit(form,message){
+
+
+		bootbox.confirm(message, function(result) {
+			
+			if(result){
+	
+				form.submit();
+			
+			}
+		
+		}); 		
+	
+
+}

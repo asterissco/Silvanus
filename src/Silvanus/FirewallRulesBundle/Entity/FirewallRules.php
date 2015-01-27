@@ -10,8 +10,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Silvanus\FirewallRulesBundle\Entity\FirewallRulesRepository")
- * @UniqueEntity(fields= {"priority","chain_id"})
- * @UniqueEntity(fields= {"rule","chain_id"})
  */
 class FirewallRules
 {
@@ -39,13 +37,10 @@ class FirewallRules
     private $priority;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="chain_id", type="integer")
-     * @ORM\OneToOne(targetEntity="Chain", cascade={"persist", "remove"}))
+     * @ORM\ManyToOne(targetEntity="Silvanus\ChainsBundle\Entity\Chain", inversedBy="rule")
      * @ORM\JoinColumn(name="chain_id", referencedColumnName="id")
      */
-    private $chain_id;
+	private $chain;
 
     /**
      *
@@ -60,6 +55,13 @@ class FirewallRules
      * @ORM\Column(name="sync_error_message", type="array", length=255, nullable=TRUE)
      */
     private $syncErrorMessage;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="active", type="boolean",  nullable=TRUE)
+     */
+    private $active = true;
 
 
     /**
@@ -121,29 +123,6 @@ class FirewallRules
 
 
     /**
-     * Set chain_id
-     *
-     * @param integer $chainId
-     * @return FirewallRules
-     */
-    public function setChainId($chainId)
-    {
-        $this->chain_id = $chainId;
-    
-        return $this;
-    }
-
-    /**
-     * Get chain_id
-     *
-     * @return integer 
-     */
-    public function getChainId()
-    {
-        return $this->chain_id;
-    }
-
-    /**
      * Set syncStatus
      *
      * @param int $syncError
@@ -190,5 +169,54 @@ class FirewallRules
 			return unserialize($this->syncErrorMessage);
 		}
         return $this->syncErrorMessage;
+    }
+
+    
+
+
+    /**
+     * Set chain
+     *
+     * @param \Silvanus\ChainsBundle\Entity\Chain $chain
+     * @return FirewallRules
+     */
+    public function setChain(\Silvanus\ChainsBundle\Entity\Chain $chain = null)
+    {
+        $this->chain = $chain;
+    
+        return $this;
+    }
+
+    /**
+     * Get chain
+     *
+     * @return \Silvanus\ChainsBundle\Entity\Chain 
+     */
+    public function getChain()
+    {
+        return $this->chain;
+    }
+
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return FirewallRules
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean 
+     */
+    public function getActive()
+    {
+        return $this->active;
     }
 }

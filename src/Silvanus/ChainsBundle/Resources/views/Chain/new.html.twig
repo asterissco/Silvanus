@@ -19,8 +19,8 @@
     <div class="form-group">
 		<div class="row">	
 			
-			<div class="col-md-12">{{ form_label(form) }}</div>
-			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_label(form) }}</div>
+			<div class="col-md-4">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
 			<div class="col-md-4">{{ form_errors(form) }}</div>
 			
 		</div>
@@ -34,8 +34,33 @@
 	
 		$(document).ready(function(){
 	
-			$('#silvanus_chainsbundle_chaintype_trusted').multiselect();
-			$('#silvanus_chainsbundle_chaintype_trusted').attr("required","required");						
+			//$('#silvanus_chainsbundle_chaintype_trusted').multiselect(); 
+		
+			$('#silvanus_chainsbundle_chaintype_type').click(function(){
+			
+				if($('#silvanus_chainsbundle_chaintype_type').val()=="stack" || $('#silvanus_chainsbundle_chaintype_type').val()=="prototype"){
+					
+					$('#silvanus_chainsbundle_chaintype_active').val("");
+					$('#silvanus_chainsbundle_chaintype_host').val("");
+					$('#silvanus_chainsbundle_chaintype_trusted').val("");
+					
+					$('#silvanus_chainsbundle_chaintype_active').attr("disabled","disabled");
+					$('#silvanus_chainsbundle_chaintype_host').attr("disabled","disabled");
+					$('#silvanus_chainsbundle_chaintype_trusted').attr("disabled","disabled");
+					
+					//$('#silvanus_chainsbundle_chaintype_trusted').multiselect("disable");
+					
+				}else{
+
+					$('#silvanus_chainsbundle_chaintype_active').removeAttr("disabled");
+					$('#silvanus_chainsbundle_chaintype_host').removeAttr("disabled");
+					$('#silvanus_chainsbundle_chaintype_trusted').removeAttr("disabled");
+					
+					//$('#silvanus_chainsbundle_chaintype_trusted').multiselect("enable");
+
+				}
+		
+			});						
 		
 		});
 	
@@ -49,7 +74,7 @@
     <div class="page-header"><h1>Chain <small>new</small></h1></div>
     
 
-    <form action="{{ path('chains_create') }}" method="post" {{ form_enctype(form) }}>
+    <form action="{{ path('chains_create') }}" method="post" {{ form_enctype(form) }} role="form" >
         {{ form_widget(form) }}
         <p>
             <button class="btn btn-success" type="submit">Create</button>

@@ -1,5 +1,5 @@
 firewallrules:
-    pattern:  /list/{id_chain}/{message}
+    pattern:  /list/{chain_id}/{message}
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:index", message: '' }
 
 firewallrules_show:
@@ -7,24 +7,29 @@ firewallrules_show:
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:show" }
 
 firewallrules_new:
-    pattern:  /new/{id_chain}
+    pattern:  /new/{chain_id}
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:new" }
 
 firewallrules_create:
-    pattern:  /create/{id_chain}
+    pattern:  /create/{chain_id}
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:create" }
     requirements: { _method: post|get }
 
 firewallrules_edit:
-    pattern:  /{id}/{id_chain}/edit
+    pattern:  /{id}/{chain_id}/edit
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:edit" }
 
 firewallrules_update:
-    pattern:  /{id}/{id_chain}/update
+    pattern:  /{id}/{chain_id}/update
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:update" }
     requirements: { _method: post|put }
 
 firewallrules_delete:
     pattern:  /{id}/delete
     defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:delete" }
+    requirements: { _method: post|delete|get }
+
+firewallrules_active_switch:
+    pattern:  /{chain_id}/{id}/{action}/activeSwitch
+    defaults: { _controller: "SilvanusFirewallRulesBundle:FirewallRules:activeSwitch" }
     requirements: { _method: post|delete|get }

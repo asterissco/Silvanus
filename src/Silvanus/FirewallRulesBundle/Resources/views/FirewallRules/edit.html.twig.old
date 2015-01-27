@@ -1,0 +1,98 @@
+{% extends '::base.html.twig' %}
+
+
+{% form_theme edit_form _self %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+
+            {% for error in errors %}
+                <div class="label label-danger">{{ error.message }}</div>
+            {% endfor %}
+        
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block form_row %}
+    
+    <div class="form-group">
+		<div class="row">	
+			
+			<div class="col-md-12">{{ form_label(form) }}</div>
+			<div class="col-md-8">{{ form_widget(form, {'attr': {'class':'form-control input-sm'}} ) }}</div>
+			<div class="col-md-4">{{ form_errors(form) }}</div>
+			
+		</div>
+    </div>
+    
+{% endblock form_row %}
+
+{% block javascripts %}
+
+	<script type="text/javascript">
+	
+		$(document).ready(function(){
+		
+		
+		});
+	
+	</script>
+
+{% endblock %}
+
+
+{% block body -%}
+    
+    <div class="page-header"><h1>Firewall <small>edit rule</small></h1></div>
+		
+			<form action="{{ path('firewallrules_update', { 'id': entity.id, 'id_chain':id_chain }) }}" method="post" {{ form_enctype(edit_form) }} class="form-vertical">
+				{{ form_widget(edit_form) }}
+				<p>
+					<button class="btn btn-success" type="submit">Update</button>
+				</p>
+				<input type="hidden" name="_method" value="PUT" />
+			
+			</form>
+		
+
+		<div class="col-md-12">	
+				<br><br>
+				
+				<div class="col-md-1">	
+				
+				<button class="btn btn-danger"  onclick="confirm_redirect('{{ path('firewallrules_delete', { 'id': entity.id }) }}','Are you sure?')">Delete</button>
+
+				</div>
+				<button class="btn btn-info" onclick="window.location.href='{{ path('firewallrules', {'id_chain':id_chain} ) }}'">Back</button>
+				
+			
+		</div>
+		<br>
+		<br>
+		<br>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">INSTRUCTIONS</div>
+				<div class="panel-body">				
+					1- Type the rule without table and chain
+					<br>
+					<br>
+						
+						<center>-s 192.168.100.25 -d 192.168.100.5 -p TCP --sport 21 -j DROP </center>
+						
+					<br>
+					<br>
+					
+					If you want to use "mode" in the rule, you must be put inside a context [ mode ], for example: 
+					<br>
+					<br>
+						<center>-s 192.168.100.25 -d 192.168.100.5 -p TCP [ -m state --state RELATED,ESTABLISHED ] -j ACCEPT </center>
+						
+					<br>
+				</div>
+			</div>			
+              
+
+{% endblock %}
