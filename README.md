@@ -1,12 +1,16 @@
-Silvanus 0.7
+Silvanus 0.8
 ========================
 
 New in this version:
 
-- Security context
-
+ - Import transport ports for IANA csv 
+ - Stack chains
+ - Prototype chains 
+ - Performance the interface 
+ 
 Features:
 
+ - Security context
  - Support multiple chains add to trusted iptables chains (INPUT, FORDWARD, OUTPUT)
  - Support multiple Rules for chains
  - Test the rules previus apply the rules by chains
@@ -105,14 +109,12 @@ Default access:
 	
 4) How to use (example)
 ----------------------------------
+
 Create a new chain (host is optionally)
 
 	name: test_chain
 	host: 192.168.100.50
 	truested: {INPUT,FORDWARD,OUTPUT} least an option
-
- 
-
 	
 Create a firewall rule ("/host/" is a "Magic Word" to refered Chains Host value, 192.168.100.50 in this case )
 
@@ -156,7 +158,13 @@ Add 1 minutes execute
 
 	*/1 * * * * php /var/www/silvanustest/Silvanus/app/console silvanus:sync >> /var/log/silvanus.log
 
-6) This project use
+
+6) Stack Chains
+
+You can create a Stack of Chains like "preffix chains" and "suffix chains". For example, if you want put 15 rules 
+on the top of all Chains, you can create a Chain Stack Chain and assing to Stack of the normals Chains.
+
+7) This project use
 ----------------------------------
 
  - Symfony 2
