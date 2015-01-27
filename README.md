@@ -166,6 +166,7 @@ Add 1 minutes execute
 
 
 6) Stack Chains
+----------------------------------
 
 You can create a Stack of Chains like "preffix chains" and "suffix chains". For example, if you want put 15 rules 
 on the top of all Chains, you can create a Chain Stack Chain and assing to Stack of the normals Chains.
